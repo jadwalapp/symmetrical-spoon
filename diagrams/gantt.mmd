@@ -1,0 +1,25 @@
+%% use this to compile it:
+%% mmdc -i diagrams/gantt.mmd -o ./proposal/images/gantt.png -w 900
+gantt
+    title Muwaqqit Project Timeline
+    dateFormat  YYYY-MM-DD
+    axisFormat %Y-%m-%d
+    todayMarker off
+
+    section Proposal
+    Idea Brainstorming          :done, a1, 2024-09-01, 4d
+    Write Proposal Sections     :done, a2, 2024-09-14, 6d
+    Proposal Submission         :milestone, active, a3, 2024-09-20, 0d
+    section GP1
+    Literature Review           :a4, 2024-09-21, 30d
+    Requirements Gathering      :a5, 2024-10-21, 21d
+    System Analysis             :a6, 2024-11-11, 14d
+    Initial Design              :a7, 2024-11-25, 21d
+    section GP2
+    Detailed Design             :a8, 2024-12-16, 30d
+    Development Phase 1         :a9, 2025-01-15, 45d
+    Development Phase 2         :a10, 2025-03-01, 45d
+    Testing & QA                :a11, 2025-04-15, 30d
+    Documentation               :a12, 2025-05-15, 21d
+    Final Presentation Prep     :a13, 2025-06-05, 14d
+    Project Submission          :milestone, a14, 2025-06-19, 0d
