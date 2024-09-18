@@ -8,6 +8,8 @@
 \usepackage[titles]{tocloft}
 \usepackage{fancyhdr}
 \usepackage{graphicx}
+\usepackage{array}
+\usepackage{booktabs}
 
 % Page style
 \pagestyle{fancy}
@@ -27,34 +29,53 @@
 
 \begin{document}
 
-% Title page
 \begin{titlepage}
-    \begin{figure*}[ht!]
+    \begin{figure}[ht!]
         \centering
-        \includegraphics[height=1.5cm]{images/yu-logo.png}
-    \end{figure*}
+        \includegraphics[height=2cm]{images/yu-logo.png}
+    \end{figure}
+    \vspace{.5cm}
+    \centering{{College of Engineering and Architecture} \par}
 
+    \vfill
+
+    \centering
+    {\LARGE\bfseries Project Proposal\par}
+    \vspace{.5cm}
+    {\large Bachelor of Science in Software and Network Engineering\par}
+    \vfill
+    \begin{singlespace}
+    \setstretch{1.2}
+    \LARGE
+    Muwaqqit:\\An Elegant yet Simple Calendar Manager
+    \end{singlespace}
+    \vspace{2cm}
+
+    \vfill
+    
     \begin{center}
-        \vspace*{2cm}
-        {\huge\bfseries Project Proposal\par}
-        \vspace{1.5cm}
-        {\Large\bfseries Muwaqqit: An Elegant yet Simple Calendar Manager\par}
-        \vspace{2cm}
-        {\Large Submitted By\par}
-        \vspace{1cm}
-        {\Large\bfseries YAZED ALKHALAF - 202211123\par}
-        {\Large\bfseries SAIMAN TAKLAS - 202021400\par}
-        {\Large\bfseries AFFAN MOHAMMAD - 202211086\par}
-        {\Large\bfseries ALI BA WAZIR - 202211018\par}
-        \vfill
-        {\Large Supervised By: Dr. Inaya Allah\par}
-        \vspace{1cm}
-        {\Large Al Yamamah University\par}
-        {\Large College of Engineering and Architecture\par}
-        {\Large Bachelor of Science in Software and Network Engineering\par}
-        \vspace{1cm}
-        {\Large \today\par}
-    \end{center}
+        \setlength{\fboxsep}{10pt}
+        \setlength{\fboxrule}{1pt}
+        \fbox{%
+        \begin{tabular}{p{0.45\linewidth}p{0.45\linewidth}}
+            \multicolumn{2}{c}{\textbf{Group Project Submission}} \\
+            \midrule
+            \textbf{Student Names} & \textbf{Student IDs} \\
+            \midrule
+            YAZED ALKHALAF & 202211123 \\
+            SAIMAN TAKLAS & 202021400 \\
+            AFFAN MOHAMMAD & 202211086 \\
+            ALI BA WAZIR & 202211018 \\
+            \midrule
+            \multicolumn{2}{l}{\textbf{Submission Date}: 2 May 2024} \\
+            \multicolumn{2}{l}{\textbf{Supervised By}: Dr. Inaya Allah} \\
+        \end{tabular}%
+        }
+        \end{center}
+
+    \vfill
+    
+    First Semester 2024--2025
 \end{titlepage}
 
 % Table of Contents
@@ -135,7 +156,7 @@ Nothing is perfect, and our project is not a outlier. The limitations we have fi
     \item WhatsApp integration allows the app to read the users messages, so it would be hard to prove privacy hasn't been breached.
     \item WhatsApp integration might not always be there, they are a third-party.
     \item Learning new technologies for iOS development might require more time than anticipated.
-    \item Accuracy of our algorithms to detect keywords indicating an event agreement has happened, especially for languages other than English and Arabic.
+    \item Accuracy of our algorithms to detect keywords indicating an event agreement has happened, especially for languages other than English.
     \item Time and manpower constraints may limit the number of features we can implement.
     \item Dependency on third-party calendar APIs and their limitations.
 \end{itemize}
@@ -157,9 +178,23 @@ In developing Muwaqqit, we have drawn inspiration from and built upon existing r
 
 \begin{itemize}
     \item \textbf{Clockwise (https://www.getclockwise.com/):} A smart calendar assistant that optimizes schedules and manages team coordination. Clockwise's approach to intelligent time blocking and meeting optimization provides valuable insights for Muwaqqit's automated scheduling features.
+    \item \textbf{Calendi (https://calendi.ai/):} Calendi describes itself as: ''Calendi is an AI calendar system. Use it for scheduling tasks, automating meetings, and witness the future of calendar.;;
+    \item \textbf{Motion (https://www.usemotion.com/):} Motion’s Intelligent Calendar takes your meetings. Your tasks. Your to-do list. Your activities. And creates one perfect, optimized schedule to get it all done.
+    \item \textbf{Dola AI (https://heydola.com/):}
+    \item \textbf{Reclaim AI (https://reclaim.ai/):}
     \item \textbf{An Exploratory Study of Calendar Use:} "Prospective remembering is the use of memory for remembering to do things in the future, as different from retrospective memory functions such as recalling past events." \cite{tungare2008exploratorystudycalendaruse}
     \item \textbf{WhatsApp Integration:} Our research indicates that direct WhatsApp integration for event extraction has not been widely implemented in existing calendar applications, making this a unique feature of Muwaqqit.
 \end{itemize}
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=\textwidth]{images/features-table.png}
+    \caption{Feature Comparison Table}
+    \label{fig:features-table}
+\end{figure}
+
+\noindent
+Note: Y = Feature available, N = Feature not available, ? = Information unclear
 
 \section{Technology and Outcomes}
 
