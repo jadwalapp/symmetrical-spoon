@@ -1,0 +1,96 @@
+\documentclass[12pt,a4paper]{report}
+
+% Packages
+\usepackage[margin=1in,left=1.5in]{geometry}
+\usepackage{times}
+\usepackage{setspace}
+\usepackage{titlesec}
+\usepackage[nottoc,notlot,notlof]{tocbibind}
+\usepackage{tocloft}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+
+% Page numbering
+\pagenumbering{roman}
+
+% Title formatting
+\titleformat{\chapter}{\normalfont\huge\bfseries\uppercase}{\thechapter}{20pt}{\huge}
+
+% Document begin
+\begin{document}
+
+% Title Page
+\begin{titlepage}
+    \begin{center}
+        \vspace*{1cm}
+        \includegraphics[height=1cm]{images/yu-logo.png}\\[1cm]
+        {\Large\bfseries AL YAMAMAH UNIVERSITY}\\[0.5cm]
+        {\large College of Engineering and Architecture}\\[0.5cm]
+        {\large Bachelor of Science in Software and Network Engineering}\\[2cm]
+        {\Huge\bfseries Muwaqqit: An Elegant, iOS-based Calendar Manager}\\[2cm]
+        {\Large\bfseries Graduation Project}\\[2cm]
+        {\large Submitted by:}\\[0.3cm]
+        {\large 
+        YAZED ALKHALAF (202211123)\\
+        SAIMAN TAKLAS (202021400)\\
+        AFFAN MOHAMMAD (202211086)\\
+        ALI BA WAZIR (202211018)
+        }\\[1cm]
+        {\large Supervised by: Dr. Inaya Allah}\\[1cm]
+        {\large First Semester 2024--2025}
+    \end{center}
+\end{titlepage}
+
+% Preface section
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+
+\chapter*{Acknowledgment}
+\addcontentsline{toc}{chapter}{Acknowledgment}
+\newpage
+
+\tableofcontents
+\listoffigures
+\listoftables
+\newpage
+
+\chapter*{List of Abbreviations}
+\addcontentsline{toc}{chapter}{List of Abbreviations}
+
+% Main body (switch to Arabic numerals)
+\pagenumbering{arabic}
+
+\chapter{Introduction}
+\section{Background of the Study}
+\section{Problem Statement}
+\section{Objectives of the Study}
+\section{Research Questions and/or Hypothesis}
+\section{Scope of the Study}
+\section{Significance of the Study}
+\section{Limitations of the Study}
+\section{Organization of the Senior Project}
+
+\chapter{Literature Review}
+
+\chapter{System Analysis and Design}
+\section{Functional Requirements}
+\section{Non-Functional Requirements}
+\section{System Use-Cases}
+\section{Interaction Diagrams}
+\section{Error Handling}
+\section{Class Diagram}
+\section{System Architecture}
+\section{Database Design}
+\section{User Interface Prototype}
+\section{Algorithms}
+
+\chapter{Project Plan}
+\section{Timelines}
+\section{Gantt Chart}
+\section{Other Relevant Details}
+
+% Bibliography
+\bibliography{references}
+\bibliographystyle{apalike}
+
+\end{document}
