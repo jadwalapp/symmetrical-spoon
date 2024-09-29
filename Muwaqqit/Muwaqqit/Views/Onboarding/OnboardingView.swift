@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import LucideIcons
 
 struct OnboardingView: View {
     var body: some View {
@@ -34,14 +33,14 @@ struct OnboardingView: View {
             Spacer()
             OButton(
                 label: "Continue with Google",
-                icon: Lucide.chrome
+                icon: .brandGoogle
             ) {
                 print("Continue with Google")
             }
             .padding(.bottom, 8)
             OButton(
                 label: "Continue with Email",
-                icon: Lucide.mail
+                icon: .mail
             ) {
                 print("Continue with Email")
             }

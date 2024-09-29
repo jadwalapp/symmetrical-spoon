@@ -6,11 +6,10 @@
 //
 
 import SwiftUI
-import LucideIcons
 
 struct OButton: View {
     private var label: String
-    private var icon: UIImage?
+    private var icon: Icons?
     private var action: () -> Void
     
     init(label: String, action: @escaping () -> Void) {
@@ -18,7 +17,7 @@ struct OButton: View {
         self.action = action
     }
     
-    init(label: String, icon: UIImage, action: @escaping () -> Void) {
+    init(label: String, icon: Icons, action: @escaping () -> Void) {
         self.label = label
         self.icon = icon
         self.action = action
@@ -28,7 +27,7 @@ struct OButton: View {
         Button(action: action) {
             HStack {
                 if (icon != nil) {
-                    Image(uiImage: icon!)
+                    Image(icon!.rawValue)
                 }
                 Text(label)
             }
