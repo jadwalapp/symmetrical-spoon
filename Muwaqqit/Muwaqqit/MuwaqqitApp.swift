@@ -11,7 +11,10 @@ import SwiftUI
 struct MuwaqqitApp: App {
     var body: some Scene {
         WindowGroup {
-            OnboardingView()
+            Group {
+                OnboardingView()
+            }
+            .preferredColorScheme(.light)
         }
     }
 }
