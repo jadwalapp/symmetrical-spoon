@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendar App Design</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #eceaea; /* Light grey background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            width: 90%;
+            max-width: 450px; /* Slightly wider */
+            background: white;
+            border-radius: 20px; /* More rounded corners */
+            box-shadow: 0 6px 30px rgba(0, 0, 0, 0.15); /* Softer shadow */
+            overflow: hidden;
+        }
+        .screen {
+            padding: 25px; /* Increased padding */
+            text-align: center;
+        }
+        .screen h1 {
+            font-size: 26px; /* Slightly larger font */
+            margin-bottom: 15px;
+            color: #333; /* Darker text */
+        }
+        .step {
+            font-size: 18px; /* Larger font for steps */
+            margin: 10px 0;
+            color: #555; /* Medium grey color */
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 24px; /* Increased button size */
+            background-color: #4a90e2; /* New blue color */
+            color: white;
+            border-radius: 8px; /* More rounded button */
+            text-decoration: none;
+            margin-top: 20px;
+            transition: background-color 0.3s; /* Smooth transition */
+        }
+        .button:hover {
+            background-color: #357ABD; /* Darker blue on hover */
+        }
+        .icon {
+            font-size: 60px; /* Slightly larger icon */
+            margin: 20px 0;
+        }
+        .success-icon {
+            font-size: 70px; /* Larger success icon */
+            color: #28a745; /* Green color for success */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="screen">
+            <h1>1. Create account/Login</h1>
+            <p class="step">Go through Google</p>
+            <a href="#" class="button">Continue with Google</a>
+        </div>
+        <div class="screen">
+            <h1>2. Connect WhatsApp</h1>
+            <div class="icon">📱</div>
+            <p class="step">We can filter events from your messages when you connect your WhatsApp.</p>
+            <a href="#" class="button">Connect WhatsApp</a>
+        </div>
+        <div class="screen">
+            <h1>3. Manage Calendars</h1>
+            <p class="step">Contact Email</p>
+            <p class="step">symantaklas1@gmail.com</p>
+        </div>
+        <div class="screen">
+            <h1>Wonderful!</h1>
+            <div class="success-icon">👏</div>
+            <p>Your account is ready to use!</p>
+        </div>
+    </div>
+</body>
+</html>
