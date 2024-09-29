@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		055822A62CA9CD580000861F /* LucideIcons in Frameworks */ = {isa = PBXBuildFile; productRef = 055822A52CA9CD580000861F /* LucideIcons */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		05A177A22CA96C3100E2030B /* Muwaqqit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Muwaqqit.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -23,6 +27,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				055822A62CA9CD580000861F /* LucideIcons in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,6 +70,7 @@
 			);
 			name = Muwaqqit;
 			packageProductDependencies = (
+				055822A52CA9CD580000861F /* LucideIcons */,
 			);
 			productName = Muwaqqit;
 			productReference = 05A177A22CA96C3100E2030B /* Muwaqqit.app */;
@@ -94,6 +100,9 @@
 			);
 			mainGroup = 05A177992CA96C3100E2030B;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				055822A42CA9CD580000861F /* XCRemoteSwiftPackageReference "lucide-icons-swift" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 05A177A32CA96C3100E2030B /* Products */;
 			projectDirPath = "";
@@ -328,6 +337,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		055822A42CA9CD580000861F /* XCRemoteSwiftPackageReference "lucide-icons-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/JakubMazur/lucide-icons-swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.446.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		055822A52CA9CD580000861F /* LucideIcons */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 055822A42CA9CD580000861F /* XCRemoteSwiftPackageReference "lucide-icons-swift" */;
+			productName = LucideIcons;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 05A1779A2CA96C3100E2030B /* Project object */;
 }

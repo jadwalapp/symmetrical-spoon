@@ -6,9 +6,11 @@
 //
 
 import SwiftUI
+import LucideIcons
 
 struct OButton: View {
     private var label: String
+    private var icon: UIImage?
     private var action: () -> Void
     
     init(label: String, action: @escaping () -> Void) {
@@ -16,9 +18,20 @@ struct OButton: View {
         self.action = action
     }
     
+    init(label: String, icon: UIImage, action: @escaping () -> Void) {
+        self.label = label
+        self.icon = icon
+        self.action = action
+    }
+    
     var body: some View {
         Button(action: action) {
-            Text(label)
+            HStack {
+                if (icon != nil) {
+                    Image(uiImage: icon!)
+                }
+                Text(label)
+            }
                 .foregroundStyle(.primary)
                 .fontWeight(.bold)
                 .padding()
