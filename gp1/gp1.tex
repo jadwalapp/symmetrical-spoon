@@ -195,8 +195,8 @@ In developing Muwaqqit, we have drawn inspiration from and built upon existing r
 \section{Functional Requirements}
 
 \begin{itemize}
-    \item The user shall be able to access their account using either Google or Email.
-    \item The user should receive a welcome emil if they are a new user.
+    \item The user shall be able to access their account using either Google OAuth or magic link via Email. For new users, a new accout is created, and for existing users, they are given access to their account directly
+    \item The system shall send a welcome email to new users.
     \item The user should be able to connect a calendar using CalDAV.
     \item The user should be able to connect their WhatsApp account.
     \item The user should be able to add events manually and set priorities optionally.
@@ -204,9 +204,9 @@ In developing Muwaqqit, we have drawn inspiration from and built upon existing r
     \item The user should be able to configure daily routines.
     \item The user should be able to manage scheduling conflicts.
     \item The user should be able to schedule prayer times.
-    \item The user should be able to receive event notifications.
-    \item The user should be able to have a personalized experience by being asked questions.
-    \item The user should be able to see events he agreed with people on in WhatsApp in the calendar, and if a conflicst arises, he can fix it through a notification.
+    \item The system shall send event notifications to the user.
+    \item The system shall personalize the experience based on answers provided by the users.
+    \item The system shall add the WhatsApp extracted events to the calendar. If a conflict occurs, the user shall get a notification to resolve the conflict with suggestions.
 \end{itemize}
 
 \section{Non-Functional Requirements}
