@@ -20,7 +20,7 @@ struct OnboardingStepTile: View {
         HStack {
             ZStack {
                 Circle()
-                    .fill(.onPrimary)
+                    .fill(.accent)
                     .frame(width: 40, height: 40)
                 Text(number)
                     .foregroundStyle(.primary)

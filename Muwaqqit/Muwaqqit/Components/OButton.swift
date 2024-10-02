@@ -40,7 +40,7 @@ struct OButton: View {
                 .fontWeight(.bold)
                 .padding()
                 .frame(maxWidth: .infinity)
-                .background(.onPrimary)
+                .background(.accent)
                 .cornerRadius(999)
         }
         .buttonStyle(.plain)
