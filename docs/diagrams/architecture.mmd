@@ -1,0 +1,55 @@
+%% use this to compile it:
+%% mmdc -i docs/diagrams/architecture.mmd -o ./docs/gp1/images/architecture.png -w 900
+graph TB
+    subgraph "Frontend (Mishkat)"
+        A[iOS SwiftUI App]
+    end
+
+    subgraph "Backend (Falak)"
+        B[gRPC Server]
+        C[Auth Service]
+        D[Calendar Service]
+        E[CalDAV Client]
+        I[Event Consumer]
+    end
+
+    subgraph "WhatsApp Service"
+        F[Node.js gRPC Server]
+        G[WhatsApp Web.js]
+        J[Event Producer]
+    end
+
+    subgraph "Message Queue"
+        K[(RabbitMQ)]
+    end
+
+    subgraph "Database"
+        H[(PostgreSQL)]
+    end
+
+    A --gRPC--> B
+    B --> C
+    B --> D
+    D --> E
+    B --gRPC--> F
+    F --> G
+
+    G --> J
+    J --"Publish Events"--> K
+    K --"Consume Events"--> I
+    I --> D
+
+    C --> H
+    D --> H
+
+    classDef frontend fill:#f9f,stroke:#333,stroke-width:4px;
+    classDef backend fill:#bbf,stroke:#333,stroke-width:2px;
+    classDef whatsapp fill:#bfb,stroke:#333,stroke-width:2px;
+    classDef database fill:#fbb,stroke:#333,stroke-width:2px;
+    classDef queue fill:#ff9,stroke:#333,stroke-width:2px;
+
+    class A frontend;
+    class B,C,D,E,I backend;
+    class F,G,J whatsapp;
+    class H database;
+    class K queue;
