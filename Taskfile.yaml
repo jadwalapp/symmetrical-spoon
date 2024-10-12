@@ -1,0 +1,7 @@
+version: "3"
+tasks:
+  gen-proto:
+    desc: Generates go code from proto files of the API for Unix-like systems.
+    cmds:
+      - mkdir -p falak/pkg/api/auth/proto
+      - protoc -I protovalidate/proto/protovalidate -I proto/ --go_out=falak/pkg/api/auth/proto --go_opt=paths=source_relative --go-grpc_out=falak/pkg/api/auth/proto --go-grpc_opt=paths=source_relative proto/auth.proto

@@ -1,0 +1,3 @@
+[submodule "protovalidate"]
+	path = protovalidate
+	url = https://github.com/bufbuild/protovalidate.git

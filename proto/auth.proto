@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+import "buf/validate/validate.proto";
+
+option go_package = "github.com/muwaqqit/symmetrical-spoon/falak/pkg/api/auth;authpb";
+
+package auth;
+
+message InitiateEmailRequest {
+    string email = 1 [(buf.validate.field) = {
+        string: {
+            pattern: "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$",
+            max_len: 320,
+        },
+    }];
+}
+
+message InitiateEmailResponse {}
+
+message CompleteEmailRequest {
+    string token = 1 [(buf.validate.field).string.uuid = true];
+}
+
+message CompleteEmailResponse {
+    string access_token = 1;
+}
+
+message UseGoogleRequest {
+    string google_token = 1 [(buf.validate.field).string.uuid = true];
+}
+
+message UseGoogleResponse {
+    string access_token = 1;
+}
+
+service Auth {
+    rpc InitiateEmail(InitiateEmailRequest) returns (InitiateEmailResponse);
+    rpc CompleteEmail(CompleteEmailRequest) returns (CompleteEmailResponse);
+    rpc UseGoogle(UseGoogleRequest) returns (UseGoogleResponse);
+}
