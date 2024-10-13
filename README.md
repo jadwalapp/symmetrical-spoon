@@ -7,6 +7,8 @@ you know, something :D
 - Golang: [https://go.dev/](https://go.dev/)
 - Taskfile: [https://taskfile.dev/](https://taskfile.dev/)
 - protoc: [https://grpc.io/docs/protoc-installation/](https://grpc.io/docs/protoc-installation/)
+- sqlc: [https://docs.sqlc.dev/en/stable/overview/install.html](https://docs.sqlc.dev/en/stable/overview/install.html)
+- migrate: [https://github.com/golang-migrate/migrate/tree/master/cmd/migrate](https://github.com/golang-migrate/migrate/tree/master/cmd/migrate)
 
 ## Generating gRPC Code from Proto Files
 

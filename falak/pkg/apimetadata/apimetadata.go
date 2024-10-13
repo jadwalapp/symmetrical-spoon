@@ -13,6 +13,6 @@ type ApiMetadata interface {
 
 type apiMetadata struct{}
 
-func NewAPiMetadata() ApiMetadata {
+func NewApiMetadata() ApiMetadata {
 	return &apiMetadata{}
 }

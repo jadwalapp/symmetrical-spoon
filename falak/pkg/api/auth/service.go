@@ -5,6 +5,7 @@ import (
 
 	"github.com/bufbuild/protovalidate-go"
 	authpb "github.com/muwaqqit/symmetrical-spoon/falak/pkg/api/auth/proto"
+	"github.com/muwaqqit/symmetrical-spoon/falak/pkg/store"
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -17,7 +18,8 @@ var (
 type service struct {
 	authpb.UnimplementedAuthServer
 
-	pv protovalidate.Validator
+	pv    protovalidate.Validator
+	store store.Queries
 }
 
 func (s *service) InitiateEmail(ctx context.Context, r *authpb.InitiateEmailRequest) (*authpb.InitiateEmailResponse, error) {
@@ -49,8 +51,9 @@ func (s *service) UseGoogle(ctx context.Context, r *authpb.UseGoogleRequest) (*a
 	}, nil
 }
 
-func NewService(pv protovalidate.Validator) authpb.AuthServer {
+func NewService(pv protovalidate.Validator, store store.Queries) authpb.AuthServer {
 	return &service{
-		pv: pv,
+		pv:    pv,
+		store: store,
 	}
 }

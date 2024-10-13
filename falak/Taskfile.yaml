@@ -1,0 +1,71 @@
+version: "3"
+tasks:
+  new-mig:
+    desc: Create a new migration.
+    cmds:
+      - migrate create -dir pkg/store/migrations/ -ext sql --seq {{.MIG_NAME}}
+    requires:
+      vars: [MIG_NAME]
+
+  sqlc-gen:
+    desc: Generate store code using sqlc.
+    cmds:
+      - sqlc generate
+
+  test:
+    desc: Run tests for all packages.
+    cmds:
+      - go test ./...
+
+  test-cov:
+    desc: Run tests for all packages and generate coverage report.
+    cmds:
+      - go test -coverpkg=./... -coverprofile=coverage.out ./...
+
+  test-cov-show:
+    desc: Run tests for all packages and generate coverage report.
+    deps:
+      - test-cov
+    cmds:
+      - go tool cover -html=coverage.out
+
+  run:
+    desc: Run the server.
+    cmds:
+      - go run cmd/main.go
+
+  mig-up:
+    desc: Run all migrations.
+    cmds:
+      - migrate -path pkg/store/migrations/ -database "postgresql://{{.DB_USER}}:{{.DB_PASSWORD}}@{{.DB_HOST}}:{{.DB_PORT}}/{{.DB_NAME}}?sslmode={{.DB_SSL_MODE}}" -verbose up 1
+    vars:
+      DB_USER:
+        sh: grep -w "DB_USER" grpc.env | cut -d "=" -f2-
+      DB_PASSWORD:
+        sh: grep -w "DB_PASSWORD" grpc.env | cut -d "=" -f2-
+      DB_HOST:
+        sh: grep -w "DB_HOST" grpc.env | cut -d "=" -f2-
+      DB_PORT:
+        sh: grep -w "DB_PORT" grpc.env | cut -d "=" -f2-
+      DB_NAME:
+        sh: grep -w "DB_NAME" grpc.env | cut -d "=" -f2-
+      DB_SSL_MODE:
+        sh: grep -w "DB_SSL_MODE" grpc.env | cut -d "=" -f2-
+
+  mig-down:
+    desc: Rollback all migrations.
+    cmds:
+      - migrate -path pkg/store/migrations/ -database "postgresql://{{.DB_USER}}:{{.DB_PASSWORD}}@{{.DB_HOST}}:{{.DB_PORT}}/{{.DB_NAME}}?sslmode={{.DB_SSL_MODE}}" -verbose down 1
+    vars:
+      DB_USER:
+        sh: grep -w "DB_USER" grpc.env | cut -d "=" -f2-
+      DB_PASSWORD:
+        sh: grep -w "DB_PASSWORD" grpc.env | cut -d "=" -f2-
+      DB_HOST:
+        sh: grep -w "DB_HOST" grpc.env | cut -d "=" -f2-
+      DB_PORT:
+        sh: grep -w "DB_PORT" grpc.env | cut -d "=" -f2-
+      DB_NAME:
+        sh: grep -w "DB_NAME" grpc.env | cut -d "=" -f2-
+      DB_SSL_MODE:
+        sh: grep -w "DB_SSL_MODE" grpc.env | cut -d "=" -f2-
