@@ -3,5 +3,5 @@ package tokens
 type Audience string
 
 const (
-	AudienceCrispyBroccoli Audience = "symmetrical-spoon"
+	Audience_SymmetricalSpoon Audience = "symmetrical-spoon"
 )

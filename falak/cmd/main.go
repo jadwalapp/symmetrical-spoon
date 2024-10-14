@@ -111,7 +111,7 @@ func main() {
 		log.Fatal().Msgf("cannot create proto validator: %v", err)
 	}
 
-	authServer := auth.NewService(*pv, *dbStore)
+	authServer := auth.NewService(*pv, *dbStore, tokens)
 	authpb.RegisterAuthServer(grpcServer, authServer)
 
 	if err := grpcServer.Serve(lis); err != nil {

@@ -19,14 +19,6 @@ type AuthGoogle struct {
 	UpdatedAt  time.Time
 }
 
-type AuthPassword struct {
-	ID         uuid.UUID
-	CustomerID uuid.UUID
-	Password   string
-	CreatedAt  time.Time
-	UpdatedAt  time.Time
-}
-
 type Customer struct {
 	ID        uuid.UUID
 	Name      string
@@ -38,7 +30,7 @@ type Customer struct {
 type MagicLink struct {
 	ID         uuid.UUID
 	CustomerID uuid.UUID
-	Token      uuid.UUID
+	TokenHash  string
 	ExpiresAt  time.Time
 	UsedAt     sql.NullTime
 	CreatedAt  time.Time

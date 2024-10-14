@@ -22,12 +22,11 @@ type tokens struct {
 	PrivateKey *rsa.PrivateKey
 }
 
-func (t tokens) NewToken(customerId, email string, aud Audience) (*string, error) {
+func (t tokens) NewToken(customerId string, aud Audience) (string, error) {
 	expiresAt := time.Now().UTC().Add(tokenValidity)
 	claims := TokenClaims{
 		Payload{
 			CustomerId: customerId,
-			Email:      email,
 		},
 		jwt.StandardClaims{
 			Audience:  string(aud),
@@ -39,10 +38,10 @@ func (t tokens) NewToken(customerId, email string, aud Audience) (*string, error
 
 	signedToken, err := token.SignedString(t.PrivateKey)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
-	return &signedToken, nil
+	return signedToken, nil
 }
 
 func (t tokens) ParseToken(token string) (*TokenClaims, error) {

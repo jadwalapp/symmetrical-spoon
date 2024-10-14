@@ -7,24 +7,42 @@ package store
 
 import (
 	"context"
+	"time"
 
 	"github.com/google/uuid"
 )
 
-const createCustomer = `-- name: CreateCustomer :one
-INSERT INTO customer (name, email)
-VALUES ($1, LOWER($2))
-RETURNING id, name, email, created_at, updated_at
+const createCustomerIfNotExists = `-- name: CreateCustomerIfNotExists :one
+WITH new_customer AS (
+    INSERT INTO customer (name, email)
+    SELECT $1, LOWER($2)
+    WHERE NOT EXISTS (
+        SELECT 1 FROM customer WHERE LOWER(email) = LOWER($2)
+    )
+    RETURNING id, name, email, created_at, updated_at
+)
+SELECT id, name, email, created_at, updated_at FROM new_customer
+UNION ALL
+SELECT id, name, email, created_at, updated_at FROM customer WHERE LOWER(email) = LOWER($2)
+LIMIT 1
 `
 
-type CreateCustomerParams struct {
+type CreateCustomerIfNotExistsParams struct {
 	Name  string
-	Lower string
+	Email string
 }
 
-func (q *Queries) CreateCustomer(ctx context.Context, arg CreateCustomerParams) (Customer, error) {
-	row := q.db.QueryRowContext(ctx, createCustomer, arg.Name, arg.Lower)
-	var i Customer
+type CreateCustomerIfNotExistsRow struct {
+	ID        uuid.UUID
+	Name      string
+	Email     string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+}
+
+func (q *Queries) CreateCustomerIfNotExists(ctx context.Context, arg CreateCustomerIfNotExistsParams) (CreateCustomerIfNotExistsRow, error) {
+	row := q.db.QueryRowContext(ctx, createCustomerIfNotExists, arg.Name, arg.Email)
+	var i CreateCustomerIfNotExistsRow
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
@@ -48,8 +66,8 @@ const getCustomerByEmail = `-- name: GetCustomerByEmail :one
 SELECT id, name, email, created_at, updated_at FROM customer WHERE LOWER(email) = LOWER($1)
 `
 
-func (q *Queries) GetCustomerByEmail(ctx context.Context, lower string) (Customer, error) {
-	row := q.db.QueryRowContext(ctx, getCustomerByEmail, lower)
+func (q *Queries) GetCustomerByEmail(ctx context.Context, email string) (Customer, error) {
+	row := q.db.QueryRowContext(ctx, getCustomerByEmail, email)
 	var i Customer
 	err := row.Scan(
 		&i.ID,

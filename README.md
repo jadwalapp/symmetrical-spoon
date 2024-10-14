@@ -4,11 +4,16 @@ you know, something :D
 
 ## Requirements
 
+- Docker: [https://docker.com](https://docker.com)
 - Golang: [https://go.dev/](https://go.dev/)
 - Taskfile: [https://taskfile.dev/](https://taskfile.dev/)
 - protoc: [https://grpc.io/docs/protoc-installation/](https://grpc.io/docs/protoc-installation/)
 - sqlc: [https://docs.sqlc.dev/en/stable/overview/install.html](https://docs.sqlc.dev/en/stable/overview/install.html)
 - migrate: [https://github.com/golang-migrate/migrate/tree/master/cmd/migrate](https://github.com/golang-migrate/migrate/tree/master/cmd/migrate)
+
+### Software that helps:
+
+- Beekeeper Studio: [https://www.beekeeperstudio.io/](https://www.beekeeperstudio.io/)
 
 ## Generating gRPC Code from Proto Files
 

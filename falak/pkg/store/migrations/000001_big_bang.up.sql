@@ -21,19 +21,6 @@ BEFORE UPDATE ON customer
 FOR EACH ROW
 EXECUTE FUNCTION update_modified_column();
 
-CREATE TABLE auth_password (
-    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-    customer_id UUID UNIQUE REFERENCES customer(id) ON DELETE CASCADE NOT NULL,
-    password VARCHAR(255) NOT NULL,
-
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-CREATE TRIGGER update_auth_password_updated_at
-BEFORE UPDATE ON auth_password
-FOR EACH ROW
-EXECUTE FUNCTION update_modified_column();
-
 CREATE TABLE auth_google (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     customer_id UUID UNIQUE REFERENCES customer(id) ON DELETE CASCADE NOT NULL,
@@ -50,7 +37,7 @@ EXECUTE FUNCTION update_modified_column();
 CREATE TABLE magic_link (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     customer_id UUID REFERENCES customer(id) ON DELETE CASCADE NOT NULL,
-    token UUID UNIQUE NOT NULL,
+    token_hash CHAR(44) UNIQUE NOT NULL, -- 44 is used here as fixed length since hash will be sha-256 and when converted to base64, it returns 44 characters with padding :D
     expires_at TIMESTAMPTZ NOT NULL,
     used_at TIMESTAMPTZ NULL,
 

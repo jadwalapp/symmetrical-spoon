@@ -35,12 +35,12 @@ func (q *Queries) CreateAuthGoogle(ctx context.Context, arg CreateAuthGooglePara
 	return i, err
 }
 
-const getAuthGoogleBySub = `-- name: GetAuthGoogleBySub :one
-SELECT id, customer_id, sub, created_at, updated_at FROM auth_google WHERE sub = $1
+const getAuthGoogleByCustomerId = `-- name: GetAuthGoogleByCustomerId :one
+SELECT id, customer_id, sub, created_at, updated_at FROM auth_google WHERE customer_id = $1
 `
 
-func (q *Queries) GetAuthGoogleBySub(ctx context.Context, sub string) (AuthGoogle, error) {
-	row := q.db.QueryRowContext(ctx, getAuthGoogleBySub, sub)
+func (q *Queries) GetAuthGoogleByCustomerId(ctx context.Context, customerID uuid.UUID) (AuthGoogle, error) {
+	row := q.db.QueryRowContext(ctx, getAuthGoogleByCustomerId, customerID)
 	var i AuthGoogle
 	err := row.Scan(
 		&i.ID,
@@ -52,12 +52,12 @@ func (q *Queries) GetAuthGoogleBySub(ctx context.Context, sub string) (AuthGoogl
 	return i, err
 }
 
-const getAuthGoogleByUserID = `-- name: GetAuthGoogleByUserID :one
-SELECT id, customer_id, sub, created_at, updated_at FROM auth_google WHERE customer_id = $1
+const getAuthGoogleBySub = `-- name: GetAuthGoogleBySub :one
+SELECT id, customer_id, sub, created_at, updated_at FROM auth_google WHERE sub = $1
 `
 
-func (q *Queries) GetAuthGoogleByUserID(ctx context.Context, customerID uuid.UUID) (AuthGoogle, error) {
-	row := q.db.QueryRowContext(ctx, getAuthGoogleByUserID, customerID)
+func (q *Queries) GetAuthGoogleBySub(ctx context.Context, sub string) (AuthGoogle, error) {
+	row := q.db.QueryRowContext(ctx, getAuthGoogleBySub, sub)
 	var i AuthGoogle
 	err := row.Scan(
 		&i.ID,
