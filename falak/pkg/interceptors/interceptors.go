@@ -5,9 +5,9 @@ import (
 	"os"
 	"strings"
 
-	authpb "github.com/muwaqqit/symmetrical-spoon/falak/pkg/api/auth/proto"
-	"github.com/muwaqqit/symmetrical-spoon/falak/pkg/apimetadata"
-	tokens "github.com/muwaqqit/symmetrical-spoon/falak/pkg/tokens"
+	authpb "github.com/jadwal/symmetrical-spoon/falak/pkg/api/auth/proto"
+	"github.com/jadwal/symmetrical-spoon/falak/pkg/apimetadata"
+	tokens "github.com/jadwal/symmetrical-spoon/falak/pkg/tokens"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc"

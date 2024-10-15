@@ -2,7 +2,7 @@ syntax = "proto3";
 
 import "buf/validate/validate.proto";
 
-option go_package = "github.com/muwaqqit/symmetrical-spoon/falak/pkg/api/auth;authpb";
+option go_package = "github.com/jadwal/symmetrical-spoon/falak/pkg/api/auth;authpb";
 
 package auth;
 

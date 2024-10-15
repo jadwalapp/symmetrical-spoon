@@ -6,7 +6,7 @@ import (
 	"net/smtp"
 
 	"github.com/domodwyer/mailyak"
-	"github.com/muwaqqit/symmetrical-spoon/falak/pkg/email/template"
+	"github.com/jadwal/symmetrical-spoon/falak/pkg/email/template"
 )
 
 type smtpEmailer struct {

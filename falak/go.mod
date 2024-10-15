@@ -1,4 +1,4 @@
-module github.com/muwaqqit/symmetrical-spoon/falak
+module github.com/jadwal/symmetrical-spoon/falak
 
 go 1.23.2
 

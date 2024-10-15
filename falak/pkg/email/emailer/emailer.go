@@ -3,7 +3,7 @@ package emailer
 import (
 	"context"
 
-	"github.com/muwaqqit/symmetrical-spoon/falak/pkg/email/template"
+	"github.com/jadwal/symmetrical-spoon/falak/pkg/email/template"
 )
 
 type EmailerName string

@@ -14,7 +14,7 @@ var (
 
 const (
 	tokenValidity = time.Hour * 24 * 7 // 7 days
-	issuer        = "muwaqqit"
+	issuer        = "jadwal"
 )
 
 type tokens struct {
