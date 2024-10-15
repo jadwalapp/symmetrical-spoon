@@ -12,6 +12,8 @@ import (
 	"github.com/muwaqqit/symmetrical-spoon/falak/pkg/api/auth"
 	authpb "github.com/muwaqqit/symmetrical-spoon/falak/pkg/api/auth/proto"
 	"github.com/muwaqqit/symmetrical-spoon/falak/pkg/apimetadata"
+	"github.com/muwaqqit/symmetrical-spoon/falak/pkg/email/emailer"
+	"github.com/muwaqqit/symmetrical-spoon/falak/pkg/email/template"
 	"github.com/muwaqqit/symmetrical-spoon/falak/pkg/interceptors"
 	"github.com/muwaqqit/symmetrical-spoon/falak/pkg/store"
 	"github.com/muwaqqit/symmetrical-spoon/falak/pkg/tokens"
@@ -89,6 +91,20 @@ func main() {
 	apiMetadata := apimetadata.NewApiMetadata()
 	// ======== API METADATA ========
 
+	// ======== EMAILER ========
+	var emailerImpl emailer.Emailer
+	switch config.EmailerName {
+	case string(emailer.EmailerName_SMTP):
+		emailerImpl = emailer.NewSmtpEmailer(config.SMTPHost, config.SMTPPort, config.SMTPUSername, config.SMTPPasword)
+	case string(emailer.EmailerName_Stdout):
+		emailerImpl = emailer.NewStdoutEmailer()
+	}
+	// ======== EMAILER ========
+
+	// ======== TEMPLATES ========
+	templates := template.NewTemplates(config.Domain)
+	// ======== TEMPLATES ========
+
 	// ======== SERVER ========
 	lis, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%s", config.Port))
 	if err != nil {
@@ -100,6 +116,7 @@ func main() {
 		grpc.ChainUnaryInterceptor(
 			interceptors.LoggingInterceptor,
 			interceptors.EnsureValidTokenInterceptor(tokens, apiMetadata),
+			interceptors.LangInterceptor(apiMetadata),
 		),
 	}
 
@@ -111,7 +128,7 @@ func main() {
 		log.Fatal().Msgf("cannot create proto validator: %v", err)
 	}
 
-	authServer := auth.NewService(*pv, *dbStore, tokens)
+	authServer := auth.NewService(*pv, *dbStore, tokens, emailerImpl, templates, apiMetadata)
 	authpb.RegisterAuthServer(grpcServer, authServer)
 
 	if err := grpcServer.Serve(lis); err != nil {

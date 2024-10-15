@@ -73,3 +73,29 @@ func LoggingInterceptor(ctx context.Context, req interface{}, info *grpc.UnarySe
 
 	return handler(ctx, req)
 }
+
+func LangInterceptor(apim apimetadata.ApiMetadata) grpc.UnaryServerInterceptor {
+	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
+		md, ok := metadata.FromIncomingContext(ctx)
+		if !ok {
+			return handler(ctx, req)
+		}
+
+		var ctxWithLang context.Context
+		lang := md.Get("x-lang")
+		language := apimetadata.Lang_English
+		if len(lang) < 1 {
+			log.Ctx(ctx).Error().Msg("missing lang header")
+		} else {
+			switch lang[0] {
+			case string(apimetadata.Lang_Arabic):
+				language = apimetadata.Lang_Arabic
+			case string(apimetadata.Lang_English):
+				language = apimetadata.Lang_English
+			}
+		}
+		ctxWithLang = apim.ContextWithLang(ctx, language)
+
+		return handler(ctxWithLang, req)
+	}
+}

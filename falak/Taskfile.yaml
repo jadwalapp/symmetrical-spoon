@@ -69,3 +69,15 @@ tasks:
         sh: grep -w "DB_NAME" grpc.env | cut -d "=" -f2-
       DB_SSL_MODE:
         sh: grep -w "DB_SSL_MODE" grpc.env | cut -d "=" -f2-
+  
+  gen-email-temps:
+    desc: Generate email templates.
+    cmds:
+      - mkdir -p pkg/email/templates/ar
+      - mkdir -p pkg/email/templates/en
+
+      - mjml pkg/email/templates/mjml/ar/magic-link.mjml -o pkg/email/templates/ar/magic-link.html
+      - mjml pkg/email/templates/mjml/en/magic-link.mjml -o pkg/email/templates/en/magic-link.html
+
+      - mjml pkg/email/templates/mjml/ar/welcome.mjml -o pkg/email/templates/ar/welcome.html
+      - mjml pkg/email/templates/mjml/en/welcome.mjml -o pkg/email/templates/en/welcome.html

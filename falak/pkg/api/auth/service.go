@@ -3,11 +3,13 @@ package auth
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"time"
 
 	"github.com/bufbuild/protovalidate-go"
 	authpb "github.com/muwaqqit/symmetrical-spoon/falak/pkg/api/auth/proto"
+	"github.com/muwaqqit/symmetrical-spoon/falak/pkg/apimetadata"
+	"github.com/muwaqqit/symmetrical-spoon/falak/pkg/email/emailer"
+	"github.com/muwaqqit/symmetrical-spoon/falak/pkg/email/template"
 	"github.com/muwaqqit/symmetrical-spoon/falak/pkg/store"
 	"github.com/muwaqqit/symmetrical-spoon/falak/pkg/tokens"
 	"github.com/muwaqqit/symmetrical-spoon/falak/pkg/util"
@@ -27,15 +29,24 @@ var (
 type service struct {
 	authpb.UnimplementedAuthServer
 
-	pv     protovalidate.Validator
-	store  store.Queries
-	tokens tokens.Tokens
+	pv          protovalidate.Validator
+	store       store.Queries
+	tokens      tokens.Tokens
+	emailer     emailer.Emailer
+	templates   template.Templates
+	apiMetadata apimetadata.ApiMetadata
 }
 
 func (s *service) InitiateEmail(ctx context.Context, r *authpb.InitiateEmailRequest) (*authpb.InitiateEmailResponse, error) {
 	if err := s.pv.Validate(r); err != nil {
 		log.Ctx(ctx).Err(err).Msg("invalid request")
 		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	lang, ok := s.apiMetadata.GetLang(ctx)
+	if !ok {
+		log.Ctx(ctx).Error().Msg("failed to get lang from context")
+		return nil, internalError
 	}
 
 	customerName, _ := util.SplitEmail(r.Email)
@@ -65,8 +76,17 @@ func (s *service) InitiateEmail(ctx context.Context, r *authpb.InitiateEmailRequ
 		return nil, internalError
 	}
 
-	// TODO: send email with magic link :D
-	fmt.Printf("magicLinkToken: %s\n", magicLinkToken)
+	magicLinkTemplate, err := s.templates.MagicLinkTemplate(lang, magicLinkToken.String())
+	if err != nil {
+		log.Ctx(ctx).Err(err).Msg("failed to create magic link template")
+		return nil, internalError
+	}
+
+	err = s.emailer.SendFromTemplate(ctx, emailer.FromEmail_NoReplyEmail, *magicLinkTemplate, customer.Email)
+	if err != nil {
+		log.Ctx(ctx).Err(err).Msg("failed to send email from template: magic link")
+		return nil, internalError
+	}
 
 	return &authpb.InitiateEmailResponse{}, nil
 }
@@ -129,10 +149,13 @@ func (s *service) UseGoogle(ctx context.Context, r *authpb.UseGoogleRequest) (*a
 	}, nil
 }
 
-func NewService(pv protovalidate.Validator, store store.Queries, tokens tokens.Tokens) authpb.AuthServer {
+func NewService(pv protovalidate.Validator, store store.Queries, tokens tokens.Tokens, emailer emailer.Emailer, templates template.Templates, apiMetadata apimetadata.ApiMetadata) authpb.AuthServer {
 	return &service{
-		pv:     pv,
-		store:  store,
-		tokens: tokens,
+		pv:          pv,
+		store:       store,
+		tokens:      tokens,
+		emailer:     emailer,
+		templates:   templates,
+		apiMetadata: apiMetadata,
 	}
 }
