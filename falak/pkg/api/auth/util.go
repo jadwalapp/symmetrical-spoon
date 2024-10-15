@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"github.com/google/uuid"
-	"github.com/jadwal/symmetrical-spoon/falak/pkg/util"
+	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/util"
 )
 
 func (s *service) generateTokenWithHash() (uuid.UUID, string, error) {

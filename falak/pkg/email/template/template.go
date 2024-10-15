@@ -3,7 +3,7 @@ package template
 import (
 	"fmt"
 
-	"github.com/jadwal/symmetrical-spoon/falak/pkg/apimetadata"
+	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/apimetadata"
 )
 
 type Template struct {

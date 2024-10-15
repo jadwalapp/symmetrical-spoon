@@ -1,4 +1,4 @@
-module github.com/jadwal/symmetrical-spoon/falak
+module github.com/jadwalapp/symmetrical-spoon/falak
 
 go 1.23.2
 
