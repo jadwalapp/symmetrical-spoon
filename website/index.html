@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>جدول | Jadwal: مدير التقويم الأنيق لنظام iOS</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lalezar&display=swap"
+      rel="stylesheet"
+    />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#2ecc71",
+              secondary: "#27ae60",
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      * {
+        font-family: "Lalezar", system-ui;
+      }
+
+      @keyframes float {
+        0% {
+          transform: translateY(0px);
+        }
+        50% {
+          transform: translateY(-20px);
+        }
+        100% {
+          transform: translateY(0px);
+        }
+      }
+      .logo-container {
+        animation: float 6s ease-in-out infinite;
+      }
+      .blur-header {
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+      }
+    </style>
+  </head>
+  <body class="bg-gray-900 text-white font-sans">
+    <header
+      class="bg-black bg-opacity-50 py-4 px-6 sticky top-0 z-50 blur-header"
+    >
+      <nav class="container mx-auto flex justify-between items-center">
+        <div class="text-2xl text-primary">جدول | Jadwal</div>
+        <div class="flex gap-6">
+          <a href="#features" class="hover:text-primary transition duration-300"
+            >المميزات</a
+          >
+          <a href="#about" class="hover:text-primary transition duration-300"
+            >حول التطبيق</a
+          >
+          <button
+            onclick="toggleLanguage()"
+            class="hover:text-primary transition duration-300"
+          >
+            English
+          </button>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="py-20 bg-gradient-to-b from-black to-gray-900">
+        <div class="container mx-auto px-6">
+          <div class="flex flex-col md:flex-row-reverse items-center">
+            <div class="md:w-1/2 mb-10 md:mb-0 text-right">
+              <h1 class="text-5xl md:text-6xl leading-tight mb-5">
+                ثورة في إدارة وقتك
+              </h1>
+              <p class="text-xl mb-10">
+                جدول هو تطبيق أنيق لإدارة التقويم على نظام iOS، يدمج جداولك
+                بذكاء، ويستخرج الأحداث من الواتساب، ويعطي الأولوية لالتزاماتك -
+                بما في ذلك أوقات الصلاة.
+              </p>
+              <a
+                href="#"
+                class="bg-primary hover:bg-secondary text-white py-3 px-8 rounded-full transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-110"
+              >
+                حمّل الآن
+              </a>
+            </div>
+            <div class="md:w-1/2 flex justify-center">
+              <div class="logo-container relative">
+                <div
+                  class="absolute inset-0 bg-gradient-to-br from-primary to-secondary opacity-75 rounded-full blur-xl"
+                ></div>
+                <img
+                  src="images/logo-light.png"
+                  alt="شعار تطبيق جدول"
+                  class="w-64 h-64 object-contain relative z-10 rounded-full"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="features" class="py-20 bg-gray-800">
+        <div class="container mx-auto px-6">
+          <h2 class="text-4xl text-center mb-12 text-primary">
+            مميزات لا مثيل لها
+          </h2>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+            <div
+              class="bg-gray-900 rounded-lg p-8 hover:shadow-lg transition duration-300 transform hover:-translate-y-2"
+            >
+              <h3 class="text-2xl mb-4 text-primary">استخراج ذكي للأحداث</h3>
+              <p>
+                استخراج الأحداث تلقائيًا من رسائل الواتساب وإضافتها إلى تقويمك،
+                مما يوفر وقتك ويقلل من أخطاء الإدخال اليدوي.
+              </p>
+            </div>
+            <div
+              class="bg-gray-900 rounded-lg p-8 hover:shadow-lg transition duration-300 transform hover:-translate-y-2"
+            >
+              <h3 class="text-2xl mb-4 text-primary">تقويمات متكاملة</h3>
+              <p>
+                عرض وإدارة جميع تقويماتك في مكان واحد، مع تكامل سلس باستخدام
+                تقنية CalDAV.
+              </p>
+            </div>
+            <div
+              class="bg-gray-900 rounded-lg p-8 hover:shadow-lg transition duration-300 transform hover:-translate-y-2"
+            >
+              <h3 class="text-2xl mb-4 text-primary">أولوية أوقات الصلاة</h3>
+              <p>
+                جدولة وإعطاء الأولوية لأوقات الصلاة في تقويمك تلقائيًا، مما يضمن
+                وضع التزاماتك الروحية في المقام الأول.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="about" class="py-20 bg-gray-900">
+        <div class="container mx-auto px-6">
+          <h2 class="text-4xl text-center mb-12 text-primary">حول جدول</h2>
+          <p class="text-xl text-center mb-8">
+            تم تطوير جدول بواسطة فريق من الطلاب المتحمسين في جامعة اليمامة،
+            ويهدف إلى إحداث ثورة في كيفية إدارة الناس لوقتهم في العصر الرقمي.
+            يجمع تطبيقنا بين التكنولوجيا المتطورة والتصميم سهل الاستخدام لإنشاء
+            حل شامل لإدارة الوقت.
+          </p>
+          <p class="text-xl text-center">
+            سواء كنت محترفًا مشغولًا، أو طالبًا يتعامل مع جداول متعددة، أو أي
+            شخص يتطلع إلى تحسين وقته، فإن جدول هنا لمساعدتك على البقاء منظمًا
+            ومنتجًا.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="bg-black py-8">
+      <div class="container mx-auto px-6">
+        <div class="flex flex-col md:flex-row justify-between items-center">
+          <div class="mb-4 md:mb-0">
+            <p>جميع الحقوق محفوظة &copy; 2024 جدول.</p>
+          </div>
+          <div class="flex gap-4">
+            <a
+              href="/privacy-policy.html"
+              class="text-gray-400 hover:text-primary transition duration-300"
+              >سياسة الخصوصية</a
+            >
+            <a
+              href="/terms-of-service.html"
+              class="text-gray-400 hover:text-primary transition duration-300"
+              >شروط الخدمة</a
+            >
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      function toggleLanguage() {
+        window.location.href = "index-en.html";
+      }
+    </script>
+  </body>
+</html>
