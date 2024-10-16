@@ -4,3 +4,6 @@ services:
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--entryPoints.web.address=:80"
+
+  falak:
+    image: ghcr.io/jadwalapp/symmetrical-spoon/falak:main
