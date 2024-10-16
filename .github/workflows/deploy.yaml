@@ -24,6 +24,11 @@ jobs:
         chmod 600 ~/.ssh/id_ed25519
         ssh-keyscan -H ${{ secrets.DEPLOY_HOST }} >> ~/.ssh/known_hosts
 
+    - name: Create environment files
+      run: |
+        echo "${{ secrets.FALAK_ENV }}" > falak/falak.env
+        echo "${{ secrets.MAIN_ENV }}" > .env
+
     - name: Create Docker context
       run: |
         docker context create deploy --docker "host=ssh://deploy@${{ secrets.DEPLOY_HOST }}"
