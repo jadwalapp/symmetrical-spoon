@@ -23,6 +23,12 @@ For additional steps and details, consult the main repository's README.
 go run cmd/main.go
 ```
 
+But better to use the `compose.yaml`, so run:
+
+```bash
+docker compose up --build
+```
+
 Then to test the api, you need `grpcui`:
 
 ```bash
@@ -32,7 +38,5 @@ go install github.com/fullstorydev/grpcui/cmd/grpcui@latest
 After you install it, run the following to get a web interface to call the api:
 
 ```bash
-grpcui -plaintext localhost:50064
+grpcui -plaintext falak.localhost:80
 ```
-
-> If you replaced the `PORT` in `app.env`, you will need to change the `50064` to that port :D

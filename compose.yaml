@@ -1,4 +1,18 @@
 services:
+  traefik:
+    image: "traefik:v3"
+    container_name: "traefik"
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entryPoints.web.address=:80"
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
   postgresdb:
     image: postgres:17
     environment:
@@ -39,5 +53,8 @@ services:
     depends_on:
       postgresdb:
         condition: service_healthy
-    ports:
-      - ${FALAK_PORT}:${FALAK_PORT}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.falak.rule=Host(`falak.localhost`)"
+      - "traefik.http.services.falak.loadbalancer.server.port=${FALAK_PORT}"
+      - "traefik.http.services.falak.loadbalancer.server.scheme=h2c"
