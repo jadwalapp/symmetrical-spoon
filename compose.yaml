@@ -26,8 +26,8 @@ services:
 
   falak:
     build:
-      context: .
-      dockerfile: "Dockerfile.falak"
+      context: ./falak
+      dockerfile: "Dockerfile"
     env_file: ./falak/grpc.env
     environment:
       DB_USER: ${POSTGRES_USER}
