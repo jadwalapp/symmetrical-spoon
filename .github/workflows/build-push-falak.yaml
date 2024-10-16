@@ -3,6 +3,13 @@ name: Build and Push Falak Image
 on:
   push:
     branches: [ main ]
+    paths:
+      - 'falak/**'
+      - '.env'
+      - 'proto/**'
+      - 'compose.yaml'
+      - 'compose.override.yaml'
+      - 'compose.prod.yaml'
 
 env:
   REGISTRY: ghcr.io
