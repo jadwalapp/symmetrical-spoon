@@ -29,6 +29,10 @@ jobs:
         eval $(ssh-agent -s)
         echo "$SSH_PASSPHRASE" | SSH_ASKPASS="/bin/echo" ssh-add ~/.ssh/id_ed25519
 
+    - name: Test SSH connection
+      run: |
+        ssh -v deploy@${{ secrets.DEPLOY_HOST }} 'echo "SSH connection successful"'
+
     - name: Create environment files
       run: |
         echo "${{ secrets.FALAK_ENV }}" > falak/grpc.env
@@ -36,7 +40,14 @@ jobs:
 
     - name: Create Docker context
       run: |
-        docker context create deploy --docker "host=ssh://deploy@${{ secrets.DEPLOY_HOST }}"
+        docker context create deploy --docker "host=ssh://deploy@${{ secrets.DEPLOY_HOST }}" --description "Remote Docker host" -v
+        docker context ls
+        docker context use deploy
+        docker context inspect deploy
+
+    - name: Check remote Docker version
+      run: |
+        docker --context deploy version
 
     - name: Login to GitHub Container Registry
       run: |
@@ -44,11 +55,14 @@ jobs:
 
     - name: Deploy
       run: |
-        docker --context deploy compose -f compose.yaml -f compose.prod.yaml pull
-        docker --context deploy compose -f compose.yaml -f compose.prod.yaml up -d
+        docker --context deploy info
+        docker --context deploy compose -f compose.yaml -f compose.prod.yaml config
+        docker --context deploy compose -f compose.yaml -f compose.prod.yaml pull --verbose
+        docker --context deploy compose -f compose.yaml -f compose.prod.yaml up -d --verbose
 
     - name: Cleanup
       if: always()
       run: |
+        docker --context deploy logout ghcr.io
         rm -rf ~/.ssh
         ssh-agent -k
