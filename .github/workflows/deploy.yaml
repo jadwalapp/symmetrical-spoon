@@ -17,15 +17,6 @@
         - name: Checkout code
           uses: actions/checkout@v4.2.1
         
-        - name: Run whoami through ssh :D
-          uses: appleboy/ssh-action@v1.1.0
-          with:
-            host: ${{ secrets.DEPLOY_HOST }}
-            username: deploy
-            key: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
-            port: 22
-            script: whoami
-        
         - name: Setup SSH
           run: |
             mkdir -p ~/.ssh
