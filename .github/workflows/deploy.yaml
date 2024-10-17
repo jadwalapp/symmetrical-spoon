@@ -17,21 +17,18 @@
         - name: Checkout code
           uses: actions/checkout@v4.2.1
         
-        - name: Setup SSH
-          run: |
-            mkdir -p ~/.ssh
-            ssh-keyscan -H ${{ secrets.DEPLOY_HOST }} >> ~/.ssh/known_hosts
-            echo "${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_jadwal_app
-            chmod 600 ~/.ssh/deploy_jadwal_app
+        - name: Deploy the new stuff :D
+          uses: appleboy/ssh-action@v1.1.0
+          with:
+            host: ${{ secrets.DEPLOY_HOST }}
+            username: deploy
+            key: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
+            port: 22
+            script: |
+              eval "$(ssh-agent -s)"
+              ssh-add ~/.ssh/deploy_jadwal_app
 
-        - name: Deploy docker compose using docker context
-          run: |
-            eval "$(ssh-agent -s)"
-            ssh-add ~/.ssh/deploy_jadwal_app
-            
-            docker context create deploy --docker host=ssh://deploy@${{ secrets.DEPLOY_HOST }}
-            docker context use deploy
-            cd symmetrical-spoon
-            git pull
-            docker compose -f comopose.yaml -f compose.prod.yaml pull
-            docker compose -f comopose.yaml -f compose.prod.yaml up -d
+              cd symmetrical-spoon
+              git pull
+              docker compose -f compose.yaml -f compose.prod.yaml pull
+              docker compose -f compose.yaml -f compose.prod.yaml up -d
