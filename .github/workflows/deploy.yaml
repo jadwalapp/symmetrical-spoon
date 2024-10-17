@@ -24,14 +24,17 @@ jobs:
           username: deploy
           key: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
           port: 22
-          passphrase: ${{ secrets.SSH_KEY_PASSPHRASE }}
           script: whoami
       
-      - name: Verify host
+      - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
           ssh-keyscan -H ${{ secrets.DEPLOY_HOST }} >> ~/.ssh/known_hosts
-      
+          echo "${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_jadwal_app
+          chmod 600 ~/.ssh/deploy_jadwal_app
+          eval "$(ssh-agent -s)"
+          ssh-add ~/.ssh/deploy_jadwal_app
+
       - name: Create deploy docker context
         run: |
           docker context create deploy --docker host=ssh://deploy@${{ secrets.DEPLOY_HOST }}
