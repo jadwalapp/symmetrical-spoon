@@ -2002,7 +2002,7 @@
 											"top": 375,
 											"width": 791,
 											"height": 13,
-											"text": "Muwaqqit"
+											"text": "Jadwal"
 										},
 										{
 											"_type": "LabelView",
@@ -9825,7 +9825,7 @@
 					"_parent": {
 						"$ref": "AAAAAAGSKHzjxWenLAA="
 					},
-					"name": "Muwaqqit"
+					"name": "Jadwal"
 				},
 				{
 					"_type": "UMLUseCase",

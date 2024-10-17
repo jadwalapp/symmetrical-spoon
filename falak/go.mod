@@ -1,14 +1,16 @@
-module github.com/muwaqqit/symmetrical-spoon/falak
+module github.com/jadwalapp/symmetrical-spoon/falak
 
 go 1.23.2
 
 require (
 	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.35.1-20240920164238-5a7b106cbb87.1
 	github.com/bufbuild/protovalidate-go v0.7.2
+	github.com/domodwyer/mailyak v3.1.1+incompatible
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/golang-migrate/migrate v3.5.4+incompatible
 	github.com/google/uuid v1.6.0
 	github.com/jackc/pgx/v5 v5.7.1
+	github.com/resendlabs/resend-go v1.7.0
 	github.com/rs/zerolog v1.33.0
 	github.com/spf13/viper v1.19.0
 	google.golang.org/grpc v1.67.1

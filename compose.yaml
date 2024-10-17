@@ -1,4 +1,12 @@
 services:
+  traefik:
+    image: "traefik:v3"
+    container_name: "traefik"
+    ports:
+      - "80:80"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
   postgresdb:
     image: postgres:17
     environment:
@@ -22,4 +30,29 @@ services:
       timeout: 5s
       retries: 5
     volumes:
-      - ./postgres-data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
+
+  falak:
+    build:
+      context: ./falak
+      dockerfile: "Dockerfile"
+    env_file: ./falak/grpc.env
+    environment:
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_HOST: postgresdb
+      DB_PORT: ${POSTGRES_PORT}
+      DB_NAME: ${POSTGRES_DB}
+      DB_SSL_MODE: disable
+      PORT: ${FALAK_PORT}
+    depends_on:
+      postgresdb:
+        condition: service_healthy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.falak.rule=Host(`${FALAK_HOST}`)"
+      - "traefik.http.services.falak.loadbalancer.server.port=${FALAK_PORT}"
+      - "traefik.http.services.falak.loadbalancer.server.scheme=h2c"
+
+volumes:
+  postgres_data:

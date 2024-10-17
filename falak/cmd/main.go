@@ -9,13 +9,16 @@ import (
 	"github.com/bufbuild/protovalidate-go"
 	"github.com/golang-migrate/migrate"
 	"github.com/golang-migrate/migrate/database/postgres"
-	"github.com/muwaqqit/symmetrical-spoon/falak/pkg/api/auth"
-	authpb "github.com/muwaqqit/symmetrical-spoon/falak/pkg/api/auth/proto"
-	"github.com/muwaqqit/symmetrical-spoon/falak/pkg/apimetadata"
-	"github.com/muwaqqit/symmetrical-spoon/falak/pkg/interceptors"
-	"github.com/muwaqqit/symmetrical-spoon/falak/pkg/store"
-	"github.com/muwaqqit/symmetrical-spoon/falak/pkg/tokens"
-	"github.com/muwaqqit/symmetrical-spoon/falak/pkg/util"
+	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/api/auth"
+	authpb "github.com/jadwalapp/symmetrical-spoon/falak/pkg/api/auth/proto"
+	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/apimetadata"
+	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/email/emailer"
+	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/email/template"
+	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/interceptors"
+	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/store"
+	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/tokens"
+	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/util"
+	"github.com/resendlabs/resend-go"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc"
@@ -89,6 +92,26 @@ func main() {
 	apiMetadata := apimetadata.NewApiMetadata()
 	// ======== API METADATA ========
 
+	// ======== RESEND ========
+	resendCli := resend.NewClient(config.ResendApiKey)
+	// ======== RESEND ========
+
+	// ======== EMAILER ========
+	var emailerImpl emailer.Emailer
+	switch config.EmailerName {
+	case string(emailer.EmailerName_SMTP):
+		emailerImpl = emailer.NewSmtpEmailer(config.SMTPHost, config.SMTPPort, config.SMTPUSername, config.SMTPPasword)
+	case string(emailer.EmailerName_Stdout):
+		emailerImpl = emailer.NewStdoutEmailer()
+	case string(emailer.EmailerName_Resend):
+		emailerImpl = emailer.NewResendEmailer(*resendCli)
+	}
+	// ======== EMAILER ========
+
+	// ======== TEMPLATES ========
+	templates := template.NewTemplates(config.Domain)
+	// ======== TEMPLATES ========
+
 	// ======== SERVER ========
 	lis, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%s", config.Port))
 	if err != nil {
@@ -100,6 +123,7 @@ func main() {
 		grpc.ChainUnaryInterceptor(
 			interceptors.LoggingInterceptor,
 			interceptors.EnsureValidTokenInterceptor(tokens, apiMetadata),
+			interceptors.LangInterceptor(apiMetadata),
 		),
 	}
 
@@ -111,7 +135,7 @@ func main() {
 		log.Fatal().Msgf("cannot create proto validator: %v", err)
 	}
 
-	authServer := auth.NewService(*pv, *dbStore)
+	authServer := auth.NewService(*pv, *dbStore, tokens, emailerImpl, templates, apiMetadata)
 	authpb.RegisterAuthServer(grpcServer, authServer)
 
 	if err := grpcServer.Serve(lis); err != nil {

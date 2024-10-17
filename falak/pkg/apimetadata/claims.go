@@ -3,7 +3,7 @@ package apimetadata
 import (
 	"context"
 
-	"github.com/muwaqqit/symmetrical-spoon/falak/pkg/tokens"
+	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/tokens"
 )
 
 type claimsKey struct{}
