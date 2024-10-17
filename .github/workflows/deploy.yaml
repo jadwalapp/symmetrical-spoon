@@ -29,6 +29,7 @@ jobs:
       
       - name: Verify host
         run: |
+          mkdir -p ~/.ssh
           ssh-keyscan -H ${{ secrets.DEPLOY_HOST }} >> ~/.ssh/known_hosts
       
       - name: Create deploy docker context
