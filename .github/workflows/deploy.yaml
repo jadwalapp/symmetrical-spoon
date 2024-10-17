@@ -14,55 +14,33 @@ jobs:
       github.event_name == 'workflow_dispatch' ||
       (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4.2.1
+      - name: Checkout code
+        uses: actions/checkout@v4.2.1
+      
+      - name: Create environment files
+        run: |
+          echo "${{ secrets.FALAK_ENV }}" > falak/grpc.env
+          echo "${{ secrets.MAIN_ENV }}" > .env
 
-    - name: Setup SSH key and start ssh-agent
-      env:
-        SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-        SSH_PASSPHRASE: ${{ secrets.SSH_KEY_PASSPHRASE }}
-      run: |
-        mkdir -p ~/.ssh
-        echo "${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
-        chmod 600 ~/.ssh/id_ed25519
-        ssh-keyscan -H ${{ secrets.DEPLOY_HOST }} >> ~/.ssh/known_hosts
-        eval $(ssh-agent -s)
-        echo "$SSH_PASSPHRASE" | SSH_ASKPASS="/bin/echo" ssh-add ~/.ssh/id_ed25519
+      - name: Setup SSH Agent
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
+          SSH_KEY_PATH: ${{ runner.temp }}/ssh_key
+          SSH_PASSPHRASE: ${{ secrets.SSH_KEY_PASSPHRASE }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > $SSH_KEY_PATH
+          chmod 600 $SSH_KEY_PATH
+          eval $(ssh-agent -s)
+          echo "$SSH_PASSPHRASE" | ssh-add $SSH_KEY_PATH
 
-    - name: Test SSH connection
-      run: |
-        ssh -v deploy@${{ secrets.DEPLOY_HOST }} 'echo "SSH connection successful"'
+      - name: Set up Docker Context
+        run: |
+          docker context create remote --docker "host=ssh://deploy@${{ secrets.DEPLOY_HOST }}"
+          docker context use remote
 
-    - name: Create environment files
-      run: |
-        echo "${{ secrets.FALAK_ENV }}" > falak/grpc.env
-        echo "${{ secrets.MAIN_ENV }}" > .env
-
-    - name: Create Docker context
-      run: |
-        docker context create deploy --docker "host=ssh://deploy@${{ secrets.DEPLOY_HOST }}" --description "Remote Docker host" -v
-        docker context ls
-        docker context use deploy
-        docker context inspect deploy
-
-    - name: Check remote Docker version
-      run: |
-        docker --context deploy version
-
-    - name: Login to GitHub Container Registry
-      run: |
-        echo "${{ secrets.GHCR_PAT }}" | docker --context deploy login ghcr.io -u ${{ github.actor }} --password-stdin
-
-    - name: Deploy
-      run: |
-        docker --context deploy info
-        docker --context deploy compose -f compose.yaml -f compose.prod.yaml config
-        docker --context deploy compose -f compose.yaml -f compose.prod.yaml pull --verbose
-        docker --context deploy compose -f compose.yaml -f compose.prod.yaml up -d --verbose
-
-    - name: Cleanup
-      if: always()
-      run: |
-        docker --context deploy logout ghcr.io
-        rm -rf ~/.ssh
-        ssh-agent -k
+      - name: Deploy with Docker Compose
+        env:
+          DOCKER_HOST: ssh://deploy@${{ secrets.DEPLOY_HOST }}
+        run: |
+          docker compose -f compose.yaml -f compose.prod.yaml up -d
