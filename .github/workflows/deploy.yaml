@@ -34,9 +34,12 @@ jobs:
           chmod 600 ~/.ssh/deploy_jadwal_app
           eval "$(ssh-agent -s)"
           ssh-add ~/.ssh/deploy_jadwal_app
-
-      - name: Create deploy docker context
-        run: |
           docker context create deploy --docker host=ssh://deploy@${{ secrets.DEPLOY_HOST }}
           docker context use deploy
           docker ps -a
+
+      # - name: Create deploy docker context
+      #   run: |
+      #     docker context create deploy --docker host=ssh://deploy@${{ secrets.DEPLOY_HOST }}
+      #     docker context use deploy
+      #     docker ps -a
