@@ -17,12 +17,17 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4.2.1
 
-    - name: Setup SSH key
+    - name: Setup SSH key and start ssh-agent
+      env:
+        SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        SSH_PASSPHRASE: ${{ secrets.SSH_KEY_PASSPHRASE }}
       run: |
         mkdir -p ~/.ssh
         echo "${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
         chmod 600 ~/.ssh/id_ed25519
         ssh-keyscan -H ${{ secrets.DEPLOY_HOST }} >> ~/.ssh/known_hosts
+        eval $(ssh-agent -s)
+        echo "$SSH_PASSPHRASE" | SSH_ASKPASS="/bin/echo" ssh-add ~/.ssh/id_ed25519
 
     - name: Create environment files
       run: |
@@ -39,5 +44,7 @@ jobs:
         docker --context deploy compose -f compose.yaml -f compose.prod.yaml up -d
 
     - name: Cleanup
+      if: always()
       run: |
         rm -rf ~/.ssh
+        ssh-agent -k
