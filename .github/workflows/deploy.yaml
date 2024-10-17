@@ -21,27 +21,37 @@ jobs:
         run: |
           echo "${{ secrets.FALAK_ENV }}" > falak/grpc.env
           echo "${{ secrets.MAIN_ENV }}" > .env
+      
+      - name: executing remote ssh commands using ssh key
+        uses: appleboy/ssh-action@v1.1.0
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: deploy
+          key: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
+          port: 22
+          passphrase: ${{ secrets.SSH_KEY_PASSPHRASE }}
+          script: whoami
 
-      - name: Setup SSH Agent
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
-          SSH_KEY_PATH: ${{ runner.temp }}/ssh_key
-          SSH_PASSPHRASE: ${{ secrets.SSH_KEY_PASSPHRASE }}
-        run: |
-          mkdir -p ~/.ssh
-          echo "$SSH_PRIVATE_KEY" > $SSH_KEY_PATH
-          chmod 600 $SSH_KEY_PATH
-          ssh-keyscan -H ${{ secrets.DEPLOY_HOST }} >> ~/.ssh/known_hosts
-          eval $(ssh-agent -s)
-          echo "$SSH_PASSPHRASE" | ssh-add $SSH_KEY_PATH
+      # - name: Setup SSH Agent
+      #   env:
+      #     SSH_PRIVATE_KEY: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
+      #     SSH_KEY_PATH: ${{ runner.temp }}/ssh_key
+      #     SSH_PASSPHRASE: ${{ secrets.SSH_KEY_PASSPHRASE }}
+      #   run: |
+      #     mkdir -p ~/.ssh
+      #     echo "$SSH_PRIVATE_KEY" > $SSH_KEY_PATH
+      #     chmod 600 $SSH_KEY_PATH
+      #     ssh-keyscan -H ${{ secrets.DEPLOY_HOST }} >> ~/.ssh/known_hosts
+      #     eval $(ssh-agent -s)
+      #     echo "$SSH_PASSPHRASE" | ssh-add $SSH_KEY_PATH
 
-      - name: Set up Docker Context
-        run: |
-          docker context create remote --docker "host=ssh://deploy@${{ secrets.DEPLOY_HOST }}"
-          docker context use remote
+      # - name: Set up Docker Context
+      #   run: |
+      #     docker context create remote --docker "host=ssh://deploy@${{ secrets.DEPLOY_HOST }}"
+      #     docker context use remote
 
-      - name: Deploy with Docker Compose
-        env:
-          DOCKER_HOST: ssh://deploy@${{ secrets.DEPLOY_HOST }}
-        run: |
-          docker compose -f compose.yaml -f compose.prod.yaml up -d
+      # - name: Deploy with Docker Compose
+      #   env:
+      #     DOCKER_HOST: ssh://deploy@${{ secrets.DEPLOY_HOST }}
+      #   run: |
+      #     docker compose -f compose.yaml -f compose.prod.yaml up -d
