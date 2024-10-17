@@ -4,6 +4,11 @@ services:
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--entryPoints.web.address=:80"
+    restart: always
+
+  postgresdb:
+    restart: always
 
   falak:
     image: ghcr.io/jadwalapp/symmetrical-spoon/falak:main
+    restart: always
