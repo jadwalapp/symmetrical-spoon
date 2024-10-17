@@ -9,7 +9,7 @@ on:
       - 'compose.yaml'
       - 'compose.override.yaml'
       - 'compose.prod.yaml'
-      - '.github/workflows/build-push-falak.yaml'
+      - '.github/workflows/build-and-push-falak.yaml'
 
 env:
   REGISTRY: ghcr.io
