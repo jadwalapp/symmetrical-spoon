@@ -9,6 +9,7 @@ on:
       - 'compose.yaml'
       - 'compose.override.yaml'
       - 'compose.prod.yaml'
+      - '.github/workflows/build-push-falak.yaml'
 
 env:
   REGISTRY: ghcr.io
@@ -44,7 +45,7 @@ jobs:
       uses: docker/build-push-action@v6.9.0
       with:
         context: ./falak
-        platforms: linux/amd64,linux/arm64
+        platforms: linux/arm64
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
