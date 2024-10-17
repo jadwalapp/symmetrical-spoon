@@ -25,7 +25,7 @@ jobs:
           key: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
           port: 22
           passphrase: ${{ secrets.SSH_KEY_PASSPHRASE }}
-          script: whomai
+          script: whoami
       
       - name: Create deploy docker context
         run: |
