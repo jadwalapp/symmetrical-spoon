@@ -26,3 +26,9 @@ jobs:
           port: 22
           passphrase: ${{ secrets.SSH_KEY_PASSPHRASE }}
           script: whomai
+      
+      - name: Create deploy docker context
+        run: |
+          docker context create deploy --docker host=ssh://deploy@${{ secrets.DEPLOY_HOST }}
+          docker context use deploy
+          docker ps -a
