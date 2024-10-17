@@ -40,3 +40,5 @@ After you install it, run the following to get a web interface to call the api:
 ```bash
 grpcui -plaintext falak.localhost:80
 ```
+
+> life is cool
