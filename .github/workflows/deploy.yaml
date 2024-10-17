@@ -31,6 +31,7 @@ jobs:
           mkdir -p ~/.ssh
           echo "$SSH_PRIVATE_KEY" > $SSH_KEY_PATH
           chmod 600 $SSH_KEY_PATH
+          ssh-keyscan -H ${{ secrets.DEPLOY_HOST }} >> ~/.ssh/known_hosts
           eval $(ssh-agent -s)
           echo "$SSH_PASSPHRASE" | ssh-add $SSH_KEY_PATH
 
