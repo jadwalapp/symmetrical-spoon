@@ -20,6 +20,7 @@ type GrpcConfig struct {
 	SMTPUSername  string `mapstructure:"SMTP_USERNAME"`
 	SMTPPasword   string `mapstructure:"SMTP_PASSWORD"`
 	Domain        string `mapstructure:"DOMAIN"`
+	ResendApiKey  string `mapstructure:"RESEND_API_KEY"`
 }
 
 // LoadGrpcConfig reads configuration from the provided path or environment variables.

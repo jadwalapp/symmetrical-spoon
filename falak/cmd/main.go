@@ -18,6 +18,7 @@ import (
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/store"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/tokens"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/util"
+	"github.com/resendlabs/resend-go"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc"
@@ -91,6 +92,10 @@ func main() {
 	apiMetadata := apimetadata.NewApiMetadata()
 	// ======== API METADATA ========
 
+	// ======== RESEND ========
+	resendCli := resend.NewClient(config.ResendApiKey)
+	// ======== RESEND ========
+
 	// ======== EMAILER ========
 	var emailerImpl emailer.Emailer
 	switch config.EmailerName {
@@ -98,6 +103,8 @@ func main() {
 		emailerImpl = emailer.NewSmtpEmailer(config.SMTPHost, config.SMTPPort, config.SMTPUSername, config.SMTPPasword)
 	case string(emailer.EmailerName_Stdout):
 		emailerImpl = emailer.NewStdoutEmailer()
+	case string(emailer.EmailerName_Resend):
+		emailerImpl = emailer.NewResendEmailer(*resendCli)
 	}
 	// ======== EMAILER ========
 

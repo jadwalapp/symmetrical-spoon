@@ -11,6 +11,7 @@ type EmailerName string
 const (
 	EmailerName_Stdout EmailerName = "stdout"
 	EmailerName_SMTP   EmailerName = "smtp"
+	EmailerName_Resend EmailerName = "resend"
 )
 
 type FromEmail string
