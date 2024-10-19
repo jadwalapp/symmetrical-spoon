@@ -1,0 +1,48 @@
+\begin{usecase}{Schedule Prayer Times}
+    \ucbasicinfo{HIGH}{Regular}
+    \ucshortdescription{Allows users to create, edit, and manage their prayer time schedules.}
+    \uctrigger{User selects the option to schedule prayer times.}
+    \ucactors{User}{None}
+    \ucpreconditions{User must be logged into the system.}
+    \ucrelationships{N/A}{N/A}{N/A}
+    \ucinputsoutputs{
+      \begin{itemize}
+        \item \textbf{User's prayer time details} (Source: user)
+        \item \textbf{(date, time)}
+      \end{itemize}
+    }{
+      \begin{itemize}
+        \item \textbf{Confirmation of scheduled prayer times, calendar entries.}
+      \end{itemize}
+    }
+    \ucmainflow{
+      \begin{enumerate}
+        \item User navigates to the prayer scheduling page.
+          \ucinfo{User is presented with a form to enter prayer times. Display of the scheduling interface.}
+        \item User inputs prayer time details.
+          \ucinfo{Input fields for time, date, and prayer type. User's input is captured for validation.}
+        \item User saves the schedule.
+          \ucinfo{System checks for valid input. Confirmation message displayed.}
+        \item System confirms schedule creation.
+          \ucinfo{User receives a notification. Scheduled prayer times are saved in the system.}
+      \end{enumerate}
+    }
+    \ucalternateflows{
+      \begin{itemize}
+        \item If input is invalid, display error messages.
+      \end{itemize}
+    }
+    \ucexceptions{
+      \begin{itemize}
+        \item If there's a system error, display a relevant error message.
+      \end{itemize}
+    }
+    \ucpostconditions{The system generates calendar entries for the scheduled prayer times.}
+    \ucspecialrequirements{The system must support notifications for prayer times.}
+    \ucconclusion{User's prayer times are successfully scheduled.}
+    \ucbusinessrules{
+      \begin{itemize}
+        \item Prayer times must be within valid time ranges.
+      \end{itemize}
+    }
+\end{usecase}
