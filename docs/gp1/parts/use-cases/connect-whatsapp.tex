@@ -1,0 +1,39 @@
+\begin{usecase}{Connect WhatsApp}
+    \ucbasicinfo{\#7}{HIGH}{Regular}
+    \ucshortdescription{This UC allows the user to connect their WhatsApp account to our system.}
+    \uctrigger{This UC is triggered when the user clicks on "Connect WhatsApp" button in the app.}
+    \ucactors{User}{WhatsApp}
+    \ucpreconditions{User must be logged in}
+    \ucrelationships{N/A}{N/A}{N/A}
+    \ucinputsoutputs{
+      \begin{itemize}
+        \item \textbf{WhatsApp account number} (Source: User)
+        \item \textbf{WhatsApp linking code} (Source: User)
+      \end{itemize}
+    }{
+      \begin{itemize}
+        \item \textbf{WhatsApp linking code} (Destination: WhatsApp)
+        \item \textbf{WhatsApp auth creds} (Destination: System)
+      \end{itemize}
+    }
+    \ucmainflow{
+      \begin{enumerate}
+        \item The user clicks "Connect WhatsApp" button.
+        \ucinfo{System asks for phone number via a dialog}
+        \item The user enters their WhatsApp account phone number.
+        \ucinfo{WhatsApp sends the linking code.}
+        \item The user enters the linking code shown in the WhatsApp app in our app.
+        \ucinfo{Confirmation of successful connection}
+      \end{enumerate}
+    }
+    \ucalternateflows{None}
+    \ucexceptions{
+      \begin{itemize}
+        \item \textbf{Wrong linking code:} If the user enters a wrong linking code, the connection of the WhatsApp account will fail unless they enter the correct  code.
+        \item \textbf{Network issue:} A network issue interrupting the communication between the app, the server, and WhatsApp.
+      \end{itemize}
+    }
+    \ucpostconditions{The system has access to the user's WhatsApp account.}
+    \ucspecialrequirements{None}
+    \ucconclusion{The UC ends when the user has a connected WhatsApp account.}
+\end{usecase}

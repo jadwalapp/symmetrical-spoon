@@ -1,0 +1,143 @@
+\ProvidesPackage{usecase}[2024/03/19 v1.2 Use Case Document Package]
+
+\RequirePackage{xcolor}
+\RequirePackage{tcolorbox}
+\RequirePackage{enumitem}
+\RequirePackage{changepage}
+\RequirePackage{hyperref}  % For creating clickable links in TOC
+
+% Color definitions
+\definecolor{darkgreen}{RGB}{0,100,0}
+\definecolor{lightgreen}{RGB}{235,255,235}
+
+% Counter for use cases
+\newcounter{usecasecount}
+
+% Use case environment
+\newenvironment{usecase}[1]{%
+  \stepcounter{usecasecount}%
+  \phantomsection  % For correct hyperlinking
+  \addcontentsline{toc}{section}{Use Case \theusecasecount: #1}  % Add to TOC
+  \noindent
+  \begin{tcolorbox}[
+    colback=darkgreen,
+    colframe=darkgreen,
+    arc=0mm,
+    top=6mm,
+    bottom=6mm,
+    left=4mm,
+    right=4mm,
+    width=\textwidth,
+  ]
+    \centering
+    \textcolor{white}{\Huge\bfseries Use Case \theusecasecount}\\[3mm]
+    \textcolor{white}{\LARGE #1}
+  \end{tcolorbox}
+  \vspace{5mm}
+}{%
+  \vspace{1cm}
+}
+
+% Section box command
+\newcommand{\usecasesection}[2]{
+  \vspace{0.3cm}
+  \noindent
+  \begin{tcolorbox}[
+    colback=lightgreen,
+    colframe=darkgreen,
+    arc=0mm,
+    title=#1,
+    fonttitle=\large\bfseries,
+    coltitle=white,
+    top=1mm,
+    bottom=1mm,
+    left=1mm,
+    right=1mm,
+    toptitle=1mm,
+    bottomtitle=1mm,
+    boxsep=0pt,
+    after skip=3pt,
+  ]
+    #2
+  \end{tcolorbox}
+}
+
+% Commands for specific sections (to be used inside the usecase environment)
+\newcommand{\ucbasicinfo}[3]{
+  \usecasesection{Basic Information}{
+    \begin{description}[font=\normalfont, labelwidth=3cm, leftmargin=!,noitemsep,align=left]
+      \item[ID Number:] #1
+      \item[Priority:] #2
+      \item[Type:] #3
+    \end{description}
+  }
+}
+
+\newcommand{\ucshortdescription}[1]{
+  \usecasesection{Short Description}{#1}
+}
+
+\newcommand{\uctrigger}[1]{
+  \usecasesection{Trigger}{#1}
+}
+
+\newcommand{\ucactors}[2]{
+  \usecasesection{Actors}{\textbf{Primary:} #1 \quad \textbf{Secondary:} #2}
+}
+
+\newcommand{\ucpreconditions}[1]{
+  \usecasesection{Preconditions}{#1}
+}
+
+\newcommand{\ucrelationships}[3]{
+  \usecasesection{Relationships}{
+    \textbf{Extends:} #1 \quad \textbf{Includes:} #2 \quad \textbf{Generalization/Specialization:} #3
+  }
+}
+
+\newcommand{\ucinputsoutputs}[2]{
+  \noindent
+  \begin{minipage}[t]{0.48\textwidth}
+    \usecasesection{Major Inputs}{#1}
+  \end{minipage}%
+  \hfill%
+  \begin{minipage}[t]{0.48\textwidth}
+    \usecasesection{Major Outputs}{#2}
+  \end{minipage}
+}
+
+\newcommand{\ucmainflow}[1]{
+  \usecasesection{Main Flow}{#1}
+}
+
+\newcommand{\ucalternateflows}[1]{
+  \usecasesection{Alternate Flows}{#1}
+}
+
+\newcommand{\ucexceptions}[1]{
+  \usecasesection{Exceptions}{#1}
+}
+
+\newcommand{\ucpostconditions}[1]{
+  \usecasesection{Post-conditions}{#1}
+}
+
+\newcommand{\ucspecialrequirements}[1]{
+  \usecasesection{Special Requirements}{#1}
+}
+
+\newcommand{\ucconclusion}[1]{
+  \usecasesection{Conclusion}{#1}
+}
+
+% Setup for lists
+\setlist{noitemsep, topsep=0pt, parsep=0pt, partopsep=0pt, leftmargin=*}
+
+% Command for information in main flow
+\newcommand{\ucinfo}[1]{
+  \begin{adjustwidth}{1cm}{}
+    \textit{Information:} #1
+  \end{adjustwidth}
+}
+
+\endinput
