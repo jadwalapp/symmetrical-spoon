@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		6564DC342CC4158E005FB2F3 /* GRPC in Frameworks */ = {isa = PBXBuildFile; productRef = 6564DC332CC4158E005FB2F3 /* GRPC */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		6564DBC72CC3E88C005FB2F3 /* Mishkat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Mishkat.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -36,6 +40,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6564DC342CC4158E005FB2F3 /* GRPC in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +83,7 @@
 			);
 			name = Mishkat;
 			packageProductDependencies = (
+				6564DC332CC4158E005FB2F3 /* GRPC */,
 			);
 			productName = Mishkat;
 			productReference = 6564DBC72CC3E88C005FB2F3 /* Mishkat.app */;
@@ -107,6 +113,9 @@
 			);
 			mainGroup = 6564DBBE2CC3E88C005FB2F3;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				6564DC2C2CC41399005FB2F3 /* XCRemoteSwiftPackageReference "grpc-swift" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 6564DBC82CC3E88C005FB2F3 /* Products */;
 			projectDirPath = "";
@@ -345,6 +354,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		6564DC2C2CC41399005FB2F3 /* XCRemoteSwiftPackageReference "grpc-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/grpc/grpc-swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.24.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		6564DC332CC4158E005FB2F3 /* GRPC */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6564DC2C2CC41399005FB2F3 /* XCRemoteSwiftPackageReference "grpc-swift" */;
+			productName = GRPC;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 6564DBBF2CC3E88C005FB2F3 /* Project object */;
 }

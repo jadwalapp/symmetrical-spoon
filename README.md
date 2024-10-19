@@ -23,9 +23,15 @@ You need the following dependencies:
 
 and you need those deps:
 
-```
+```bash
 go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
 go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+```
+
+and you need those deps for the iOS app, you nede homebrew to install those two deps on linux and macOS:
+
+```bash
+brew install swift-protobuf grpc-swift
 ```
 
 > Run: `task gen-proto`
