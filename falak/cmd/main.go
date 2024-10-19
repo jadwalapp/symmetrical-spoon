@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"net"
+	"net/http"
 	"os"
 
 	"github.com/bufbuild/protovalidate-go"
@@ -14,6 +15,9 @@ import (
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/apimetadata"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/email/emailer"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/email/template"
+	googlesvc "github.com/jadwalapp/symmetrical-spoon/falak/pkg/google"
+	googleclient "github.com/jadwalapp/symmetrical-spoon/falak/pkg/google/client"
+	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/httpclient"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/interceptors"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/store"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/tokens"
@@ -112,6 +116,15 @@ func main() {
 	templates := template.NewTemplates(config.Domain)
 	// ======== TEMPLATES ========
 
+	// ======== GOOGLE CLIENT ========
+	googleHttpCli := httpclient.NewClient(&http.Client{})
+	googleCli := googleclient.NewClient(googleHttpCli, config.GoogleClientBaseUrl)
+	// ======== GOOGLE CLIENT ========
+
+	// ======== GOOGLE SVC ========
+	googleSvc := googlesvc.NewService(config.GoogleOAuthClientId, googleCli)
+	// ======== GOOGLE SVC ========
+
 	// ======== SERVER ========
 	lis, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%s", config.Port))
 	if err != nil {
@@ -135,7 +148,7 @@ func main() {
 		log.Fatal().Msgf("cannot create proto validator: %v", err)
 	}
 
-	authServer := auth.NewService(*pv, *dbStore, tokens, emailerImpl, templates, apiMetadata)
+	authServer := auth.NewService(*pv, *dbStore, tokens, emailerImpl, templates, apiMetadata, googleSvc)
 	authpb.RegisterAuthServer(grpcServer, authServer)
 
 	if err := grpcServer.Serve(lis); err != nil {
