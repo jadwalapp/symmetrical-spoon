@@ -10,9 +10,22 @@
 		6564DBC72CC3E88C005FB2F3 /* Mishkat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Mishkat.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		6564DC2B2CC40DA6005FB2F3 /* Exceptions for "Mishkat" folder in "Mishkat" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 6564DBC62CC3E88C005FB2F3 /* Mishkat */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		6564DBC92CC3E88C005FB2F3 /* Mishkat */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				6564DC2B2CC40DA6005FB2F3 /* Exceptions for "Mishkat" folder in "Mishkat" target */,
+			);
 			path = Mishkat;
 			sourceTree = "<group>";
 		};
@@ -256,6 +269,7 @@
 				DEVELOPMENT_TEAM = JL46C549NC;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Mishkat/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Jadwal;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -287,6 +301,7 @@
 				DEVELOPMENT_TEAM = JL46C549NC;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Mishkat/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Jadwal;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
