@@ -9,9 +9,9 @@ workflows:
         distribution_type: app_store
         bundle_identifier: app.jadwal.mishkat
       vars:
-        BUNDLE_ID: "app.jadwal.mishkat"
-        XCODE_WORKSPACE: "Mishkat.xcodeproj"
-        XCODE_SCHEME: "Mishkat"
+        BUNDLE_ID: app.jadwal.mishkat
+        XCODE_WORKSPACE: Mishkat.xcodeproj
+        XCODE_SCHEME: Mishkat
       xcode: 16.0
     scripts:
       - name: Set up code signing settings on Xcode project
@@ -27,7 +27,7 @@ workflows:
       - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.app
       - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM
     integrations:
-      app_store_connect: fadi-alkhalaf
+      app_store_connect: Fadi AlKhalaf Cloudmagic
     publishing:
       app_store_connect:
         auth: integration
