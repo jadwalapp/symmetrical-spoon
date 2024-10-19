@@ -1,0 +1,49 @@
+\begin{usecase}{Continue with Google}
+  \ucbasicinfo{HIGH}{Regular}
+  \ucshortdescription{This UC allows users to login or continue with Google if we have a Google account}
+  \uctrigger{This UC starts when the user enters their email to the system.}
+  \ucactors{User}{Google}
+  \ucpreconditions{User must have an activated or valid Google email.}
+  \ucrelationships{Send Welcome Email}{N/A}{N/A}
+  \ucinputsoutputs{
+    \begin{itemize}
+      \item \textbf{Google account} (Source: User)
+      \item \textbf{Authentication request to Google} (Source: System)
+    \end{itemize}
+  }{
+    \begin{itemize}
+      \item \textbf{Success or error message} (Destination: User)
+      \item \textbf{Authentication response} (Destination: Google)
+    \end{itemize}
+  }
+  \ucmainflow{
+    \begin{enumerate}
+      \item The user click continue with Google.
+        \ucinfo{System displays "continue with Google" button}
+      \item Authentication request.
+        \ucinfo{A request sent to Google for user authentication and get JWT and sent it to the system, while the system will generate a our JWT}
+      \item Authentication response.
+        \ucinfo{Confirmation of successful authentication}
+    \end{enumerate}
+  }
+  \ucalternateflows{
+    \begin{itemize}
+      \item User cancels authentication
+      \item Authentication failure
+    \end{itemize}
+  }
+  \ucexceptions{
+    \begin{itemize}
+      \item Invalid Google email
+      \item Network issue
+    \end{itemize}
+  }
+  \ucconclusion{}
+  \ucpostconditions{The user is successfully authenticated and redirected to the main application interface}
+  \ucbusinessrules{
+    \begin{itemize}
+      \item User should have valid Google account
+    \end{itemize}
+  }
+  \ucspecialrequirements{Sign-in page should display clear button and error message}
+\end{usecase}

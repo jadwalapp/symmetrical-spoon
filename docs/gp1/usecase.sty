@@ -30,7 +30,6 @@
     width=\textwidth,
   ]
     \centering
-    \textcolor{white}{\Huge\bfseries Use Case \theusecasecount}\\[3mm]
     \textcolor{white}{\LARGE #1}
   \end{tcolorbox}
   \vspace{5mm}
@@ -63,12 +62,12 @@
 }
 
 % Commands for specific sections (to be used inside the usecase environment)
-\newcommand{\ucbasicinfo}[3]{
+\newcommand{\ucbasicinfo}[2]{
   \usecasesection{Basic Information}{
     \begin{description}[font=\normalfont, labelwidth=3cm, leftmargin=!,noitemsep,align=left]
-      \item[ID Number:] #1
-      \item[Priority:] #2
-      \item[Type:] #3
+      \item[ID Number:] \theusecasecount
+      \item[Priority:] #1
+      \item[Type:] #2
     \end{description}
   }
 }
@@ -128,6 +127,10 @@
 
 \newcommand{\ucconclusion}[1]{
   \usecasesection{Conclusion}{#1}
+}
+
+\newcommand{\ucbusinessrules}[1]{
+  \usecasesection{Business Rules}{#1}
 }
 
 % Setup for lists

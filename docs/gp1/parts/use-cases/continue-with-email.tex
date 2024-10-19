@@ -1,5 +1,5 @@
 \begin{usecase}{Continue with Email}
-    \ucbasicinfo{\#1}{HIGH}{Regular}
+    \ucbasicinfo{HIGH}{Regular}
     \ucshortdescription{This UC allows users to login or create an account using their email.}
     \uctrigger{This UC starts when the user enters their email to the system.}
     \ucactors{User}{None}
@@ -40,7 +40,7 @@
         \item Magic link expired or invalid.
       \end{itemize}
     }
+    \ucconclusion{This UC ends when the user is logged in.}
     \ucpostconditions{The system generates a JWT.}
     \ucspecialrequirements{An email server must be present to send email magic link.}
-    \ucconclusion{This UC ends when the user is logged in.}
 \end{usecase}
