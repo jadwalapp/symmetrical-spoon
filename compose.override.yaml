@@ -13,6 +13,10 @@ services:
       - "traefik.http.routers.dashboard.service=api@internal"
       - "traefik.http.routers.dashboard.entrypoints=web"
 
+  postgresdb:
+    ports:
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
+
   falak:
     build:
       context: ./falak
