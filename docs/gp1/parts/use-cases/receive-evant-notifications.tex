@@ -1,0 +1,42 @@
+\begin{usecase}{Receive Event Notifications}
+    \ucbasicinfo{HIGH}{Regular}
+    \ucshortdescription{Allows users to receive notifications about upcoming events.}
+    \uctrigger{User subscribes to notifications for specific events.}
+    \ucactors{User}{}
+    \ucpreconditions{User must be logged into the system and subscribed to event notifications.}
+    \ucrelationships{N/A}{User Preferences Management }{N/A}
+    \ucinputsoutputs{
+      \begin{itemize}
+        \item \textbf{User’s subscription preferences,event details. } (Source: User)
+      \end{itemize}
+    }{
+      \begin{itemize}
+        
+        \item \textbf{Notifications sent to users,confirmation of subscription.} (Destination: System)
+      \end{itemize}
+    }
+    \ucmainflow{
+      \begin{enumerate}
+        \item Notifications sent to users, confirmation of subscription.
+        \ucinfo{User is presented with options to manage notification preferences. Display of current subscription status and options.}
+        \item User selects events to receive notifications for.
+        \ucinfo{Options for different types of events prayer times, community events.User’s selections are captured for processing.}
+        \item User saves the notification preferences.
+        \ucinfo{System validates user selections. Confirmation message displayed.}
+        \item System schedules notifications based on user preferences.
+        \ucinfo{Notifications are set to trigger at specified times. Notifications are queued for delivery.}
+      \end{enumerate}
+    }
+    \ucalternateflows{If user cancels the subscription, display confirmation message.}
+    \ucexceptions{
+      \begin{itemize}
+        \item \textbf{If there’s a system error, display a relevant error message.:} 
+      \end{itemize}
+    }
+    \ucconclusion{User successfully subscribes to event notifications.}
+    \ucpostconditions{Notifications are sent to users as per their preferences.}
+    \ucspecialrequirements{The system must support multiple notification channels (email, app notifications).}
+    \ucbusinessrules{Notifications must be sent in accordance with user preferences.
+
+    }
+\end{usecase}

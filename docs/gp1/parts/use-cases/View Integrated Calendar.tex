@@ -1,0 +1,42 @@
+\begin{usecase}{View Integrated Calendar}
+    \ucbasicinfo{HIGH}{Regular}
+    \ucshortdescription{Allows users to view their integrated calendar with all scheduled events and reminders.}
+    \uctrigger{User selects the option to view the integrated calendar.}
+    \ucactors{User}{}
+    \ucpreconditions{User must be logged into the system.}
+    \ucrelationships{N/A}{Event Management }{N/A}
+    \ucinputsoutputs{
+      \begin{itemize}
+        \item \textbf{User's request to view the calendar, date range. } (Source: User)
+      \end{itemize}
+    }{
+      \begin{itemize}
+        
+        \item \textbf{Display of the integrated calendar with events and reminders.} (Destination: System)
+      \end{itemize}
+    }
+    \ucmainflow{
+      \begin{enumerate}
+        \item Display of the integrated calendar with events and reminders.
+        \ucinfo{Display of the current month with events highlighted.}
+        \item Options to navigate through months or choose a specific date. 
+        \ucinfo{Calendar updates to show selected date events.}
+        \item Events are pulled from the user's account and any linked calendars. 
+        \ucinfo{Display of events for the selected date.}
+        \item Tooltips or pop-up modals show event details.
+        \ucinfo{Detailed view of selected event information.}
+      \end{enumerate}
+    }
+    \ucalternateflows{ Notify the user about the absence of events.Message indicating "No events scheduled.}
+    \ucexceptions{
+      \begin{itemize}
+        \item \textbf{Log error for troubleshooting.User-friendly error message displayed.:} 
+      \end{itemize}
+    }
+    \ucconclusion{User successfully views their integrated calendar with all scheduled events.}
+    \ucpostconditions{The calendar remains updated with any new events or changes.}
+    \ucspecialrequirements{The system must support integration with external calendars (Google Calendar).}
+    \ucbusinessrules{Events must be displayed according to user preferences (color coding, categories).
+
+    }
+\end{usecase}
