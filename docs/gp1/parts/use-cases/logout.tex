@@ -1,48 +1,45 @@
-\begin{usecase}{Continue with Google}
-  \ucbasicinfo{\#2}{HIGH}{Regular}
-  \ucshortdescription{This UC allows users to login or continue with Google if we have a Google account}
-  \uctrigger{This UC starts when the user enters their email to the system.}
-  \ucactors{User}{Google}
-  \ucpreconditions{User must have an activated or valid Google email.}
-  \ucrelationships{Send Welcome Email}{N/A}{N/A}
+\begin{usecase}{Log out}
+  \ucbasicinfo{HIGH}{Regular}
+  \ucshortdescription{User able to logout}
+  \uctrigger{when the UC is done from the application}
+  \ucactors{User}{}
+  \ucpreconditions{User must log in}
+  \ucrelationships{}{}{}
   \ucinputsoutputs{
     \begin{itemize}
-      \item \textbf{Google account} (Source: User)
-      \item \textbf{Authentication request to Google} (Source: System)
+      \item \textbf{Log-out} (Source: User)
     \end{itemize}
   }{
     \begin{itemize}
-      \item \textbf{Success or error message} (Destination: User)
-      \item \textbf{Authentication response} (Destination: Google)
+      \item \textbf{logged out from system} (Destination: System)
     \end{itemize}
   }
   \ucmainflow{
     \begin{enumerate}
-      \item The user click continue with Google.
-        \ucinfo{System displays "continue with Google" button}
-      \item Authentication request.
-        \ucinfo{A request sent to Google for user authentication and get JWT and sent it to the system, while the system will generate a our JWT}
-      \item Authentication response.
-        \ucinfo{Confirmation of successful authentication}
+      \item The user click the button Log-out
+        \ucinfo{System displays "Log-out" button}
+      \item Emphasize the Log-out.
+        \ucinfo{The system may prompt the user to confirm the logout action}
+      \item The user will be logged out from the system
+        \ucinfo{Confirmation of successful Log-out}
     \end{enumerate}
   }
   \ucalternateflows{
     \begin{itemize}
-      \item User cancels authentication
-      \item Authentication failure
+      \item If the user selects "Cancel" on the confirmation prompt, the system returns to the previous page without logging out.
     \end{itemize}
   }
   \ucexceptions{
     \begin{itemize}
-      \item Invalid Google email
+      \item System error
       \item Network issue
     \end{itemize}
   }
   \ucconclusion{}
-  \ucpostconditions{The user is successfully authenticated and redirected to the main application interface}
+  \ucpostconditions{The user will be logged out from the system}
   \ucbusinessrules{
     \begin{itemize}
-      \item User should have valid Google account
+      \item User should log in
     \end{itemize}
   }
   \ucspecialrequirements{Sign-in page should display clear button and error message}
