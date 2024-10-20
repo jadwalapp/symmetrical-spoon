@@ -1,0 +1,51 @@
+\begin{usecase}{Add Event Manually}
+    \ucbasicinfo{HIGH}{Regular}
+    \ucshortdescription{This UC allows users to add events manually }
+    \uctrigger{The user clicks and adds the events.}
+    \ucactors{User}{None}
+    \ucpreconditions{The user is logged into the application }
+    \ucrelationships{N/Al}{N/A}{N/A}
+    \ucinputsoutputs{
+      \begin{itemize}
+        \item \textbf{Event Name} (Source: User)
+        \item \textbf{Event Location} (Source: User)
+        \item \textbf{Event Date (Start and End)} (Source: User)
+        \item \textbf{Event Time (Start and End)} (Source: User)
+        \item \textbf{Event Description} (Source: User)
+        \item \textbf{Notifications/Reminders} (Source: User)
+      \end{itemize}
+    }{
+      \begin{itemize}
+        \item \textbf{The event is displayed on the calendar with its details and duration
+        } (Destination: Calendar)
+      \end{itemize}
+    }
+    \ucmainflow{
+      \begin{enumerate}
+        \item The name of the event (e.g., "Meeting with Client")
+          \ucinfo{Event is saved and displayed on the user’s calendar}
+        \item The start and end time of the event.
+          \ucinfo{The system displays the event in the correct time slot with its duration, while checking for conflicts and scheduling notifications}
+        \item The User optionally adds a description
+          \ucinfo{The system stores and displays description of the event.}
+        \item Set reminders for the event.
+          \ucinfo{Notification or reminder set for the event}
+      \end{enumerate}
+    }
+    \ucalternateflows{
+      \begin{enumerate}
+        \item User clicks on a date on the calendar to bring up a popup with event fields and the date is pre-filled. 
+        \item	The user can add a different color for the events.
+      \end{enumerate}
+    }
+    \ucexceptions{
+      \begin{itemize}
+        \item Invalid date and time format\
+        \item The event's start and end times conflict with an existing event
+        \item The user attempts to save the event without filling in mandatory fields
+      \end{itemize}
+    }
+    \ucconclusion{The UC ends when the event has been successfully added to the calendar, and the user sees it displayed.}
+    \ucpostconditions{The event is successfully added to the calendar, visible in the correct time slot, and notifications are set as per user preferences}
+    \ucspecialrequirements{The interface must be simple and allowing users to input events with less efforts.}
+\end{usecase}
