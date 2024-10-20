@@ -4,11 +4,39 @@ services:
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--entryPoints.web.address=:80"
+      - "--entryPoints.websecure.address=:443"
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      - "--certificatesresolvers.myresolver.acme.email=${ACME_EMAIL}"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+      - "--entryPoints.web.http.redirections.entryPoint.to=websecure"
+      - "--entryPoints.web.http.redirections.entryPoint.scheme=https"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "traefik-certificates:/letsencrypt"
     restart: always
+    labels:
+      - "traefik.http.routers.http-catchall.rule=hostregexp(`{host:.+}`)"
+      - "traefik.http.routers.http-catchall.entrypoints=web"
+      - "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
 
   postgresdb:
     restart: always
+    ports: []
 
   falak:
     image: ghcr.io/jadwalapp/symmetrical-spoon/falak:main
     restart: always
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.falak.rule=Host(`${FALAK_HOST}`)"
+      - "traefik.http.routers.falak.entrypoints=websecure"
+      - "traefik.http.routers.falak.tls.certresolver=myresolver"
+      - "traefik.http.services.falak.loadbalancer.server.port=${FALAK_PORT}"
+      - "traefik.http.services.falak.loadbalancer.server.scheme=h2c"
+
+volumes:
+  traefik-certificates:

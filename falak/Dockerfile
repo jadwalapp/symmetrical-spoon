@@ -3,7 +3,7 @@ WORKDIR /falak
 COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -o main cmd/main.go
 
-FROM alpine:latest as certs
+FROM alpine:latest AS certs
 RUN apk --update add ca-certificates
 
 FROM scratch

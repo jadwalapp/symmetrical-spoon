@@ -6,6 +6,8 @@ services:
       - "80:80"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    networks:
+      - web
 
   postgresdb:
     image: postgres:17
@@ -31,6 +33,8 @@ services:
       retries: 5
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - internal
 
   falak:
     build:
@@ -48,11 +52,13 @@ services:
     depends_on:
       postgresdb:
         condition: service_healthy
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.falak.rule=Host(`${FALAK_HOST}`)"
-      - "traefik.http.services.falak.loadbalancer.server.port=${FALAK_PORT}"
-      - "traefik.http.services.falak.loadbalancer.server.scheme=h2c"
+    networks:
+      - web
+      - internal
 
 volumes:
   postgres_data:
+
+networks:
+  web:
+  internal:

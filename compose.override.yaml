@@ -5,5 +5,20 @@ services:
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--entryPoints.web.address=:80"
+      - "--log.level=DEBUG"
     ports:
       - "8080:8080"
+    labels:
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.localhost`)"
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.routers.dashboard.entrypoints=web"
+
+  falak:
+    build:
+      context: ./falak
+      dockerfile: "Dockerfile"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.falak.rule=Host(`${FALAK_HOST}`)"
+      - "traefik.http.services.falak.loadbalancer.server.port=${FALAK_PORT}"
+      - "traefik.http.services.falak.loadbalancer.server.scheme=h2c"
