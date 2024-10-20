@@ -13,6 +13,9 @@ on:
 jobs:
   build-and-push:
     uses: ./.github/workflows/reuseable-build-and-push.yaml
+    permissions:
+      contents: read
+      packages: write
     with:
       image_name: website
       context_path: ./website
