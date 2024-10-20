@@ -1,0 +1,17 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": [
+          "JL46C549NC.app.jadwal.mishkat"
+        ],
+        "components": [
+          {
+            "/": "/magic-link",
+            "comment": "Used for magic link experience :D"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct OnboardingView: View {
+    @EnvironmentObject var authViewModel: AuthViewModel
+    
     var body: some View {
         VStack {
             Spacer()
@@ -35,14 +37,14 @@ struct OnboardingView: View {
                 icon: .brandGoogle,
                 label: "Continue with Google"
             ) {
-                print("Continue with Google")
+                authViewModel.continueWithGoogle()
             }
             .padding(.bottom, 8)
             OButton(
                 icon: .mail,
                 label: "Continue with Email"
             ) {
-                print("Continue with Email")
+                authViewModel.continueWithEmail()
             }
             Spacer()
         }
