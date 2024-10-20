@@ -20,12 +20,12 @@
       \begin{enumerate}
         \item The user enters their email.
           \ucinfo{System displays email input field.}
-        \item System sends email and displays "Check your email" message.
-          \ucinfo{WhatsApp sends the linking code.}
-        \item User interacts with email client.
-          \ucinfo{Confirmation of successful connection.}
-        \item System verifies link and logs user in.
-          \ucinfo{System processes link and updates user status.}
+        \item System generates and sends magic link.
+          \ucinfo{System sends email and displays "Check your email" message}
+        \item The user clicks the magic link.
+          \ucinfo{The app is opened on the device of the user}
+        \item The app sends the token to the system to log the user in
+          \ucinfo{System verifies token and logs user in.}
       \end{enumerate}
     }
     \ucalternateflows{
@@ -37,7 +37,7 @@
       \begin{itemize}
         \item Invalid email format.
         \item Email not registered (if login only).
-        \item Magic link expired or invalid.
+        \item Magic link token expired or invalid.
       \end{itemize}
     }
     \ucconclusion{This UC ends when the user is logged in.}

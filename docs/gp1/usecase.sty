@@ -65,11 +65,7 @@
 % Commands for specific sections (to be used inside the usecase environment)
 \newcommand{\ucbasicinfo}[2]{
   \usecasesection{Basic Information}{
-    \begin{description}[font=\normalfont, labelwidth=3cm, leftmargin=!,itemsep=0pt,parsep=0pt,align=left]
-      \item[ID Number:] \theusecasecount
-      \item[Priority:] #1
-      \item[Type:] #2
-    \end{description}
+      \textbf{ID Number:} \theusecasecount \quad \textbf{Priority:} #1 \quad \textbf{Type:} #2
   }
 }
 
