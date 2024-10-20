@@ -38,5 +38,15 @@ services:
       - "traefik.http.services.falak.loadbalancer.server.port=${FALAK_PORT}"
       - "traefik.http.services.falak.loadbalancer.server.scheme=h2c"
 
+  website:
+    image: ghcr.io/jadwalapp/symmetrical-spoon/website:main
+    restart: always
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.website.rule=Host(`${WEBSITE_HOST}`)"
+      - "traefik.http.routers.website.entrypoints=websecure"
+      - "traefik.http.routers.website.tls.certresolver=myresolver"
+      - "traefik.http.services.website.loadbalancer.server.port=8080"
+
 volumes:
   traefik-certificates:

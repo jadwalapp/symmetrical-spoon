@@ -2,7 +2,7 @@
 
   on:
     workflow_run:
-      workflows: ["Build and Push Falak Image"]
+      workflows: ["Build and Push Falak Image", "Build and Push Website Image"]
       types:
         - completed
     workflow_dispatch:

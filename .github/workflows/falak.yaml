@@ -1,0 +1,19 @@
+name: Build and Push Falak Image
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'falak/**'
+      - 'proto/**'
+      - 'compose.yaml'
+      - 'compose.override.yaml'
+      - 'compose.prod.yaml'
+      - '.github/workflows/falak.yaml'
+
+jobs:
+  build-and-push:
+    uses: ./.github/workflows/reuseable-build-and-push.yaml
+    with:
+      image_name: falak
+      context_path: ./falak

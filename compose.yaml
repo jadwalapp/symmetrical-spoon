@@ -56,6 +56,17 @@ services:
       - web
       - internal
 
+  website:
+    build:
+      context: ./website
+      dockerfile: Dockerfile
+    networks:
+      - web
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.website.rule=Host(`${WEBSITE_HOST}`)"
+      - "traefik.http.services.website.loadbalancer.server.port=8080"
+
 volumes:
   postgres_data:
 

@@ -1,0 +1,18 @@
+name: Build and Push Website Image
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'website/**'
+      - 'compose.yaml'
+      - 'compose.override.yaml'
+      - 'compose.prod.yaml'
+      - '.github/workflows/website.yaml'
+
+jobs:
+  build-and-push:
+    uses: ./.github/workflows/reuseable-build-and-push.yaml
+    with:
+      image_name: website
+      context_path: ./website
