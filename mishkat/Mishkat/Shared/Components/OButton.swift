@@ -12,8 +12,6 @@ struct OButton: View {
     private var icon: Icons?
     private var action: () -> Void
     
-    @State private var buttonClickCounter: Int = 0
-    
     init(label: String, action: @escaping () -> Void) {
         self.label = label
         self.action = action
@@ -26,10 +24,7 @@ struct OButton: View {
     }
     
     var body: some View {
-        Button(action: {
-            buttonClickCounter += 1
-            action()
-        }) {
+        Button(action: action) {
             HStack {
                 if (icon != nil) {
                     Image(icon!.rawValue)
@@ -44,7 +39,6 @@ struct OButton: View {
             .cornerRadius(999)
         }
         .buttonStyle(.plain)
-        .sensoryFeedback(.impact, trigger: buttonClickCounter)
     }
 }
 
