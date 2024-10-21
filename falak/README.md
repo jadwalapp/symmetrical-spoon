@@ -1,6 +1,6 @@
 # falak
 
-- you need to make a copy of `grpc.env.example` and put it in `grpc.env`, then fill the values.
+- you need to make a copy of `falak.env.example` and put it in `falak.env`, then fill the values.
 
 ## JWT Token Keys Generation:
 
@@ -13,7 +13,7 @@ base64 -i falak-dev-public.pem > falak-dev-public.pem.base64
 base64 -i falak-dev-private.pem > falak-dev-private.pem.base64
 ```
 
-Finally, update your `grpc.env` file with the keys.
+Finally, update your `falak.env` file with the keys.
 
 For additional steps and details, consult the main repository's README.
 

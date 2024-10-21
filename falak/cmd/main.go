@@ -3,18 +3,18 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"net"
 	"net/http"
 	"os"
 
+	"connectrpc.com/connect"
 	"github.com/bufbuild/protovalidate-go"
 	"github.com/golang-migrate/migrate"
 	"github.com/golang-migrate/migrate/database/postgres"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/api/auth"
-	authpb "github.com/jadwalapp/symmetrical-spoon/falak/pkg/api/auth/proto"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/apimetadata"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/email/emailer"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/email/template"
+	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/gen/proto/auth/v1/authv1connect"
 	googlesvc "github.com/jadwalapp/symmetrical-spoon/falak/pkg/google"
 	googleclient "github.com/jadwalapp/symmetrical-spoon/falak/pkg/google/client"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/httpclient"
@@ -25,8 +25,8 @@ import (
 	"github.com/resendlabs/resend-go"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
+	"golang.org/x/net/http2"
+	"golang.org/x/net/http2/h2c"
 
 	_ "github.com/golang-migrate/migrate/source/file"
 	_ "github.com/jackc/pgx/v5/stdlib"
@@ -37,7 +37,7 @@ const dbDriverName = "pgx"
 func main() {
 	log.Logger = zerolog.New(os.Stderr).With().Timestamp().Logger()
 
-	config, err := util.LoadGrpcConfig(".")
+	config, err := util.LoadFalakConfig(".")
 	if err != nil {
 		log.Fatal().Msgf("cannot load config: %v", err)
 	}
@@ -125,33 +125,36 @@ func main() {
 	googleSvc := googlesvc.NewService(config.GoogleOAuthClientId, googleCli)
 	// ======== GOOGLE SVC ========
 
-	// ======== SERVER ========
-	lis, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%s", config.Port))
-	if err != nil {
-		log.Fatal().Msgf("failed to listen: %v", err)
-	}
-	log.Info().Msgf("listening on %s", lis.Addr())
-
-	opts := []grpc.ServerOption{
-		grpc.ChainUnaryInterceptor(
-			interceptors.LoggingInterceptor,
-			interceptors.EnsureValidTokenInterceptor(tokens, apiMetadata),
-			interceptors.LangInterceptor(apiMetadata),
-		),
-	}
-
-	grpcServer := grpc.NewServer(opts...)
-	reflection.Register(grpcServer)
-
+	// ======== PROTOVALIDATE ========
 	pv, err := protovalidate.New()
 	if err != nil {
 		log.Fatal().Msgf("cannot create proto validator: %v", err)
 	}
+	// ======== PROTOVALIDATE ========
+
+	// ======== INTERCEPTORS ========
+	interceptorsForServer := connect.WithInterceptors(
+		interceptors.LoggingInterceptor(),
+		interceptors.EnsureValidTokenInterceptor(tokens, apiMetadata),
+		interceptors.LangInterceptor(apiMetadata),
+	)
+	// ======== INTERCEPTORS ========
+
+	// ======== SERVER ========
+	mux := http.NewServeMux()
 
 	authServer := auth.NewService(*pv, *dbStore, tokens, emailerImpl, templates, apiMetadata, googleSvc)
-	authpb.RegisterAuthServer(grpcServer, authServer)
+	authPath, authHandler := authv1connect.NewAuthServiceHandler(authServer, interceptorsForServer)
+	mux.Handle(authPath, authHandler)
 
-	if err := grpcServer.Serve(lis); err != nil {
+	addr := fmt.Sprintf("0.0.0.0:%s", config.Port)
+	log.Info().Msgf("listening on %s", addr)
+
+	err = http.ListenAndServe(
+		addr,
+		h2c.NewHandler(mux, &http2.Server{}),
+	)
+	if err != nil {
 		log.Fatal().Err(err).Msg("failed to server grpc server")
 	}
 	// ======== SERVER ========

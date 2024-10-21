@@ -1,13 +1,13 @@
 {
-  "originHash" : "b0d8975aa19f1bb7106ae78f24de3911e84189892afc3b6fe6db19bcec9e631c",
+  "originHash" : "69a5afbbc4dc33010d7fdbdf03b2cefa66ed5a57ddd0537a8b985a1ce34aa41a",
   "pins" : [
     {
-      "identity" : "grpc-swift",
+      "identity" : "connect-swift",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/grpc/grpc-swift.git",
+      "location" : "https://github.com/connectrpc/connect-swift",
       "state" : {
-        "revision" : "3ef3a9f42a11bfca767de880f1a0aedd2b65b840",
-        "version" : "1.24.1"
+        "revision" : "6d0f8edc1f7d68908c34fb6b25a49dce45aa55f9",
+        "version" : "0.14.0"
       }
     },
     {
@@ -29,39 +29,12 @@
       }
     },
     {
-      "identity" : "swift-http-types",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-http-types",
-      "state" : {
-        "revision" : "ae67c8178eb46944fd85e4dc6dd970e1f3ed6ccd",
-        "version" : "1.3.0"
-      }
-    },
-    {
-      "identity" : "swift-log",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-log.git",
-      "state" : {
-        "revision" : "9cb486020ebf03bfa5b5df985387a14a98744537",
-        "version" : "1.6.1"
-      }
-    },
-    {
       "identity" : "swift-nio",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-nio.git",
       "state" : {
         "revision" : "f7dc3f527576c398709b017584392fb58592e7f5",
         "version" : "2.75.0"
-      }
-    },
-    {
-      "identity" : "swift-nio-extras",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-nio-extras.git",
-      "state" : {
-        "revision" : "2e9746cfc57554f70b650b021b6ae4738abef3e6",
-        "version" : "1.24.1"
       }
     },
     {
@@ -80,15 +53,6 @@
       "state" : {
         "revision" : "d7ceaf0e4d8001cd35cdc12e42cdd281e9e564e8",
         "version" : "2.28.0"
-      }
-    },
-    {
-      "identity" : "swift-nio-transport-services",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-nio-transport-services.git",
-      "state" : {
-        "revision" : "dbace16f126fdcd80d58dc54526c561ca17327d7",
-        "version" : "1.22.0"
       }
     },
     {

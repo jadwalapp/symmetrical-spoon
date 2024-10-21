@@ -18,9 +18,6 @@ services:
       - ${POSTGRES_PORT}:${POSTGRES_PORT}
 
   falak:
-    build:
-      context: ./falak
-      dockerfile: "Dockerfile"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.falak.rule=Host(`${FALAK_HOST}`)"

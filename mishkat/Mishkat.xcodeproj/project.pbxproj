@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		6564DC342CC4158E005FB2F3 /* GRPC in Frameworks */ = {isa = PBXBuildFile; productRef = 6564DC332CC4158E005FB2F3 /* GRPC */; };
+		650921332CC68C9800E8332B /* Connect in Frameworks */ = {isa = PBXBuildFile; productRef = 650921322CC68C9800E8332B /* Connect */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,7 +40,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6564DC342CC4158E005FB2F3 /* GRPC in Frameworks */,
+				650921332CC68C9800E8332B /* Connect in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -83,7 +83,7 @@
 			);
 			name = Mishkat;
 			packageProductDependencies = (
-				6564DC332CC4158E005FB2F3 /* GRPC */,
+				650921322CC68C9800E8332B /* Connect */,
 			);
 			productName = Mishkat;
 			productReference = 6564DBC72CC3E88C005FB2F3 /* Mishkat.app */;
@@ -114,7 +114,7 @@
 			mainGroup = 6564DBBE2CC3E88C005FB2F3;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				6564DC2C2CC41399005FB2F3 /* XCRemoteSwiftPackageReference "grpc-swift" */,
+				650921312CC68C9800E8332B /* XCRemoteSwiftPackageReference "connect-swift" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 6564DBC82CC3E88C005FB2F3 /* Products */;
@@ -358,21 +358,21 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		6564DC2C2CC41399005FB2F3 /* XCRemoteSwiftPackageReference "grpc-swift" */ = {
+		650921312CC68C9800E8332B /* XCRemoteSwiftPackageReference "connect-swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/grpc/grpc-swift.git";
+			repositoryURL = "https://github.com/connectrpc/connect-swift";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 1.24.1;
+				minimumVersion = 0.14.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		6564DC332CC4158E005FB2F3 /* GRPC */ = {
+		650921322CC68C9800E8332B /* Connect */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 6564DC2C2CC41399005FB2F3 /* XCRemoteSwiftPackageReference "grpc-swift" */;
-			productName = GRPC;
+			package = 650921312CC68C9800E8332B /* XCRemoteSwiftPackageReference "connect-swift" */;
+			productName = Connect;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
