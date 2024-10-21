@@ -7,10 +7,14 @@
 
 import SwiftUI
 
-@MainActor
 class AuthViewModel: ObservableObject {
     enum AuthState {
         case onboarding
+        case emailInput
+        case tokenSent
+    }
+    
+    enum AuthNavigationDestination: Hashable {
         case emailInput
         case tokenSent
     }
@@ -19,37 +23,55 @@ class AuthViewModel: ObservableObject {
     @Published var isAuthenticated = false
     @Published var email: String = ""
     @Published var error: String?
+    @Published var isLoading = false
+    @Published var navigationPath: [AuthNavigationDestination] = []
     
     private let authRepository: AuthRepository
     
     init(authRepository: AuthRepository) {
         self.authRepository = authRepository
+        self.isAuthenticated = KeychainManager.shared.getToken() != nil
     }
     
     func continueWithGoogle() {
+        isLoading = true
         Task {
             do {
-                // TODO: get the google token somehow :D
+                // TODO: Implement Google Sign-In
                 let response = try await authRepository.useGoogle(googleToken: "googleToken")
-                self.isAuthenticated = true
+                await MainActor.run {
+                    KeychainManager.shared.saveToken(response.accessToken)
+                    self.isAuthenticated = true
+                    self.isLoading = false
+                }
             } catch {
-                self.error = error.localizedDescription
+                await MainActor.run {
+                    self.error = error.localizedDescription
+                    self.isLoading = false
+                }
             }
         }
     }
     
     func continueWithEmail() {
-        authState = .emailInput
+        navigationPath.append(.emailInput)
     }
     
     func submitEmail(email: String) {
         self.email = email
+        isLoading = true
         Task {
             do {
                 let _ = try await authRepository.initiateEmail(email: email)
-                self.authState = .tokenSent
+                await MainActor.run {
+                    self.navigationPath.append(.tokenSent)
+                    self.isLoading = false
+                }
             } catch {
-                self.error = error.localizedDescription
+                await MainActor.run {
+                    self.error = error.localizedDescription
+                    self.isLoading = false
+                }
             }
         }
     }
@@ -58,14 +80,29 @@ class AuthViewModel: ObservableObject {
         submitEmail(email: email)
     }
     
-    func completeEmailVerification(token: String) {
+    func handleMagicLink(token: String) {
+        isLoading = true
         Task {
             do {
-                let _ = try await authRepository.completeEmail(token: token)
-                self.isAuthenticated = true
+                let response = try await authRepository.completeEmail(token: token)
+                await MainActor.run {
+                    KeychainManager.shared.saveToken(response.accessToken)
+                    self.isAuthenticated = true
+                    self.isLoading = false
+                }
             } catch {
-                self.error = error.localizedDescription
+                await MainActor.run {
+                    self.error = error.localizedDescription
+                    self.isLoading = false
+                }
             }
         }
+    }
+
+    func logout() {
+        KeychainManager.shared.deleteToken()
+        isAuthenticated = false
+        navigationPath.removeAll()
+        authState = .onboarding
     }
 }

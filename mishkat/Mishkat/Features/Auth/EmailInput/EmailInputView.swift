@@ -20,12 +20,18 @@ struct EmailInputView: View {
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .autocapitalization(.none)
                 .keyboardType(.emailAddress)
+                .disabled(authViewModel.isLoading)
             
-            OButton(icon: .mail, label: "Continue") {
-                authViewModel.submitEmail(email: email)
+            if authViewModel.isLoading {
+                ProgressView()
+            } else {
+                OButton(icon: .mail, label: "Continue") {
+                    authViewModel.submitEmail(email: email)
+                }
             }
         }
         .padding()
+        .navigationBarBackButtonHidden(authViewModel.isLoading)
     }
 }
 

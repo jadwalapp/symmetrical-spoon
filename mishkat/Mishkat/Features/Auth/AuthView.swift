@@ -11,15 +11,16 @@ struct AuthView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
     
     var body: some View {
-        Group {
-            switch authViewModel.authState {
-            case .onboarding:
-                OnboardingView()
-            case .emailInput:
-                EmailInputView()
-            case .tokenSent:
-                TokenSentView()
-            }
+        NavigationStack(path: $authViewModel.navigationPath) {
+            OnboardingView()
+                .navigationDestination(for: AuthViewModel.AuthNavigationDestination.self) { destination in
+                    switch destination {
+                    case .emailInput:
+                        EmailInputView()
+                    case .tokenSent:
+                        TokenSentView()
+                    }
+                }
         }
         .alert(item: Binding(
             get: { authViewModel.error.map { AuthError(message: $0) } },

@@ -6,22 +6,13 @@
 //
 
 import SwiftUI
-import GRPC
 
 @main
 struct MishkatApp: App {
     @StateObject private var authViewModel: AuthViewModel
     
     init() {
-        let channel = ClientConnection.insecure(group: PlatformSupport.makeEventLoopGroup(loopCount: 1))
-            .connect(host: "falak.jadwal.app", port: 80)
-        
-        let client = Auth_AuthNIOClient(
-            channel: channel,
-            defaultCallOptions: CallOptions()
-        )
-        
-        let authRepository = AuthRepository(authClient: client)
+        let authRepository = DependencyContainer.shared.authRepository
         _authViewModel = StateObject(wrappedValue: AuthViewModel(authRepository: authRepository))
     }
     
@@ -30,8 +21,19 @@ struct MishkatApp: App {
             ContentView()
                 .environmentObject(authViewModel)
                 .onOpenURL { url in
-                    print("we got this url 🥳: \(url)")
+                    handleDeepLink(url)
                 }
         }
+    }
+    
+    private func handleDeepLink(_ url: URL) {
+        guard url.path == "/magic-link",
+              let components = URLComponents(url: url, resolvingAgainstBaseURL: true),
+              let token = components.queryItems?.first(where: { $0.name == "token" })?.value
+        else {
+            return
+        }
+        
+        authViewModel.handleMagicLink(token: token)
     }
 }
