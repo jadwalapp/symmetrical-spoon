@@ -9,6 +9,7 @@ on:
       - 'compose.yaml'
       - 'compose.override.yaml'
       - 'compose.prod.yaml'
+      - '.github/workflows/reuseable-build-and-push.yaml'
       - '.github/workflows/falak.yaml'
 
 jobs:
