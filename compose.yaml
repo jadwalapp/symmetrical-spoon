@@ -38,7 +38,7 @@ services:
     build:
       context: ./falak
       dockerfile: "Dockerfile"
-    env_file: ./falak/grpc.env
+    env_file: ./falak/falak.env
     environment:
       DB_USER: ${POSTGRES_USER}
       DB_PASSWORD: ${POSTGRES_PASSWORD}
