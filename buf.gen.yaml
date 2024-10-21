@@ -1,0 +1,17 @@
+version: v2
+plugins:
+  - remote: buf.build/connectrpc/swift
+    out: mishkat/Mishkat/Generated
+    opt:
+      - GenerateAsyncMethods=true
+      - GenerateCallbackMethods=true
+      - Visibility=Public
+  - remote: buf.build/apple/swift
+    out: mishkat/Mishkat/Generated
+    opt: Visibility=Public
+  - local: protoc-gen-go
+    out: falak/pkg/gen/proto
+    opt: paths=source_relative
+  - local: protoc-gen-connect-go
+    out: falak/pkg/gen/proto
+    opt: paths=source_relative

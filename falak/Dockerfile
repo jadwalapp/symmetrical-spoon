@@ -8,7 +8,7 @@ RUN apk --update add ca-certificates
 
 FROM scratch
 COPY --from=builder /falak/main /main
-COPY ./grpc.env.example /grpc.env
+COPY ./falak.env.example /falak.env
 COPY ./pkg/store/migrations pkg/store/migrations
 COPY --from=certs /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 CMD [ "/main" ]

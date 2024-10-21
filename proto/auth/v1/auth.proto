@@ -2,9 +2,9 @@ syntax = "proto3";
 
 import "buf/validate/validate.proto";
 
-option go_package = "github.com/jadwalapp/symmetrical-spoon/falak/pkg/api/auth;authpb";
+option go_package = "github.com/jadwalapp/symmetrical-spoon/falak/pkg/gen/proto/auth/v1;authv1";
 
-package auth;
+package auth.v1;
 
 message InitiateEmailRequest {
     string email = 1 [(buf.validate.field) = {
@@ -33,7 +33,7 @@ message UseGoogleResponse {
     string access_token = 1;
 }
 
-service Auth {
+service AuthService {
     rpc InitiateEmail(InitiateEmailRequest) returns (InitiateEmailResponse);
     rpc CompleteEmail(CompleteEmailRequest) returns (CompleteEmailResponse);
     rpc UseGoogle(UseGoogleRequest) returns (UseGoogleResponse);
