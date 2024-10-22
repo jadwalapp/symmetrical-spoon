@@ -31,6 +31,7 @@ services:
     restart: always
     labels:
       - "traefik.enable=true"
+      - "traefik.docker.network=symmetrical-spoon_web"
       - "traefik.http.routers.falak.rule=Host(`${FALAK_HOST}`)"
       - "traefik.http.routers.falak.entrypoints=websecure"
       - "traefik.http.routers.falak.tls.certresolver=myresolver"
@@ -46,6 +47,16 @@ services:
       - "traefik.http.routers.website.entrypoints=websecure"
       - "traefik.http.routers.website.tls.certresolver=myresolver"
       - "traefik.http.services.website.loadbalancer.server.port=8080"
+
+  grafana:
+    restart: always
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=symmetrical-spoon_web"
+      - "traefik.http.routers.grafana.rule=Host(`${GRAFANA_HOST}`)"
+      - "traefik.http.routers.grafana.entrypoints=websecure"
+      - "traefik.http.routers.grafana.tls.certresolver=myresolver"
+      - "traefik.http.services.grafana.loadbalancer.server.port=3000"
 
 volumes:
   traefik-certificates:

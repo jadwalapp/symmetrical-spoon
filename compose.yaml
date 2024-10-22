@@ -60,10 +60,12 @@ services:
       dockerfile: Dockerfile
     networks:
       - web
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.website.rule=Host(`${WEBSITE_HOST}`)"
-      - "traefik.http.services.website.loadbalancer.server.port=8080"
+
+  grafana:
+    image: grafana/grafana:latest
+    networks:
+      - web
+      - internal
 
 volumes:
   postgres_data:
