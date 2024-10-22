@@ -12,7 +12,7 @@ struct SettingsView: View {
         
         var body: some View {
             Button("Logout") {
-                authViewModel.isAuthenticated = false
+                authViewModel.logout()
             }
             // Add other settings options here
         }
