@@ -1,0 +1,49 @@
+\begin{usecase}{Suggest Conflict Resolutions}
+  \ucbasicinfo{HIGH}{Regular}
+  \ucshortdescription{This UC suggests possible resolutions when the system detects scheduling conflicts between events, including those extracted from WhatsApp.}
+  \uctrigger{The UC is triggered when a scheduling conflict is detected between two or more events.}
+  \ucactors{User}{Calendar System, WhatsApp}
+  \ucpreconditions{The user has events in the calendar, including potentially extracted events from WhatsApp, that overlap.}
+  \ucrelationships{Extends: Extract Events from WhatsApp}{Includes: Manage Scheduling Conflicts}{None}
+  \ucinputsoutputs{
+    \begin{itemize}
+      \item Conflicting events (Source: User or WhatsApp extraction)
+      \item User-selected resolution (Source: User)
+    \end{itemize}
+  }{
+    \begin{itemize}
+      \item {Resolution options} (Destination: User Interface)
+      \item {Updated calendar schedule} (Destination: Calendar)
+    \end{itemize}
+  }
+  \ucmainflow{
+    \begin{enumerate}
+      \item Conflict Detection  
+        \ucinfo{The system detects overlapping events in the calendar, either added manually or extracted from WhatsApp.}
+      \item Offer Resolutions
+        \ucinfo{The system provides the user with a list of resolution options, such as:
+        \begin{itemize}
+          \item Reschedule one of the conflicting events to another time slot.
+          \item Keep both events with a conflict warning. 
+        \end{itemize}}
+      \item User Selection  
+        \ucinfo{The user selects their preferred resolution option from the list provided.}
+      \item Implement Resolution
+        \ucinfo{The system updates the calendar based on the user's choice, rescheduling events or marking conflicts as necessary.}
+    \end{enumerate}
+  }
+  \ucalternateflows{
+    \begin{enumerate}
+      \item {N/A}
+    \end{enumerate}
+  }
+  \ucexceptions{
+    \begin{itemize}
+      \item If the system cannot find an available time slot for rescheduling an event, the system keeps both events but marks them as conflicting.
+      \item If the user does not choose any resolution, the conflicting events are marked as conflicting and remain scheduled.
+    \end{itemize}
+  }
+  \ucconclusion{The UC concludes when the user’s decision is applied, and the calendar reflects the resolution, whether by rescheduling events, prioritizing one, or maintaining both with a conflict warning.}
+  \ucpostconditions{The conflicting events in the calendar are either resolved or marked as conflicting, based on the user’s input.}
+  \ucspecialrequirements{The system should offer feasible conflict resolution options, considering the user’s existing schedule and any extracted events from WhatsApp.}
+\end{usecase}
