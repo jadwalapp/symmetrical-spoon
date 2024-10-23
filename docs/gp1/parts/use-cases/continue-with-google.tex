@@ -1,49 +1,37 @@
 \begin{usecase}{Continue with Google}
   \ucbasicinfo{HIGH}{Regular}
-  \ucshortdescription{This UC allows users to login or continue with Google if we have a Google account}
-  \uctrigger{This UC starts when the user enters their email to the system.}
+  \ucshortdescription{This UC allows users to login or sign up with their Google account.}
+  \uctrigger{This UC starts when the user clicks "Continue with Google" button in the app.}
   \ucactors{User}{Google}
-  \ucpreconditions{User must have an activated or valid Google email.}
+  \ucpreconditions{The user must have an active Google account.}
   \ucrelationships{Send Welcome Email}{N/A}{N/A}
   \ucinputsoutputs{
     \begin{itemize}
-      \item \textbf{Google account} (Source: User)
-      \item \textbf{Authentication request to Google} (Source: System)
+      \item \textbf{Google access token} (Source: User)
     \end{itemize}
   }{
     \begin{itemize}
-      \item \textbf{Success or error message} (Destination: User)
-      \item \textbf{Authentication response} (Destination: Google)
+      \item \textbf{Authentication response} (Destination: User)
     \end{itemize}
   }
   \ucmainflow{
     \begin{enumerate}
       \item The user click continue with Google.
-        \ucinfo{System displays "continue with Google" button}
-      \item Authentication request.
-        \ucinfo{A request sent to Google for user authentication and get JWT and sent it to the system, while the system will generate a our JWT}
-      \item Authentication response.
-        \ucinfo{Confirmation of successful authentication}
+        \ucinfo{App uses OAuth to authenticate with Google}
+      \item App sends Google access token to the system.
+        \ucinfo{System verifies the token is issued for us and then issues JWT for usage within the app.}
     \end{enumerate}
   }
   \ucalternateflows{
     \begin{itemize}
-      \item User cancels authentication
-      \item Authentication failure
+      \item The user cancels the authentication request.
     \end{itemize}
   }
   \ucexceptions{
     \begin{itemize}
-      \item Invalid Google email
       \item Network issue
     \end{itemize}
   }
-  \ucconclusion{}
-  \ucpostconditions{The user is successfully authenticated and redirected to the main application interface}
-  \ucbusinessrules{
-    \begin{itemize}
-      \item User should have valid Google account
-    \end{itemize}
-  }
-  \ucspecialrequirements{Sign-in page should display clear button and error message}
+  \ucconclusion{This UC ends when the user is logged in.}
+  \ucpostconditions{The system generates a JWT.}
 \end{usecase}

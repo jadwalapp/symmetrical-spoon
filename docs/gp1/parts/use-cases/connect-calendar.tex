@@ -1,41 +1,30 @@
 \begin{usecase}{Connect Calendar}
   \ucbasicinfo{HIGH}{Regular}
-  \ucshortdescription{This UC allows the user to connect their external calendars (e.g., work, personal, or third-party) to our system.}
-  \uctrigger{This UC is triggered when the user selects the option to connect external calendars to synchronize with their existing calendar.}
-  \ucactors{User}{External Calendar Provider (e.g., Google, Outlook)}
+  \ucshortdescription{This UC allows the user to connect their external calendars to our system.}
+  \uctrigger{This UC is triggered when the user selects the option to connect external calendars.}
+  \ucactors{User}{CalDAV}
   \ucpreconditions{User must be logged in}
   \ucrelationships{N/A}{N/A}{N/A}
   \ucinputsoutputs{
     \begin{itemize}
-      \item \textbf{Calendar login credentials} (Source: User)
-      \item \textbf{Permission to access calendar data} (Source: User)
+      \item \textbf{CalDAV login credentials} (Source: User)
     \end{itemize}
   }{
     \begin{itemize}
       \item \textbf{Calendar data sync status} (Destination: System)
-      \item \textbf{Event updates} (Destination: User's main calendar)
     \end{itemize}
   }
   \ucmainflow{
     \begin{enumerate}
       \item The user clicks the "Connect Calendar" option in the app.
-      \ucinfo{The system presents a list of available external calendar providers (e.g., Google, Outlook).}
-      \item The user selects an external calendar provider and enters login credentials.
-      \ucinfo{The system authenticates the user via the external provider's login process.}
-      \item The system requests permission to access calendar data from the external provider.
-      \ucinfo{The user grants permission for the app to access the external calendar's events.}
+        \ucinfo{The app asks the user to enter their CalDAV credentials.}
       \item The system syncs the external calendar with the user's main calendar.
-      \ucinfo{Confirmation of successful connection and calendar sync is shown to the user.}
+        \ucinfo{User is able to see his calendars in the app all together.}
     \end{enumerate}
   }
   \ucalternateflows{
     \begin{itemize}
       \item \textbf{Sync Failure:} If syncing fails due to network issues, the system prompts the user to try again or manually refresh.
-    \end{itemize}
-  }
-  \ucexceptions{
-    \begin{itemize}
-      \item \textbf{Permission Denied:} If the user denies access, the system will not connect the calendar and prompts the user to reconsider.
     \end{itemize}
   }
   \ucconclusion{The UC ends when the user successfully connects and syncs their external calendar with the system.}

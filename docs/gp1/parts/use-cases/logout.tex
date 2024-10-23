@@ -1,46 +1,16 @@
 \begin{usecase}{Log out}
   \ucbasicinfo{HIGH}{Regular}
-  \ucshortdescription{User able to logout}
-  \uctrigger{when the UC is done from the application}
+  \ucshortdescription{This UC allows the user to logout from the app.}
+  \uctrigger{This UC is triggered when logout button in settings page is clicked.}
   \ucactors{User}{}
-  \ucpreconditions{User must log in}
-  \ucrelationships{}{}{}
-  \ucinputsoutputs{
-    \begin{itemize}
-      \item \textbf{Log-out} (Source: User)
-    \end{itemize}
-  }{
-    \begin{itemize}
-      \item \textbf{logged out from system} (Destination: System)
-    \end{itemize}
-  }
+  \ucpreconditions{The user must be logged in.}
+  \ucrelationships{N/A}{N/A}{N/A}
   \ucmainflow{
     \begin{enumerate}
-      \item The user click the button Log-out
-        \ucinfo{System displays "Log-out" button}
-      \item Emphasize the Log-out.
-        \ucinfo{The system may prompt the user to confirm the logout action}
-      \item The user will be logged out from the system
-        \ucinfo{Confirmation of successful Log-out}
+      \item The user click the logout button
+        \ucinfo{The app logs the user out and moves them to the get started screen.}
     \end{enumerate}
   }
-  \ucalternateflows{
-    \begin{itemize}
-      \item If the user selects "Cancel" on the confirmation prompt, the system returns to the previous page without logging out.
-    \end{itemize}
-  }
-  \ucexceptions{
-    \begin{itemize}
-      \item System error
-      \item Network issue
-    \end{itemize}
-  }
-  \ucconclusion{}
+  \ucconclusion{The user is logged out and sign in again with any account.}
   \ucpostconditions{The user will be logged out from the system}
-  \ucbusinessrules{
-    \begin{itemize}
-      \item User should log in
-    \end{itemize}
-  }
-  \ucspecialrequirements{Sign-in page should display clear button and error message}
 \end{usecase}
