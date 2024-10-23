@@ -1,0 +1,47 @@
+\begin{usecase}{Extract Events from WhatsApp}
+  \ucbasicinfo{HIGH}{Regular}
+  \ucshortdescription{Allows users to extract event details shared in WhatsApp messages and save them to their calendar.}
+  \uctrigger{User selects a message containing event details in WhatsApp.}
+  \ucactors{User}{WhatsApp}
+  \ucpreconditions{User must have WhatsApp installed and linked to the system.}
+  \ucrelationships{N/A}{Event Management}{N/A}
+  \ucinputsoutputs{
+    \begin{itemize}
+      \item \textbf{User-selected WhatsApp message containing event details.} (Source: User)
+    \end{itemize}
+  }{
+    \begin{itemize}
+      \item \textbf{Extracted event details saved to the calendar.} (Destination: User)
+    \end{itemize}
+  }
+  \ucmainflow{
+    \begin{enumerate}
+      \item User opens WhatsApp and selects a message with event details. 
+        \ucinfo{Display of the selected message.}
+      \item User taps on the "Extract Event" option.
+        \ucinfo{System processes the message to identify event details.}
+      \item System extracts event details from the message.
+        \ucinfo{Date, time, and location are parsed from the text. }
+    \end{enumerate}
+  }
+  \ucalternateflows{
+    \begin{itemize}
+      \item If the message does not contain valid event details, display an error message.
+      \item Notify the user about invalid format. 
+    \end{itemize}
+  }
+  \ucexceptions{
+    \begin{itemize}
+      \item If there is a system error during extraction, display a relevant error message. 
+      \item Log error for troubleshooting.
+    \end{itemize}
+  }
+  \ucconclusion{User successfully extracts event details from WhatsApp and saves them to the calendar.}
+  \ucpostconditions{The event is added to the user's calendar, and the user can view it in their schedule.}
+  \ucbusinessrules{
+    \begin{itemize}
+      \item Only messages with recognized event formats can be extracted.
+    \end{itemize}
+  }
+  \ucspecialrequirements{The system must have permissions to access WhatsApp messages and extract relevant information.}
+\end{usecase}
