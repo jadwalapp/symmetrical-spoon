@@ -14,6 +14,7 @@ require (
 	github.com/resendlabs/resend-go v1.7.0
 	github.com/rs/zerolog v1.33.0
 	github.com/spf13/viper v1.19.0
+	github.com/sqlc-dev/pqtype v0.3.0
 	golang.org/x/net v0.30.0
 	google.golang.org/protobuf v1.35.1
 )
