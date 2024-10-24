@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/sqlc-dev/pqtype"
 )
 
 type AuthGoogle struct {
@@ -17,6 +18,17 @@ type AuthGoogle struct {
 	Sub        string
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
+}
+
+type CalendarAccount struct {
+	ID          uuid.UUID
+	CustomerID  uuid.UUID
+	Provider    string
+	Url         sql.NullString
+	Username    sql.NullString
+	Credentials []byte
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
 }
 
 type Customer struct {
@@ -35,4 +47,70 @@ type MagicLink struct {
 	UsedAt     sql.NullTime
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
+}
+
+type Valarm struct {
+	ID          uuid.UUID
+	EventUid    string
+	Action      string
+	Trigger     string
+	Description sql.NullString
+	Summary     sql.NullString
+	Duration    sql.NullString
+	Repeat      sql.NullInt32
+	Attendees   pqtype.NullRawMessage
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+}
+
+type Vcalendar struct {
+	Uid         string
+	AccountID   uuid.UUID
+	Prodid      string
+	Version     string
+	Calscale    sql.NullString
+	DisplayName string
+	Description sql.NullString
+	Color       sql.NullString
+	Timezone    sql.NullString
+	SyncToken   sql.NullString
+	Sequence    sql.NullInt32
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+}
+
+type Vevent struct {
+	Uid            string
+	CalendarUid    string
+	Dtstamp        time.Time
+	Dtstart        time.Time
+	Dtend          sql.NullTime
+	Duration       sql.NullString
+	Summary        string
+	Description    sql.NullString
+	Location       sql.NullString
+	Status         sql.NullString
+	Classification sql.NullString
+	Transp         sql.NullString
+	Rrule          sql.NullString
+	Rdate          pqtype.NullRawMessage
+	Exdate         pqtype.NullRawMessage
+	Sequence       sql.NullInt32
+	Etag           sql.NullString
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
+}
+
+type VeventException struct {
+	ID           uuid.UUID
+	EventUid     string
+	RecurrenceID time.Time
+	Summary      sql.NullString
+	Description  sql.NullString
+	Location     sql.NullString
+	Dtstart      sql.NullTime
+	Dtend        sql.NullTime
+	Status       sql.NullString
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
 }

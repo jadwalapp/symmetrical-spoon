@@ -1,4 +1,4 @@
-@startchen ahmad
+@startchen Calendar
 
 entity CalendarAccount {
   Id
@@ -15,7 +15,11 @@ entity Calendar {
 
 entity CalendarEvent {
   Id
-  
+  EventTitle
+  Location
+  IsAllDay
+  StartDate
+  EndDate
 }
 
 relationship OwnsCalendars {

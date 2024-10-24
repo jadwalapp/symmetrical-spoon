@@ -1,28 +1,102 @@
 syntax = "proto3";
 
 import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/jadwalapp/symmetrical-spoon/falak/pkg/gen/proto/calendar/v1;calendarv1";
 
 package calendar.v1;
 
-message CreateCalendarRequest {}
-message CreateCalendarResponse {}
+message Calendar {
+    string id = 1;
+    string name = 2;
+    google.protobuf.Timestamp start_date = 3;
+    google.protobuf.Timestamp end_date = 4;
+    string color = 5;
+}
+
+message CreateCalendarRequest {
+    string name = 1 [(buf.validate.field) = {
+        string: {
+            min_len: 1,
+            max_len: 64,
+        }
+    }];
+    google.protobuf.Timestamp start_date = 2;
+    google.protobuf.Timestamp end_date = 3;
+    string color = 4 [(buf.validate.field).string.len = 7];
+}
+message CreateCalendarResponse {
+    Calendar calendar = 1;
+}
 
 message GetCalendarsRequest {}
-message GetCalendarsResponse {}
+message GetCalendarsResponse {
+    repeated Calendar calendars = 1;
+}
 
-message CreateEventRequest {}
-message CreateEventResponse {}
+message Event {
+    string id = 1;
+    string title = 2;
+    string location = 3;
+    bool is_all_day = 4;
+    google.protobuf.Timestamp start_date = 5;
+    google.protobuf.Timestamp end_date = 6;
+}
+
+message CreateEventRequest {
+    string calendar_id = 1 [(buf.validate.field).string.uuid = true];
+    string title = 2 [(buf.validate.field) = {
+        string: {
+            min_len: 1,
+            max_len: 256
+        }
+    }];
+    string location = 3 [(buf.validate.field) = {
+        string: {
+            max_len: 512
+        }
+    }];
+    bool is_all_day = 4;
+    google.protobuf.Timestamp start_date = 5 [(buf.validate.field).required = true];
+    google.protobuf.Timestamp end_date = 6 [(buf.validate.field).required = true];
+}
+message CreateEventResponse {
+    Event event = 1;
+}
 
 message UpdateEventRequest {}
 message UpdateEventResponse {}
 
-message DeleteEventRequest {}
+message DeleteEventRequest {
+    string event_id = 1 [(buf.validate.field).string.uuid = true];
+}
 message DeleteEventResponse {}
 
-message GetEventsByCalendarRequest {}
-message GetEventsByCalendarResponse {}
+message GetEventsByCalendarRequest {
+    string calendar_id = 1 [(buf.validate.field).string.uuid = true];
+    google.protobuf.Timestamp start_date = 2;
+    google.protobuf.Timestamp end_date = 3;
+}
+message GetEventsByCalendarResponse {
+    repeated Event events = 1;
+}
+
+message ConnectCalDAVCalendarRequest {
+    string name = 1 [(buf.validate.field) = {
+        string: {
+            min_len: 1,
+            max_len: 64
+        }
+    }];
+    string url = 2 [(buf.validate.field).string.uri = true];
+    string username = 3;
+    string password = 4;
+}
+
+message ConnectCalDAVCalendarResponse {
+    Calendar calendar = 1;
+}
 
 service CalendarService {
     rpc CreateCalendar(CreateCalendarRequest) returns (CreateCalendarResponse);
@@ -32,4 +106,5 @@ service CalendarService {
     rpc UpdateEvent(UpdateEventRequest) returns (UpdateEventResponse);
     rpc DeleteEvent(DeleteEventRequest) returns (DeleteEventResponse);
     rpc GetEventsByCalendar(GetEventsByCalendarRequest) returns (GetEventsByCalendarResponse);
+    rpc ConnectCalDAVCalendar(ConnectCalDAVCalendarRequest) returns (ConnectCalDAVCalendarResponse);
 }

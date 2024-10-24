@@ -1,0 +1,5 @@
+DROP TABLE IF EXISTS valarm;
+DROP TABLE IF EXISTS vevent_exception;
+DROP TABLE IF EXISTS vevent;
+DROP TABLE IF EXISTS vcalendar;
+DROP TABLE IF EXISTS calendar_accounts;
