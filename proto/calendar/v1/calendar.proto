@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+import "buf/validate/validate.proto";
+
+option go_package = "github.com/jadwalapp/symmetrical-spoon/falak/pkg/gen/proto/calendar/v1;calendarv1";
+
+package calendar.v1;
+
+message CreateCalendarRequest {}
+message CreateCalendarResponse {}
+
+message GetCalendarsRequest {}
+message GetCalendarsResponse {}
+
+message CreateEventRequest {}
+message CreateEventResponse {}
+
+message UpdateEventRequest {}
+message UpdateEventResponse {}
+
+message DeleteEventRequest {}
+message DeleteEventResponse {}
+
+message GetEventsByCalendarRequest {}
+message GetEventsByCalendarResponse {}
+
+service CalendarService {
+    rpc CreateCalendar(CreateCalendarRequest) returns (CreateCalendarResponse);
+    rpc GetCalendars(GetCalendarsRequest) returns (GetCalendarsResponse);
+    
+    rpc CreateEvent(CreateEventRequest) returns (CreateEventResponse);
+    rpc UpdateEvent(UpdateEventRequest) returns (UpdateEventResponse);
+    rpc DeleteEvent(DeleteEventRequest) returns (DeleteEventResponse);
+    rpc GetEventsByCalendar(GetEventsByCalendarRequest) returns (GetEventsByCalendarResponse);
+}

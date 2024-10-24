@@ -24,4 +24,8 @@ buf lint
 buf generate
 ```
 
----
+## To generate diagrams using PlantUML locally
+
+```bash
+docker run -p 8094:8080 plantuml/plantuml-server:jetty
+```

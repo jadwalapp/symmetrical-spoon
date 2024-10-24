@@ -40,3 +40,14 @@ services:
       - "traefik.http.routers.grafana.rule=Host(`${GRAFANA_HOST}`)"
       - "traefik.http.routers.grafana.entrypoints=web"
       - "traefik.http.services.grafana.loadbalancer.server.port=3000"
+
+  plantuml:
+    image: plantuml/plantuml-server:jetty
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=symmetrical-spoon_web"
+      - "traefik.http.routers.grafana.rule=Host(`plantuml.localhost`)"
+      - "traefik.http.routers.grafana.entrypoints=web"
+      - "traefik.http.services.grafana.loadbalancer.server.port=8080"
+    networks:
+      - web

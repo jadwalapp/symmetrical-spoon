@@ -1,0 +1,31 @@
+@startchen ahmad
+
+entity CalendarAccount {
+  Id
+  Name
+}
+
+entity Calendar {
+  Id
+  Name
+  StartDate
+  EndDate
+  Color
+}
+
+entity CalendarEvent {
+  Id
+  
+}
+
+relationship OwnsCalendars {
+}
+OwnsCalendars =1= CalendarAccount
+OwnsCalendars =N= Calendar
+
+relationship ContainsEvents {
+}
+ContainsEvents =1= Calendar
+ContainsEvents =N= CalendarEvent
+
+@endchen

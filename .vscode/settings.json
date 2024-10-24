@@ -1,0 +1,5 @@
+{
+  "plantuml.server": "http://localhost:8094",
+  "plantuml.render": "PlantUMLServer",
+  "plantuml.exportOutDir": "docs/diagrams/out"
+}
