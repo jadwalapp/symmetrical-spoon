@@ -1,0 +1,242 @@
+@startuml Continue with Email
+User -> Backend ++ : InitiateEmail
+activate User
+
+Backend -> Database ++ : CreateCustomerIfNotExists
+Database --> Backend -- : Customer
+
+Backend -> Database ++ : CreateMagicLink
+Database --> Backend -- : MagicLink
+
+Backend -> EmailServer ++ : SendMagicLink
+EmailServer --> Backend -- : EmailSentResponse
+
+Backend --> User -- : Response
+deactivate User
+@enduml
+
+@startuml Continue with Google
+User -> Backend ++ : InitiateGoogleAuth
+activate User
+
+Backend -> GoogleAuth ++ : RequestOAuthToken
+GoogleAuth --> Backend -- : OAuthToken
+
+Backend -> Database ++ : CreateCustomerIfNotExists
+Database --> Backend -- : Customer
+
+Backend -> Database ++ : CreateJWTToken
+Database --> Backend -- : Token
+
+Backend --> User -- : Response
+deactivate User
+@enduml
+
+@startuml Send Welcome Email
+System -> Database ++ : FetchUserInfo
+activate System
+
+Database --> System -- : UserData
+
+System -> EmailServer ++ : SendWelcomeEmail
+EmailServer --> System -- : EmailSentResponse
+
+System --> System : LogEmailSent
+deactivate System
+@enduml
+
+@startuml Log out
+User -> Backend ++ : LogoutRequest
+activate User
+
+Backend -> Database ++ : InvalidateToken
+Database --> Backend -- : TokenInvalidated
+
+Backend --> User -- : LogoutResponse
+deactivate User
+@enduml
+
+@startuml Connect Calendar
+User -> Backend ++ : ConnectCalendarRequest
+activate User
+
+Backend -> CalDAV ++ : AuthenticateCredentials
+CalDAV --> Backend -- : AuthResponse
+
+Backend -> Database ++ : StoreCalendarConnection
+Database --> Backend -- : ConnectionStored
+
+Backend -> CalDAV ++ : SyncCalendarData
+CalDAV --> Backend -- : SyncedData
+
+Backend --> User -- : ConnectionResponse
+deactivate User
+@enduml
+
+@startuml Create Calendar
+User -> Backend ++ : CreateCalendarRequest
+activate User
+
+Backend -> Database ++ : StoreCalendarInfo
+Database --> Backend -- : CalendarCreated
+
+Backend -> Database ++ : CreateDefaultSettings
+Database --> Backend -- : SettingsCreated
+
+Backend --> User -- : CalendarResponse
+deactivate User
+@enduml
+
+@startuml Connect WhatsApp
+User -> Backend ++ : InitiateWhatsAppConnection
+activate User
+
+Backend -> WhatsApp ++ : RequestLinkingCode
+WhatsApp --> Backend -- : LinkingCode
+
+Backend -> Database ++ : StorePendingConnection
+Database --> Backend -- : ConnectionPending
+
+User -> Backend : SubmitLinkingCode
+
+Backend -> WhatsApp ++ : VerifyLinkingCode
+WhatsApp --> Backend -- : VerificationResponse
+
+Backend -> Database ++ : FinalizeConnection
+Database --> Backend -- : ConnectionComplete
+
+Backend --> User -- : ConnectionResponse
+deactivate User
+@enduml
+
+@startuml Extract Events from WhatsApp
+User -> Backend ++ : ExtractEventRequest
+activate User
+
+Backend -> WhatsApp ++ : FetchMessageContent
+WhatsApp --> Backend -- : MessageContent
+
+Backend -> Backend : ParseEventDetails
+
+Backend -> Database ++ : StoreEvent
+Database --> Backend -- : EventStored
+
+Backend --> User -- : ExtractionResponse
+deactivate User
+@enduml
+
+@startuml Suggest Conflict Resolutions
+System -> Database ++ : DetectConflicts
+activate System
+
+Database --> System -- : ConflictingEvents
+
+System -> Backend ++ : GenerateResolutions
+Backend --> System -- : ResolutionOptions
+
+System -> Database ++ : StoreResolutions
+Database --> System -- : ResolutionsStored
+
+System --> User : ResolutionOptions
+deactivate System
+@enduml
+
+@startuml Manage Scheduling Conflicts
+User -> Backend ++ : ReportConflict
+activate User
+
+Backend -> Database ++ : FetchConflictingEvents
+Database --> Backend -- : Events
+
+Backend -> Backend : GenerateResolutions
+
+Backend -> Database ++ : ApplyResolution
+Database --> Backend -- : ResolutionApplied
+
+Backend --> User -- : ConflictResolved
+deactivate User
+@enduml
+
+@startuml Add Event Manually
+User -> Backend ++ : CreateEventRequest
+activate User
+
+Backend -> Database ++ : CheckConflicts
+Database --> Backend -- : ConflictStatus
+
+Backend -> Database ++ : StoreEvent
+Database --> Backend -- : EventStored
+
+Backend -> EmailServer ++ : SendEventNotification
+EmailServer --> Backend -- : NotificationSent
+
+Backend --> User -- : EventResponse
+deactivate User
+@enduml
+
+@startuml View Integrated Calendar
+User -> Backend ++ : FetchCalendarRequest
+activate User
+
+Backend -> Database ++ : GetUserCalendars
+Database --> Backend -- : CalendarList
+
+Backend -> Database ++ : FetchEvents
+Database --> Backend -- : Events
+
+Backend -> Backend : OrganizeEventData
+
+Backend --> User -- : CalendarResponse
+deactivate User
+@enduml
+
+@startuml Configure Daily Routine
+User -> Backend ++ : ConfigureRoutineRequest
+activate User
+
+Backend -> Database ++ : StoreRoutineConfig
+Database --> Backend -- : ConfigStored
+
+Backend -> Database ++ : CreateRecurringEvents
+Database --> Backend -- : EventsCreated
+
+Backend -> EmailServer ++ : SetupNotifications
+EmailServer --> Backend -- : NotificationsConfigured
+
+Backend --> User -- : RoutineResponse
+deactivate User
+@enduml
+
+@startuml Schedule Prayer Times
+User -> Backend ++ : CreatePrayerSchedule
+activate User
+
+Backend -> Database ++ : StorePrayerTimes
+Database --> Backend -- : TimesStored
+
+Backend -> Database ++ : CreateRecurringEvents
+Database --> Backend -- : EventsCreated
+
+Backend -> EmailServer ++ : SetupReminders
+EmailServer --> Backend -- : RemindersSet
+
+Backend --> User -- : ScheduleResponse
+deactivate User
+@enduml
+
+@startuml Receive Event Notifications
+User -> Backend ++ : ConfigureNotifications
+activate User
+
+Backend -> Database ++ : StoreNotificationPreferences
+Database --> Backend -- : PreferencesStored
+
+Backend -> NotificationService ++ : SetupNotifications
+NotificationService --> Backend -- : NotificationsConfigured
+
+Backend -> EmailServer ++ : ConfigureEmailNotifications
+EmailServer --> Backend -- : EmailConfigured
+
+Backend --> User -- : ConfigurationResponse
+deactivate User
+@enduml
