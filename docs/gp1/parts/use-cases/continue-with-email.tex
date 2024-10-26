@@ -21,8 +21,8 @@
     \begin{enumerate}
       \item The user enters their email.
         \ucinfo{System displays an email input field.}
-      \item System generates and sends magic link.
-        \ucinfo{System sends email and displays ``Check your email'' message}
+      \item System creates an account if the user has no account, and then generates and sends the magic link.
+        \ucinfo{App displays ``Check your email'' message.}
       \item The user clicks the magic link in the email.
         \ucinfo{The app is opened on the device of the user.}
       \item The app sends the token to the system to log the user in.
@@ -31,14 +31,14 @@
   }
   \ucalternateflows{
     \begin{itemize}
-      \item If the user has no account, the system creates an account.
+      \item 
     \end{itemize}
   }
   \ucexceptions{
     \begin{itemize}
       \item Invalid email format.
       \item Magic link token expired or invalid.
-      \item Network issue
+      \item \textbf{Request sending failure}: If sending the request fails due to network issues, the system prompts the user to try again.
     \end{itemize}
   }
   \ucconclusion{This UC ends when the user is logged in.}

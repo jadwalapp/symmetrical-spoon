@@ -1,47 +1,45 @@
 \begin{usecase}{Extract Events from WhatsApp}
   \ucbasicinfo{High}{Regular}
-  \ucshortdescription{Allows users to extract event details shared in WhatsApp messages and save them to their calendar.}
-  \uctrigger{User selects a message containing event details in WhatsApp.}
-  \ucactors{User}{WhatsApp}
-  \ucpreconditions{User must have WhatsApp installed and linked to the system.}
-  \ucrelationships{N/A}{Event Management}{N/A}
+  \ucshortdescription{System monitors WhatsApp messages of connected WhatsApp accounts and extract event details adding them to the user's calendar.}
+  \uctrigger{A messages is sent to the connected WhatsApp account of an arbitrary user in our system.}
+  \ucactors{WhatsApp}{}
+  \ucpreconditions{At least one WhatsApp account must be connected.}
+  \ucrelationships{Suggest Conflict Resolution}{N/A}{N/A}
   \ucinputsoutputs{
     \begin{itemize}
-      \item \textbf{User-selected WhatsApp message containing event details.} (Source: User)
+      \item \textbf{Messages sent to currently selected user} (Source: WhatsApp)
     \end{itemize}
   }{
     \begin{itemize}
-      \item \textbf{Extracted event details saved to the calendar.} (Destination: User)
+      \item \textbf{Extracted event details} (Destination: System)
     \end{itemize}
   }
   \ucmainflow{
     \begin{enumerate}
-      \item User opens WhatsApp and selects a message with event details. 
-        \ucinfo{Display of the selected message.}
-      \item User taps on the ``Extract Event'' option.
-        \ucinfo{System processes the message to identify event details.}
-      \item System extracts event details from the message.
-        \ucinfo{Date, time, and location are parsed from the text. }
+      \item A sent message is received and the user has replied and 30 seconds have passed without any interruptions.
+        \ucinfo{System reads a few messages before the current one to have context.}
+      \item Add the detected event to the user's calendar.
+        \ucinfo{Send a notification to the user telling them about the newly added event.}
     \end{enumerate}
   }
   \ucalternateflows{
     \begin{itemize}
-      \item If the message does not contain valid event details, display an error message.
-      \item Notify the user about invalid format. 
+      \item If there is a conflict adding this event, send a notification telling the user that there is a conflict they need to resolve.
     \end{itemize}
   }
   \ucexceptions{
     \begin{itemize}
-      \item If there is a system error during extraction, display a relevant error message. 
-      \item Log error for troubleshooting.
+      \item If there is an error during extraction of events, fail silently and log it to a specific table in the database for debugging later by developers.
     \end{itemize}
   }
-  \ucconclusion{User successfully extracts event details from WhatsApp and saves them to the calendar.}
-  \ucpostconditions{The event is added to the user's calendar, and the user can view it in their schedule.}
+  \ucconclusion{System successfully adds the event to the user's calendar and notifies the user of the added event.}
+  \ucpostconditions{The event is added to the user's calendar.}
   \ucbusinessrules{
     \begin{itemize}
-      \item Only messages with recognized event formats can be extracted.
+      \item Only messages with events and its surrounding context shall be analyzed.
+      \item System must wait for user's reply before analyzing the messages.
+      \item System must wait for 30 seconds before initiating the analysis on messages after the user replies and reset as long the conversation is onggoing.
     \end{itemize}
   }
-  \ucspecialrequirements{The system must have permissions to access WhatsApp messages and extract relevant information.}
+  \ucspecialrequirements{The system must have access to the user's WhatsApp account as a client to receive and read messages.}
 \end{usecase}
