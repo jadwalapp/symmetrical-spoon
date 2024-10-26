@@ -1,0 +1,7 @@
+{
+  "recommendations": [
+    "golang.go",
+    "jebbs.plantuml",
+    "ms-azuretools.vscode-docker"
+  ]
+}
