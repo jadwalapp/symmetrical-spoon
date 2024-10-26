@@ -1,14 +1,19 @@
 \begin{usecase}{Manage Scheduling Conflicts}
-  \ucbasicinfo{High}{Regular}
-  \ucshortdescription{This UC allows the user to manage scheduling conflicts by suggesting resolutions when overlapping events are detected, including events extracted from WhatsApp.}
-  \uctrigger{This UC is triggered when the user adds, modifies, or extracts an event (e.g., from WhatsApp) that overlaps with an existing event.}
-  \ucactors{User}{Calendar System, WhatsApp}
-  \ucpreconditions{The user is logged into the application, and WhatsApp events are synchronized with the calendar.}
-  \ucrelationships{Includes: Suggest Conflict Resolutions}{Extends: Extract Events from WhatsApp, Set Event Priorities}{None}
+  \ucbasicinfo{Medium}{Regular}
+  \ucshortdescription{This UC allows the user to manage scheduling conflicts by suggesting resolutions when overlapping events are detected.}
+  \uctrigger{This UC is triggered when an automatically added event overlaps with an existing event.}
+  \ucactors{User}{None}
+  \ucpreconditions{
+    \begin{itemize}
+      \item User is logged in.
+      \item Conflicting events list is not empty.
+    \end{itemize}
+  }
+  \ucrelationships{N/A}{N/A}{N/A}
   \ucinputsoutputs{
     \begin{itemize}
-      \item \textbf{Conflicting events} (Source: User or WhatsApp extraction)
-      \item \textbf{Priority decision} (Source: User)
+      \item \textbf{Conflicting events} (Source: System)
+      \item \textbf{Event to override} (Source: User)
     \end{itemize}
   }{
     \begin{itemize}
