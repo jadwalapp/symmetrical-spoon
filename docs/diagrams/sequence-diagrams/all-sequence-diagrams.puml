@@ -1,34 +1,75 @@
 @startuml Continue with Email
-User -> Backend ++ : InitiateEmail
 activate User
 
+User -> Backend ++ : InitiateEmail
+
 Backend -> Database ++ : CreateCustomerIfNotExists
+note right of Database : Customer record is always returned.\nIf custoemr doesn't exist, customer\nis created first then returned.
 Database --> Backend -- : Customer
 
-Backend -> Database ++ : CreateMagicLink
+Backend -> Backend : Generate Magic Token and its Hash
+
+Backend -> Database ++ : CreateMagicLink(hashed magic token)
 Database --> Backend -- : MagicLink
 
-Backend -> EmailServer ++ : SendMagicLink
-EmailServer --> Backend -- : EmailSentResponse
+Backend -> EmailServer ++ : SendMagicLink(normal)
+EmailServer --> Backend -- : Email Sent Response
 
-Backend --> User -- : Response
+Backend --> User -- : Email Sent Response
+
+User -> User : Opens Email And Clicks Magic Link
+
+User -> Backend : CompleteEmail(MagicToken)
+
+Backend -> Backend : Hash MagicToken
+
+Backend -> Database : Get Magic Link by HashedToken
+alt MagicLink exists
+    Backend -> Backend : Check (Hashed MagicToken == Hashed MagicToken from Database)
+    alt Auth Success
+        Backend -> Backend : Issue JWT
+        Backend --> User : JWT (Access Token)
+    else Auth Failure
+        Backend --> User : Permission Denied
+    end
+else MagicLink doesn't exist
+    Database --> Backend : ErrNoSqlRowsFound
+    Backend --> User : PermissionDenied
+end
+
 deactivate User
 @enduml
 
 @startuml Continue with Google
-User -> Backend ++ : InitiateGoogleAuth
 activate User
 
-Backend -> GoogleAuth ++ : RequestOAuthToken
-GoogleAuth --> Backend -- : OAuthToken
+User -> GoogleAuth ++ : GetAccessToken
+GoogleAuth --> User : AccessToken
 
-Backend -> Database ++ : CreateCustomerIfNotExists
-Database --> Backend -- : Customer
+User -> Backend ++ : UseGoogle(AccessToken)
+Backend -> GoogleAuth : GetUserInfoByToken
+alt Token Valid
+    GoogleAuth --> Backend : UserInfo
+    
+    Backend -> Database ++ : CreateCustomerIfNotExist
+    Database --> Backend : Customer
 
-Backend -> Database ++ : CreateJWTToken
-Database --> Backend -- : Token
+    Backend -> Database : CreateAuthGoogleIfNotExist(UserInfo.sid)
+    note right of Database : Customer record is always returned.\nIf custoemr doesn't exist, customer\nis created first then returned.
+    Database --> Backend : AuthGoogle
 
-Backend --> User -- : Response
+    Backend -> Backend : Check AuthGoogle.sid == UserInfo.sid
+    alt Auth Success
+        Backend -> Backend : Issue JWT
+        Backend --> User : JWT (Access Token)
+    else Auth Failure
+        Backend --> User : Permission Denied
+    end
+else Token Invalid
+    GoogleAuth --> Backend : Error
+    Backend --> User : Permission Denied
+end
+
 deactivate User
 @enduml
 
@@ -38,10 +79,12 @@ activate System
 
 Database --> System -- : UserData
 
-System -> EmailServer ++ : SendWelcomeEmail
+System -> System : Get Magic Link Template
+System -> System : Fill Magic Link Template by UserData
+
+System -> EmailServer ++ : SendEmail(Filled Magic Link Template)
 EmailServer --> System -- : EmailSentResponse
 
-System --> System : LogEmailSent
 deactivate System
 @enduml
 
