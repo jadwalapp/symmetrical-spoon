@@ -1,5 +1,5 @@
 \begin{usecase}{Send Welcome Email}
-    \ucbasicinfo{HIGH}{Regular}
+    \ucbasicinfo{Low}{Regular}
     \ucshortdescription{This UC welcomes the user to the platform.}
     \uctrigger{This UC starts when the user account is created.}
     \ucactors{User}{None}
@@ -22,20 +22,14 @@
         \item The system fetches the send welcome email template.
           \ucinfo{The template is filled with the user name.}
         \item The system sends the email with the template.
-          \ucinfo{The email makes the user feel appreciated.}
-      \end{enumerate}
-    }
-    \ucalternateflows{
-      \begin{enumerate}
-        \item If the user has no account, the system creates a user.
+          \ucinfo{The email is received by the user welcoming them.}
       \end{enumerate}
     }
     \ucexceptions{
       \begin{itemize}
-        \item Email server down.
+        \item Email server is down.
       \end{itemize}
     }
-    \ucconclusion{This UC ends when the user receives an email address from us.}
-    \ucpostconditions{}
+    \ucconclusion{This UC ends when the user receives an email from us welcoming them.}
     \ucspecialrequirements{An email server must be present to send welcome email.}
 \end{usecase}

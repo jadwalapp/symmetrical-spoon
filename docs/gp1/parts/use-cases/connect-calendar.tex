@@ -1,13 +1,13 @@
 \begin{usecase}{Connect Calendar}
-  \ucbasicinfo{HIGH}{Regular}
+  \ucbasicinfo{Medium}{Regular}
   \ucshortdescription{This UC allows the user to connect their external calendars to our system.}
-  \uctrigger{This UC is triggered when the user selects the option to connect external calendars.}
+  \uctrigger{This UC is triggered when the user selects the option to connect an external calendar in the app.}
   \ucactors{User}{CalDAV}
   \ucpreconditions{User must be logged in}
   \ucrelationships{N/A}{N/A}{N/A}
   \ucinputsoutputs{
     \begin{itemize}
-      \item \textbf{CalDAV login credentials} (Source: User)
+      \item \textbf{CalDAV login credentials and Name} (Source: User)
     \end{itemize}
   }{
     \begin{itemize}
@@ -17,17 +17,20 @@
   \ucmainflow{
     \begin{enumerate}
       \item The user clicks the ``Connect Calendar'' option in the app.
-        \ucinfo{The app asks the user to enter their CalDAV credentials.}
-      \item The system syncs the external calendar with the user's main calendar.
-        \ucinfo{User is able to see his calendars in the app all together.}
+        \ucinfo{The app asks the user to enter their CalDAV credentials along with a user provided name.}
+      \item The system talks to the external calendar system via the credentials provided by the user.
+        \ucinfo{The system adds the received calendar data to the database and a connection success status is shown to the user.}
+      \item The system saves the CalDAV credentials securely in the database.
+        \ucinfo{The credentials are encrypted before storing them.}
     \end{enumerate}
   }
-  \ucalternateflows{
+  \ucexceptions{
     \begin{itemize}
-      \item \textbf{Sync Failure:} If syncing fails due to network issues, the system prompts the user to try again or manually refresh.
+      \item Invalid credentials.
+      \item Network issue with CalDAV server.
     \end{itemize}
   }
-  \ucconclusion{The UC ends when the user successfully connects and syncs their external calendar with the system.}
-  \ucpostconditions{The system has access to the user's external calendar, and events are synced and displayed in the user's main calendar.}
+  \ucconclusion{The UC ends when the user has a successfully connected and synced external calendar with our system.}
+  \ucpostconditions{The system has access to the user's external calendar, and events are synced and displayed for the user in the app..}
   \ucspecialrequirements{The system must handle multiple calendars efficiently.}
 \end{usecase}

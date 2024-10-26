@@ -1,5 +1,5 @@
 \begin{usecase}{Continue with Google}
-  \ucbasicinfo{HIGH}{Regular}
+  \ucbasicinfo{High}{Regular}
   \ucshortdescription{This UC allows users to login or sign up with their Google account.}
   \uctrigger{This UC starts when the user clicks ``Continue with Google'' button in the app.}
   \ucactors{User}{Google}
@@ -12,6 +12,7 @@
   }{
     \begin{itemize}
       \item \textbf{Authentication response} (Destination: User)
+      \item \textbf{JWT} (Destination: App)
     \end{itemize}
   }
   \ucmainflow{
@@ -29,9 +30,11 @@
   }
   \ucexceptions{
     \begin{itemize}
+      \item Google access token invalid
       \item Network issue
     \end{itemize}
   }
   \ucconclusion{This UC ends when the user is logged in.}
   \ucpostconditions{The system generates a JWT.}
+  \ucspecialrequirements{A google client must be present for the validation of the access token to be possible.}
 \end{usecase}

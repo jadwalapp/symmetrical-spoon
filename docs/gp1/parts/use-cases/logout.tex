@@ -1,16 +1,16 @@
-\begin{usecase}{Log out}
-  \ucbasicinfo{HIGH}{Regular}
+\begin{usecase}{Logout}
+  \ucbasicinfo{High}{Regular}
   \ucshortdescription{This UC allows the user to logout from the app.}
-  \uctrigger{This UC is triggered when logout button in settings page is clicked.}
+  \uctrigger{This UC is triggered when logout button in the settings page is clicked.}
   \ucactors{User}{}
   \ucpreconditions{The user must be logged in.}
   \ucrelationships{N/A}{N/A}{N/A}
   \ucmainflow{
     \begin{enumerate}
       \item The user click the logout button
-        \ucinfo{The app logs the user out and moves them to the get started screen.}
+        \ucinfo{The app deletes the JWT and moves the user to the onboarding screen.}
     \end{enumerate}
   }
-  \ucconclusion{The user is logged out and sign in again with any account.}
+  \ucconclusion{The user is logged out.}
   \ucpostconditions{The user will be logged out from the system}
 \end{usecase}
