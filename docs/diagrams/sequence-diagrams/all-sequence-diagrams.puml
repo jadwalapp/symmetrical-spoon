@@ -1,4 +1,9 @@
 @startuml Continue with Email
+actor User
+participant Backend
+database Database
+participant EmailServer
+
 activate User
 
 User -> Backend ++ : InitiateEmail
@@ -41,6 +46,11 @@ deactivate User
 @enduml
 
 @startuml Continue with Google
+actor User
+participant GoogleAuth
+participant Backend
+database Database
+
 activate User
 
 User -> GoogleAuth ++ : GetAccessToken
@@ -49,14 +59,14 @@ GoogleAuth --> User : AccessToken
 User -> Backend ++ : UseGoogle(AccessToken)
 Backend -> GoogleAuth : GetUserInfoByToken
 alt Token Valid
-    GoogleAuth --> Backend : UserInfo
+    GoogleAuth --> Backend -- : UserInfo
     
     Backend -> Database ++ : CreateCustomerIfNotExist
     Database --> Backend : Customer
 
     Backend -> Database : CreateAuthGoogleIfNotExist(UserInfo.sid)
     note right of Database : Customer record is always returned.\nIf custoemr doesn't exist, customer\nis created first then returned.
-    Database --> Backend : AuthGoogle
+    Database --> Backend  -- : AuthGoogle
 
     Backend -> Backend : Check AuthGoogle.sid == UserInfo.sid
     alt Auth Success
@@ -66,16 +76,20 @@ alt Token Valid
         Backend --> User : Permission Denied
     end
 else Token Invalid
-    GoogleAuth --> Backend : Error
-    Backend --> User : Permission Denied
+    GoogleAuth --> Backend : GetUserInfoByToken Error
+    Backend --> User -- : Permission Denied
 end
 
-deactivate User
 @enduml
 
 @startuml Send Welcome Email
-System -> Database ++ : FetchUserInfo
+actor System
+participant EmailServer
+database Database
+
 activate System
+
+System -> Database ++ : FetchUserInfo
 
 Database --> System -- : UserData
 
@@ -85,10 +99,11 @@ System -> System : Fill Magic Link Template by UserData
 System -> EmailServer ++ : SendEmail(Filled Magic Link Template)
 EmailServer --> System -- : EmailSentResponse
 
-deactivate System
 @enduml
 
 @startuml Log out
+actor User
+
 activate User
 
 User -> User : Delete JWT from device
@@ -96,72 +111,115 @@ User -> User : Delete JWT from device
 @enduml
 
 @startuml Connect Calendar
-User -> Backend ++ : ConnectCalendarRequest
+actor User
+participant Backend
+participant CalDAV
+database Database
+
 activate User
+
+User -> Backend ++ : ConnectCalDAVCalendar
 
 Backend -> CalDAV ++ : AuthenticateCredentials
 CalDAV --> Backend -- : AuthResponse
 
 Backend -> Database ++ : StoreCalendarConnection
-Database --> Backend -- : ConnectionStored
+Database --> Backend : ConnectionStored
 
 Backend -> CalDAV ++ : SyncCalendarData
 CalDAV --> Backend -- : SyncedData
 
-Backend --> User -- : ConnectionResponse
+Backend -> Database : Store Calendar Data
+Database --> Backend -- :  Database Response
+
+Backend --> User -- : ConnectCalDAVCalendar Response
 deactivate User
 @enduml
 
 @startuml Create Calendar
-User -> Backend ++ : CreateCalendarRequest
+actor User
+participant Backend
+database Database
+
 activate User
+
+User -> Backend ++ : CreateCalendarRequest
 
 Backend -> Database ++ : StoreCalendarInfo
 Database --> Backend -- : CalendarCreated
 
-Backend -> Database ++ : CreateDefaultSettings
-Database --> Backend -- : SettingsCreated
-
 Backend --> User -- : CalendarResponse
+
 deactivate User
 @enduml
 
 @startuml Connect WhatsApp
-User -> Backend ++ : InitiateWhatsAppConnection
+actor User
+participant Backend
+participant WhatsApp
+database Database
+
 activate User
 
+User -> Backend ++ : InitiateWhatsApp(phone number)
+
 Backend -> WhatsApp ++ : RequestLinkingCode
-WhatsApp --> Backend -- : LinkingCode
+alt RequestLinkingCode Success
+    WhatsApp --> Backend : RequestLinkingCode Succeeded
+    Backend -> User -- : InitiateWhatsApp Succeeded
 
-Backend -> Database ++ : StorePendingConnection
-Database --> Backend -- : ConnectionPending
+    User -> User : Get Linking Code from WhatsApp
 
-User -> Backend : SubmitLinkingCode
+    User -> Backend ++ : CompleteWhatsApp(Linking Code)
+    Backend -> WhatsApp : SendLinkingCode
+    alt SendLinkingCode Success
+        WhatsApp --> Backend : SendLinkingCode Succeeded
+        Backend -> Database ++ : Store WhatsAppAuthCreds for Future Use
+        Database --> Backend -- : Stored WhatsAppAuthCreds Successfully
+        Backend --> User : CompleteWhatsApp Succeeded
+    else SendLinkingCode Failure
+        WhatsApp --> Backend : SendLinkingCode Failed
+        Backend --> User : CompleteWhatsApp Failed
+    end
+else RequestLinkingCode Failure
+    WhatsApp --> Backend -- : RequestLinkingCode Failed
+    Backend --> User -- : InitiateWhatsApp Failed
+end
 
-Backend -> WhatsApp ++ : VerifyLinkingCode
-WhatsApp --> Backend -- : VerificationResponse
-
-Backend -> Database ++ : FinalizeConnection
-Database --> Backend -- : ConnectionComplete
-
-Backend --> User -- : ConnectionResponse
 deactivate User
 @enduml
 
 @startuml Extract Events from WhatsApp
-User -> Backend ++ : ExtractEventRequest
-activate User
+actor "WhatsApp Service\n(uses whatsapp-web.js)" as WhatsApp
+participant Backend
+participant "LLM Service" as LLM
+database Database
+participant "Apple Push Notification service (APNs)" as APN
 
-Backend -> WhatsApp ++ : FetchMessageContent
-WhatsApp --> Backend -- : MessageContent
+activate WhatsApp
+loop Listen for Messages
+    note over WhatsApp: Client receives\nnew message
+    WhatsApp -> WhatsApp: Get last 15 messages\nfrom chat context
+    
+    WhatsApp ->> Backend ++: Send messages context\nfor analysis
+    Backend -> LLM ++: Analyze Context for Event
+    
+    alt Event Found
+        LLM --> Backend: Return Event JSON
+        Backend -> Database ++: Store Event
+        Database --> Backend: Confirm Storage
 
-Backend -> Backend : ParseEventDetails
+        Backend -> Database : Ask For Device IDs Of Customer Owning Event
+        Database --> Backend -- : Device IDs of Customer Owning Event
+        Backend -> APN ++ : Send Push Notification "Telling User Event Was Added" to Device IDs
+        APN --> Backend -- : Push Notification Sending Result
+    else No Event
+        LLM --> Backend --: No Event Detected
+        deactivate Backend
+        note over WhatsApp: Continue listening\nfor messages
+    end
+end
 
-Backend -> Database ++ : StoreEvent
-Database --> Backend -- : EventStored
-
-Backend --> User -- : ExtractionResponse
-deactivate User
 @enduml
 
 @startuml Suggest Conflict Resolutions
@@ -229,53 +287,46 @@ Backend --> User -- : CalendarResponse
 deactivate User
 @enduml
 
-@startuml Configure Daily Routine
-User -> Backend ++ : ConfigureRoutineRequest
-activate User
-
-Backend -> Database ++ : StoreRoutineConfig
-Database --> Backend -- : ConfigStored
-
-Backend -> Database ++ : CreateRecurringEvents
-Database --> Backend -- : EventsCreated
-
-Backend -> EmailServer ++ : SetupNotifications
-EmailServer --> Backend -- : NotificationsConfigured
-
-Backend --> User -- : RoutineResponse
-deactivate User
-@enduml
-
 @startuml Schedule Prayer Times
-User -> Backend ++ : CreatePrayerSchedule
+actor User
+participant Backend
+participant "Prayer Times API" as PrayerTimesAPI
+database Database
+
 activate User
+User -> Backend ++ : EnablePrayerTimeScheduling
 
-Backend -> Database ++ : StorePrayerTimes
-Database --> Backend -- : TimesStored
+Backend -> PrayerTimesAPI ++ : Fetch Prayer Times by User's Timezone
+PrayerTimesAPI --> Backend -- : PrayerTimes
 
-Backend -> Database ++ : CreateRecurringEvents
-Database --> Backend -- : EventsCreated
+Backend -> Database ++ : Create Events to Block Times of Prayer
+Database --> Backend -- : Creation Response
 
-Backend -> EmailServer ++ : SetupReminders
-EmailServer --> Backend -- : RemindersSet
+Backend --> User : EnablePrayerTimeScheduling Response
 
-Backend --> User -- : ScheduleResponse
-deactivate User
 @enduml
 
 @startuml Receive Event Notifications
-User -> Backend ++ : ConfigureNotifications
-activate User
+actor System
+database Database
+participant "Apple Push Notification service (APNs)" as APN
 
-Backend -> Database ++ : StoreNotificationPreferences
-Database --> Backend -- : PreferencesStored
+activate System
 
-Backend -> NotificationService ++ : SetupNotifications
-NotificationService --> Backend -- : NotificationsConfigured
+loop Poll Every One Minute
+    System -> Database ++ : Check Alarms Set for Events
+    Database --> System : Return Active Alarms
+    alt Active Alarms Found
+        System -> Database : Ask For Device IDs Of Customer Owning Event
+        Database --> System -- : Device IDs of Customer Owning Event
+        
+        loop For Every Event
+            System -> APN ++  : Send Push Notification to Device IDs
+            APN --> System -- : Push Notification Sending Result
+        end
+    else No Active Alarms
+        note over System,Database : Continue Polling
+    end
+end
 
-Backend -> EmailServer ++ : ConfigureEmailNotifications
-EmailServer --> Backend -- : EmailConfigured
-
-Backend --> User -- : ConfigurationResponse
-deactivate User
 @enduml
