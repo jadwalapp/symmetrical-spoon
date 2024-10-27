@@ -89,14 +89,10 @@ deactivate System
 @enduml
 
 @startuml Log out
-User -> Backend ++ : LogoutRequest
 activate User
 
-Backend -> Database ++ : InvalidateToken
-Database --> Backend -- : TokenInvalidated
+User -> User : Delete JWT from device
 
-Backend --> User -- : LogoutResponse
-deactivate User
 @enduml
 
 @startuml Connect Calendar
