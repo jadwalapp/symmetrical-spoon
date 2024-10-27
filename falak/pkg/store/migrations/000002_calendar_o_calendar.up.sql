@@ -95,6 +95,8 @@ CREATE TRIGGER update_vevent_exception_updated_at
 CREATE TABLE valarm (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     event_uid VARCHAR NOT NULL REFERENCES vevent(uid) ON DELETE CASCADE,
+
+    -- Alarm properties
     action VARCHAR NOT NULL CHECK (action IN ('AUDIO', 'DISPLAY', 'EMAIL')),
     trigger VARCHAR NOT NULL,
     description TEXT,
