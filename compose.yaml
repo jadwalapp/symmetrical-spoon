@@ -66,9 +66,12 @@ services:
     networks:
       - web
       - internal
+    volumes:
+      - grafana-storage:/var/lib/grafana
 
 volumes:
   postgres_data:
+  grafana-storage:
 
 networks:
   web:
