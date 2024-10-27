@@ -243,14 +243,94 @@ end
 @enduml
 
 @startuml Manage Scheduling Conflicts
+actor User
+participant Backend
+database Database
+participant "Apple Push Notification service (APNs)" as APN
+
+activate User
+
+User -> Backend ++ : ViewConflicts
+
+Backend -> Database ++ : FetchConflicts
+Database --> Backend -- : ConflictsList
+
+Backend -> Backend : GenerateResolutionOptions
+Backend --> User -- : DisplayConflictsWithOptions
+
+alt User Selects Resolution
+    User -> Backend ++ : ResolveConflict(selectedOption)
+    
+    Backend -> Database ++ : UpdateEvents
+    Database --> Backend -- : EventsUpdated
+    
+    Backend -> Database ++ : Ask For Device IDs Of Customer Owning Event
+    Database --> Backend -- : Device IDs of Customer Owning Event
+    
+    Backend -> APN ++ : Send Push Notification "Conflict Resolved" to Device IDs
+    APN --> Backend -- : Push Notification Sending Result
+    
+    Backend --> User : ConflictResolved
+else User Rejects
+    note over User, Backend : Do Nothing
+end
+
+deactivate User
 
 @enduml
 
 @startuml Add Event Manually
+actor User
+participant Backend
+database Database
+participant "Apple Push Notification service (APNs)" as APN
+
+activate User
+
+User -> Backend ++ : CreateEvent(eventDetails)
+
+Backend -> Backend : ValidateEventDetails
+alt Validation Success
+    Backend -> Database ++ : StoreEvent
+    Database --> Backend -- : EventStored
+    
+    Backend -> Backend : CheckForConflicts
+    opt Conflicts Found
+        Backend -> Database ++ : Ask For Device IDs Of Customer Owning Event
+        Database --> Backend -- : Device IDs of Customer Owning Event
+        
+        Backend -> APN ++ : Send Push Notification "New Conflict Detected" to Device IDs
+        APN --> Backend -- : Push Notification Sending Result
+    end
+    
+    Backend --> User : EventCreated
+else Validation Failed
+    Backend --> User : ValidationError
+end
+
+deactivate User
 
 @enduml
 
 @startuml View Integrated Calendar
+actor User
+participant Backend
+database Database
+
+activate User
+
+User -> Backend ++ : ViewIntegratedCalendar
+
+Backend -> Database ++ : FetchAllCalendars
+Database --> Backend -- : IntegratedCalendars
+
+Backend -> Database ++ : FetchAllEvents
+Database --> Backend -- : AllEvents
+
+Backend -> Backend : MergeAndSortEvents
+Backend --> User -- : DisplayIntegratedCalendar
+
+deactivate User
 
 @enduml
 
