@@ -21,14 +21,11 @@ type AuthGoogle struct {
 }
 
 type CalendarAccount struct {
-	ID          uuid.UUID
-	CustomerID  uuid.UUID
-	Provider    string
-	Url         sql.NullString
-	Username    sql.NullString
-	Credentials []byte
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
+	ID         uuid.UUID
+	CustomerID uuid.UUID
+	Provider   string
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
 }
 
 type Customer struct {
@@ -73,7 +70,6 @@ type Vcalendar struct {
 	Description sql.NullString
 	Color       sql.NullString
 	Timezone    sql.NullString
-	SyncToken   sql.NullString
 	Sequence    sql.NullInt32
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
@@ -96,7 +92,6 @@ type Vevent struct {
 	Rdate          pqtype.NullRawMessage
 	Exdate         pqtype.NullRawMessage
 	Sequence       sql.NullInt32
-	Etag           sql.NullString
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
 }
