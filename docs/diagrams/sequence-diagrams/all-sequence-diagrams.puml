@@ -223,68 +223,35 @@ end
 @enduml
 
 @startuml Suggest Conflict Resolutions
-System -> Database ++ : DetectConflicts
+actor System
+database Database
+participant "Apple Push Notification service (APNs)" as APN
+
 activate System
 
-Database --> System -- : ConflictingEvents
+System -> Database ++ : Check If Conflicts Exist Between Events
+Database --> System : ConflictedEvents Result
+alt ConflictedEvents are not empty
+    System -> Database : Ask For Device IDs Of Customer Owning Event
+    Database --> System -- : Device IDs of Customer Owning Event
+    System -> APN ++ : Send Push Notification "Telling User There is Conflict" to Device IDs
+    APN --> System -- : Push Notification Sending Result
+else ConflictedEvents are empty
+    note over System, Database : Do Nothing
+end
 
-System -> Backend ++ : GenerateResolutions
-Backend --> System -- : ResolutionOptions
-
-System -> Database ++ : StoreResolutions
-Database --> System -- : ResolutionsStored
-
-System --> User : ResolutionOptions
-deactivate System
 @enduml
 
 @startuml Manage Scheduling Conflicts
-User -> Backend ++ : ReportConflict
-activate User
 
-Backend -> Database ++ : FetchConflictingEvents
-Database --> Backend -- : Events
-
-Backend -> Backend : GenerateResolutions
-
-Backend -> Database ++ : ApplyResolution
-Database --> Backend -- : ResolutionApplied
-
-Backend --> User -- : ConflictResolved
-deactivate User
 @enduml
 
 @startuml Add Event Manually
-User -> Backend ++ : CreateEventRequest
-activate User
 
-Backend -> Database ++ : CheckConflicts
-Database --> Backend -- : ConflictStatus
-
-Backend -> Database ++ : StoreEvent
-Database --> Backend -- : EventStored
-
-Backend -> EmailServer ++ : SendEventNotification
-EmailServer --> Backend -- : NotificationSent
-
-Backend --> User -- : EventResponse
-deactivate User
 @enduml
 
 @startuml View Integrated Calendar
-User -> Backend ++ : FetchCalendarRequest
-activate User
 
-Backend -> Database ++ : GetUserCalendars
-Database --> Backend -- : CalendarList
-
-Backend -> Database ++ : FetchEvents
-Database --> Backend -- : Events
-
-Backend -> Backend : OrganizeEventData
-
-Backend --> User -- : CalendarResponse
-deactivate User
 @enduml
 
 @startuml Schedule Prayer Times
