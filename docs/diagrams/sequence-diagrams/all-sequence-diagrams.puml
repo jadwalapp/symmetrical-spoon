@@ -101,7 +101,7 @@ EmailServer --> System -- : EmailSentResponse
 
 @enduml
 
-@startuml Log out
+@startuml Logout
 actor User
 
 activate User
