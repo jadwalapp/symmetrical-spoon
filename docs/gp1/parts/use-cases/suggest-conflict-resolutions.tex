@@ -2,7 +2,7 @@
   \ucbasicinfo{High}{Regular}
   \ucshortdescription{This UC gives the user all the conflicts and possible ways to resolve it.}
   \uctrigger{The UC is triggered when a conflict is detected between any overlapping event}
-  \ucactors{User}{Calendar System, WhatsApp}
+  \ucactors{User}{WhatsApp}
   \ucpreconditions{The calendar must have events}
   \ucrelationships{N/A}{Manage Scheduling Conflicts}{N/A}
   \ucinputsoutputs{
@@ -18,32 +18,27 @@
   }
   \ucmainflow{
     \begin{enumerate}
-      \item Conflict Detection  
-        \ucinfo{The system detects overlapping of events either added manually or extracted from WhatsApp.}
-      \item Offer Resolutions
+      \item The system detection conflicts 
+        \ucinfo{The system detects overlapping of events either added manually or extracted from WhatsApp and gives a notification to the user.}
+      \item The system gives the suggestions for Conflicts.
         \ucinfo{The system provides the user with the list of resolution options.
         \begin{itemize}
           \item By moving the overlapping event to another time slot.   
           \item Keep both events with a conflict warning. 
         \end{itemize}}
-      \item User Selection  
-        \ucinfo{The user moves the overlapping event to another time slot by the list provided by the system}
-      \item Implement Resolution
-        \ucinfo{The system makes the changes in the calendar respectively}
     \end{enumerate}
   }
   \ucalternateflows{
     \begin{enumerate}
-      \item {N/A}
+      \item {No conflicts detected}
     \end{enumerate}
   }
   \ucexceptions{
     \begin{itemize}
-      \item If the system doesn't get any possible way to resolve the conflict then the system would mark both the event as conflicting or displays to delete one of the event.
-      \item If the user doesn't choose any option to resolve the conflict then both the events are makrd as conflicting.
+      \item If the system doesn't get any possible way to resolve the conflict then the system would mark both the event as conflicting.
     \end{itemize}
   }
-  \ucconclusion{The UC ends when the user gives it's input for resolution weather if it's to reschedule the event, delete it or leave it without resolving and it is reflected in on the calendar.}
+  \ucconclusion{The UC ends when the user chooses resolution weather if to reschedule the event or leaving it without resolving and it is reflected in on the calendar.}
   \ucpostconditions{The conflicting events in the calendar are either resolved or marked as conflicting}
   \ucspecialrequirements{The system give feasible conflict resolution options}
 \end{usecase}
