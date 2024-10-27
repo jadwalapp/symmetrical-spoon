@@ -1,35 +1,29 @@
 \begin{usecase}{Schedule Prayer Times}
     \ucbasicinfo{High}{Regular}
-    \ucshortdescription{Allows users to create, edit, and manage their prayer time schedules.}
-    \uctrigger{User selects the option to schedule prayer times.}
+    \ucshortdescription{The calendar is blocked and updated automatically according to the person's time zone prayer time.}
+    \uctrigger{This usecase triggered when the user enables the prayer time feature in the application.}
     \ucactors{User}{None}
     \ucpreconditions{User must be logged into the system.}
     \ucrelationships{N/A}{N/A}{N/A}
     \ucinputsoutputs{
       \begin{itemize}
-        \item \textbf{User's prayer time details} (Source: user)
-        \item \textbf{(date, time)}
+        \item \textbf{User's time Zone} (Source: user)
+        \item \textbf{We get the IP address of the user and get their time zone}
       \end{itemize}
     }{
       \begin{itemize}
-        \item \textbf{Confirmation of scheduled prayer times, calendar entries.}
+        \item \textbf{The calendar displays the blocked time for prayer time according to their time zone.}
       \end{itemize}
-    }
+      }
     \ucmainflow{
       \begin{enumerate}
-        \item User navigates to the prayer scheduling page.
-          \ucinfo{User is presented with a form to enter prayer times. Display of the scheduling interface.}
-        \item User inputs prayer time details.
-          \ucinfo{Input fields for time, date, and prayer type. User's input is captured for validation.}
-        \item User saves the schedule.
-          \ucinfo{System checks for valid input. Confirmation message displayed.}
-        \item System confirms schedule creation.
-          \ucinfo{User receives a notification. Scheduled prayer times are saved in the system.}
+        \item User enables the feature by clicking the the option Schedule Prayer Time.
+          \ucinfo{The system checks the time zone of the user and blocks the calendar accordingly.}
       \end{enumerate}
     }
     \ucalternateflows{
       \begin{itemize}
-        \item If input is invalid, display error messages.
+        \item The user doesn't enable the scheduling prayer time.
       \end{itemize}
     }
     \ucexceptions{
@@ -37,8 +31,8 @@
         \item If there's a system error, display a relevant error message.
       \end{itemize}
     }
-    \ucpostconditions{The system generates calendar entries for the scheduled prayer times.}
-    \ucspecialrequirements{The system must support notifications for prayer times.}
+    \ucpostconditions{The system generates calendar with prayer time}
+    \ucspecialrequirements{The system must block the calendar according to their time zone}
     \ucconclusion{User's prayer times are successfully scheduled.}
     \ucbusinessrules{
       \begin{itemize}
