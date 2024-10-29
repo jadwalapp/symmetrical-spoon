@@ -1,0 +1,53 @@
+@startuml Relational Model
+entity "User" as e01 {
+  *User_id : Int <<Primary key>>
+  *Email : VARCHAR 
+  *GoogleAuthId : VARCHAR 
+  *AccountType: VARCHAR 
+  *CreatedAt: Int
+  *UpdatedAt: Int 
+}
+entity "Calender Table" as e02{
+*CalenderId: Int <<Primary key>>
+*User_id : Int <<Foreign key>>
+*CalenderType: VARCHAR 
+*CreatedAt: Int
+*UpdatedAt: Int 
+}
+entity "Event" as e03{
+*EventId: Int <<Primary key>>
+*User_id : Int <<Foreign key>>
+*Title: VARCHAR 
+*Description:VARCHAR 
+*Location:VARCHAR 
+*IsConflict:Boolean
+*StartTime:Int
+*EndTime:Int
+*CreatedAt: Int
+*UpdatedAt: Int 
+
+}
+entity "Notification" as e04{
+  *NotificationId :Int <<Primary key>>
+  *UserId:Int <<Foreign key>>
+  *EventId:Int <<Foreign key>>
+  *NotificationType: VARCHAR
+  *SentTo:VARCHAR
+
+}
+entity "ConflictResolution" as e05{
+*ConflictId:Int <<Primary key>>
+*EventId:Int <<Foreign key>>
+*ResolutionStatus:  VARCHAR
+
+}
+e02 }|-- e01
+e03 }|-- e01
+e04 }|-- e01
+e05 }|-- e01
+
+e04 }|--e03
+
+
+
+@enduml
