@@ -165,7 +165,7 @@ Keeping your calendar up to date with information is challenging, especially wit
 \section{Objectives of the Project}
 
 The main objectives of Jadwal are:
-
+\\
 \begin{itemize}
     \item To develop an intelligent calendar management system that automatically extracts events from the informal communication channels like WhatsApp and adds them to the user's main calendar.
     \item To create a user friendly interface that allows users to easily add events to the calendar.
@@ -178,13 +178,15 @@ The main objectives of Jadwal are:
 \section{Scope of the Project}
 
 Jadwal is not just another calendar application; it's a comprehensive time management tool designed to aggregate and optimize your existing calendars and data sources. The scope of the project includes:
+\\
 \begin{itemize}
     \item Development of an iOS application as the primary platform.
     \item Integration with calendars using CalDAV.
     \item WhatsApp message parsing for event extraction (subject to technical feasibility).
     \item Target audience: Busy professionals, students, and anyone juggling multiple schedules.
     \item User testing phase to ensure ease of use and effectiveness. Our testing methods will include:
-        \begin{itemize}
+       \\
+    \begin{itemize}
             \item Beta testing with a diverse group of users.
             \item Analytics to track user behavior and app performance.
         \end{itemize}
@@ -195,19 +197,23 @@ Jadwal is not just another calendar application; it's a comprehensive time manag
 \section{Significance of the Project}
 
 Jadwal's significance can be summarized in the following points:
-
+\\
 \begin{enumerate}
     \item \textbf{Time is Money}: Since time is the only asset you can't get more of, Jadwal tries to make it less painful and less time consuming to have a good calendar throughout your day by parsing events from your informal communication channels like WhatsApp automatically.
+    \\
     \item \textbf{Prayer First Calendar}: Prayer times come first, then your daily scheduled items.
+    \\
     \item \textbf{Reduced Human Error}: Automated event extraction and addition to calendars minimize the risk of missing important events or appointments due to manual input errors or forgetfulness.
+   \\
     \item \textbf{Conflict Resolution}: The smart resolution system helps users identify and resolve scheduling conflicts efficiently, reducing stress and improving overall time management.
+   \\
     \item \textbf{Holistic View of Commitments}: By integrating multiple calendars into a single view, Jadwal provides users with a comprehensive overview of their commitments across various aspects of life, facilitating better decision-making and work-life balance.
 \end{enumerate}
 
 \section{Limitations of the Project}
 
 Nothing is perfect, and our project is not an outlier. The limitations we have figured out about it are as follows:
-
+\\
 \begin{itemize}
     \item WhatsApp integration allows the app to read the users messages, so it would be hard to prove privacy hasn't been breached.
     \item WhatsApp integration might not always be there, they are a third-party.
@@ -231,14 +237,20 @@ Our project plan can be illustrated in the following gantt chart, \textbf{Figure
 \chapter{Literature Review}
 
 In developing Jadwal, we have drawn inspiration from and built upon existing research and products in the field of intelligent calendar management. Some key references include:
-
+\\
 \begin{itemize}
     \item \textbf{Clockwise (https://www.getclockwise.com/):} A smart calendar assistant that optimizes schedules and manages team coordination \cite{clockwise}. Clockwise's approach to intelligent time blocking and meeting optimization provides valuable insights for Jadwal's automated scheduling features.
+    \\
     \item \textbf{Motion (https://www.usemotion.com/):} Motion's Intelligent Calendar takes your meetings, your tasks, your to-do list, your activities, and creates one perfect, optimized schedule to get it all done \cite{motion}.
+   \\
     \item \textbf{Reclaim AI (https://reclaim.ai/):} An intelligent time management tool that helps optimize schedules and automate tasks \cite{reclaim}.
+    \\
     \item \textbf{Calendi (https://calendi.ai/):} Calendi describes itself as: ``Calendi is an AI calendar system. Use it for scheduling tasks, automating meetings, and witness the future of calendar.'' \cite{calendi}
+   \\
     \item \textbf{An Exploratory Study of Calendar Use:} ``Prospective remembering is the use of memory for remembering to do things in the future, as different from retrospective memory functions such as recalling past events.'' \cite{tungare2008exploratorystudycalendaruse}
+    \\
     \item \textbf{WhatsApp Integration:} Our research indicates that direct WhatsApp integration for event extraction has not been widely implemented in existing calendar applications, making this a unique feature of Jadwal.
+    \\
 \end{itemize}
 
 \begin{figure}[!h]
@@ -247,6 +259,24 @@ In developing Jadwal, we have drawn inspiration from and built upon existing res
     \caption{Feature Comparison Table}
     \label{fig:features-table}
 \end{figure}
+
+\newpage
+
+In Figure \ref{fig:features-table} The table compares \textit{Jadwal}, our project, with four other scheduling applications—Clockwise, Motion, Reclaim AI, and Calendi—based based on several key features.
+\\
+\begin{itemize}
+    \item \textbf{Open Source}: \textit{Jadwal} stands out as the only application that is open-source, allowing users and developers to access, modify, and improve the code. The other applications do not provide this.
+    \\
+    \item \textbf{WhatsApp Integration}: \textit{Jadwal} stands out again as the only application that connects and extract the event discussed over the platform by the user.
+    \\
+    \item \textbf{CalDAV Support}: \textit{Jadwal}, Clockwise, and Reclaim AI offer CalDAV support, which allows users to integrate calendars from different sources, while Motion and Calendi either does not sipport this.
+    \\
+    \item \textbf{Conflict Resolution}: All listed applications, including \textit{Jadwal}, supports conflict resolution, allowing users to manage overlapping events efficiently.
+    \\
+    \item \textbf{Prioritize Prayer Times}: \textit{Jadwal} is the only one offering this feature where the user be able to have prayer time scheduled
+    \\
+    \item \textbf{iOS Application}: \textit{Jadwal} is available on iOS, along with Clockwise, Reclaim AI, and Motion. The availability of Calendi on iOS is uncertain.
+\end{itemize}
 
 \chapter{System Analysis and Design}
 
@@ -278,9 +308,10 @@ In developing Jadwal, we have drawn inspiration from and built upon existing res
     % todo: check if we should remove this or keep it before submission
     \item \textbf{Data Privacy:} The app shall comply with the data protection regulations and laws in Saudi Arabia.
 \end{itemize}
-
+\newpage
 \section{System use-cases}
 
+                                                      
 \textbf{Figure \ref{fig:use-case-diagram}} shows the use case diagram for the system of Jadwal.
 
 \begin{figure}[!h]
