@@ -19,7 +19,7 @@ Of course that doesn't mean they can't be used for implementing in other languag
     \label{fig:api-metadata-class-diagram}
 \end{figure}
 
-In Figure \ref{fig:api-metadata-class-diagram}, the diagram shows the Api Metadata interface and its implementation along with important fields. It basically extracts data from the headers and includes it in the context of the requests. It helps you put stuff into the context and extract it from them. Context in Golang allows you to attach stuff to it, but it is not type safe, so we are making a wrapper to make it safe. Below we are adding wrappers for `Claims' and `Lang'. `Claims' are extracted from the JWT (JSON Web Token). `Lang' is self-explanatory.
+In Figure \ref{fig:api-metadata-class-diagram}, the diagram shows the Api Metadata interface and its implementation along with important fields. It basically extracts data from the headers and includes it in the context of the requests. It helps you put stuff into the context and extract it from them. Context in Golang allows you to attach stuff to it, but it is not type safe, so we are making a wrapper to make it safe. Below we are adding wrappers for \texttt{Claims} and \texttt{Lang}. \texttt{Claims} are extracted from the JWT (JSON Web Token). \texttt{Lang} is self-explanatory.
 
 \newpage
 

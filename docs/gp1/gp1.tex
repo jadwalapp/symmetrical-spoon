@@ -14,8 +14,9 @@
 \usepackage{xcolor}
 \usepackage{hyperref}
 \usepackage{enumitem}
-\usepackage{indentfirst}
 \usepackage{longtable}
+\usepackage{ragged2e}
+
 
 \doublespacing
 
@@ -40,6 +41,7 @@
 \begin{document}
 
 % Title Page
+\begin{singlespace}
 \begin{titlepage}
     \begin{center}
         \vspace*{1cm}
@@ -68,8 +70,8 @@
                     AFFAN MOHAMMAD & 202211086 \\
                     ALI BA WAZIR & 202211018 \\
                     \midrule
-                    \multicolumn{2}{l}{\textbf{Submission Date}: 19 Sep 2024} \\
-                    \multicolumn{2}{l}{\textbf{Supervised By}: Dr. Inaya Allah} \\
+                    \multicolumn{2}{l}{\textbf{Submission Date}: 30 Oct 2024} \\
+                    \multicolumn{2}{l}{\textbf{Supervised By}: Dr. Inayatullah} \\
                 \end{tabular}
             }
         \end{center}
@@ -77,28 +79,30 @@
         {\large First Semester 2024--2025}
     \end{center}
 \end{titlepage}
+\end{singlespace}
 
-% Preface section
+\begin{singlespace}
+
 \chapter*{Abstract}
 \addcontentsline{toc}{chapter}{Abstract}
-
-In response to Saudi Arabia’s rapid modernization, time management has been a real challenge. This paper introduces Jadwal, that proposes an automatic schedule managing system where an individual can connect all the calendars and even extract the events that have been discussed on informal communication channels.
-\\
-\\
+    
+\begin{justify}
+In response to Saudi Arabia's rapid modernization, time management has been a real challenge. This paper introduces Jadwal, that proposes an automatic schedule managing system where an individual can connect all the calendars and even extract the events that have been discussed on informal communication channels.
+    
 An iOS-based automatic schedule management system Jadwal, designed to enhance both personal and professional time organization, all-in-one scheduling experience. The primary objective is to offer a user-friendly interface that simplifies calendar management, helping users stay organized and maximize productivity. Through elegant design and intelligent event extraction from informal communication channels, Jadwal aspires to make seamless time management accessible for everyone.
-
-
+\end{justify}
+    
 \chapter*{Acknowledgment}
 \addcontentsline{toc}{chapter}{Acknowledgment}
-
+    
+\begin{justify}
 First and foremost, we would like to extend our heartfelt gratitude to our project members, whose dedication and hard work have been invaluable in achieving the initial milestone of our final project. Their commitment and teamwork have made it possible to help us reach the first stage on time, and we truly appreciate every effort contributed by them.
-\\
-\\
+    
 Secondly, we would like to thank our Graduation project supervisor Dr. Inayath Ullah for his valuable guidance and precious time. His counsel was instrumental in shaping our project.
-\\
-\\
-Lastly, I would like to thank all the professors and friends for their insightful recommendations which helped us to enhance our project and make it one of the most successful one. 
-
+    
+Lastly, I would like to thank all the professors and friends for their insightful recommendations which helped us to enhance our project and make it one of the most successful one.
+\end{justify}
+    
 \newpage
 
 \tableofcontents
@@ -152,6 +156,8 @@ Lastly, I would like to thank all the professors and friends for their insightfu
     \end{longtable}
 \end{center}
 
+\end{singlespace}
+
 % Main body (switch to Arabic numerals)
 \pagenumbering{arabic}
 
@@ -200,7 +206,6 @@ Jadwal is not just another calendar application; it's a comprehensive time manag
 \section{Significance of the Project}
 
 Jadwal's significance can be summarized in the following points:
-\\
 \begin{enumerate}
     \item \textbf{Time is Money}: Since time is the only asset you can't get more of, Jadwal tries to make it less painful and less time consuming to have a good calendar throughout your day by parsing events from your informal communication channels like WhatsApp automatically.
     \item \textbf{Prayer First Calendar}: Prayer times come first, then your daily scheduled items.
@@ -221,6 +226,8 @@ Nothing is perfect, and our project is not an outlier. The limitations we have f
     \item Dependency on third-party APIs and their limitations.
 \end{itemize}
 
+\newpage
+
 \section{Organization of the Senior Project}
 
 Our project plan can be illustrated in the following gantt chart, \textbf{Figure \ref{fig:project-gantt-chart}}.
@@ -235,7 +242,6 @@ Our project plan can be illustrated in the following gantt chart, \textbf{Figure
 \chapter{Literature Review}
 
 In developing Jadwal, we have drawn inspiration from and built upon existing research and products in the field of intelligent calendar management. Some key references include:
-\\
 \begin{itemize}
     \item \textbf{Clockwise (https://www.getclockwise.com/):} A smart calendar assistant that optimizes schedules and manages team coordination \cite{clockwise}. Clockwise's approach to intelligent time blocking and meeting optimization provides valuable insights for Jadwal's automated scheduling features.
     \item \textbf{Motion (https://www.usemotion.com/):} Motion's Intelligent Calendar takes your meetings, your tasks, your to-do list, your activities, and creates one perfect, optimized schedule to get it all done \cite{motion}.
@@ -254,19 +260,13 @@ In developing Jadwal, we have drawn inspiration from and built upon existing res
 
 \newpage
 
-In Figure \ref{fig:features-table} The table compares \textit{Jadwal}, our project, with four other scheduling applications—Clockwise, Motion, Reclaim AI, and Calendi—based based on several key features.
-\\
+In Figure \ref{fig:features-table} The table compares \textit{Jadwal}, our project, with four other scheduling applications—Clockwise, Motion, Reclaim AI, and Calendi—based based on several key features:
 \begin{itemize}
     \item \textbf{Open Source}: \textit{Jadwal} stands out as the only application that is open-source, allowing users and developers to access, modify, and improve the code. The other applications do not provide this.
-    \\
     \item \textbf{WhatsApp Integration}: \textit{Jadwal} stands out again as the only application that connects and extract the event discussed over the platform by the user.
-    \\
     \item \textbf{CalDAV Support}: \textit{Jadwal}, Clockwise, and Reclaim AI offer CalDAV support, which allows users to integrate calendars from different sources, while Motion and Calendi either does not sipport this.
-    \\
     \item \textbf{Conflict Resolution}: All listed applications, including \textit{Jadwal}, supports conflict resolution, allowing users to manage overlapping events efficiently.
-    \\
     \item \textbf{Prioritize Prayer Times}: \textit{Jadwal} is the only one offering this feature where the user be able to have prayer time scheduled
-    \\
     \item \textbf{iOS Application}: \textit{Jadwal} is available on iOS, along with Clockwise, Reclaim AI, and Motion. The availability of Calendi on iOS is uncertain.
 \end{itemize}
 
@@ -285,9 +285,9 @@ In Figure \ref{fig:features-table} The table compares \textit{Jadwal}, our proje
     \item The user should be able to schedule prayer times.
     \item The system shall send event notifications to the user.
     \item The system shall add the WhatsApp extracted events to the calendar. If a conflict occurs, the user shall get a notification to resolve the conflict with suggestions.
-    % todo: check if we should remove this or keep it before submission
-    \item The system shall synchronize calendar data across multiple devices.
 \end{itemize}
+
+\newpage
 
 \section{Non-Functional Requirements}
 
@@ -302,8 +302,7 @@ In Figure \ref{fig:features-table} The table compares \textit{Jadwal}, our proje
 \end{itemize}
 \newpage
 \section{System use-cases}
-
-                                                      
+   
 \textbf{Figure \ref{fig:use-case-diagram}} shows the use case diagram for the system of Jadwal.
 
 \begin{figure}[!h]
