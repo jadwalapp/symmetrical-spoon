@@ -8,10 +8,13 @@
 
 /* Begin PBXBuildFile section */
 		650921332CC68C9800E8332B /* Connect in Frameworks */ = {isa = PBXBuildFile; productRef = 650921322CC68C9800E8332B /* Connect */; };
+		65A9BE5B2CD15602008364E6 /* ElegantCalendar in Frameworks */ = {isa = PBXBuildFile; productRef = 65A9BE5A2CD15602008364E6 /* ElegantCalendar */; };
+		65A9BE5D2CD15C4C008364E6 /* ElegantCalendar.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 65A9BE5C2CD15C4C008364E6 /* ElegantCalendar.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		6564DBC72CC3E88C005FB2F3 /* Mishkat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Mishkat.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		65A9BE5C2CD15C4C008364E6 /* ElegantCalendar.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = ElegantCalendar.xcassets; path = ../../../SourcePackages/checkouts/ElegantCalendar/ElegantCalendar.xcassets; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -41,6 +44,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				650921332CC68C9800E8332B /* Connect in Frameworks */,
+				65A9BE5B2CD15602008364E6 /* ElegantCalendar in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -50,6 +54,7 @@
 		6564DBBE2CC3E88C005FB2F3 = {
 			isa = PBXGroup;
 			children = (
+				65A9BE5C2CD15C4C008364E6 /* ElegantCalendar.xcassets */,
 				6564DBC92CC3E88C005FB2F3 /* Mishkat */,
 				6564DBC82CC3E88C005FB2F3 /* Products */,
 			);
@@ -84,6 +89,7 @@
 			name = Mishkat;
 			packageProductDependencies = (
 				650921322CC68C9800E8332B /* Connect */,
+				65A9BE5A2CD15602008364E6 /* ElegantCalendar */,
 			);
 			productName = Mishkat;
 			productReference = 6564DBC72CC3E88C005FB2F3 /* Mishkat.app */;
@@ -115,6 +121,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				650921312CC68C9800E8332B /* XCRemoteSwiftPackageReference "connect-swift" */,
+				65A9BE592CD15602008364E6 /* XCRemoteSwiftPackageReference "ElegantCalendar" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 6564DBC82CC3E88C005FB2F3 /* Products */;
@@ -131,6 +138,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				65A9BE5D2CD15C4C008364E6 /* ElegantCalendar.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -366,6 +374,14 @@
 				minimumVersion = 0.14.0;
 			};
 		};
+		65A9BE592CD15602008364E6 /* XCRemoteSwiftPackageReference "ElegantCalendar" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ThasianX/ElegantCalendar";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.3.2;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -373,6 +389,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 650921312CC68C9800E8332B /* XCRemoteSwiftPackageReference "connect-swift" */;
 			productName = Connect;
+		};
+		65A9BE5A2CD15602008364E6 /* ElegantCalendar */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 65A9BE592CD15602008364E6 /* XCRemoteSwiftPackageReference "ElegantCalendar" */;
+			productName = ElegantCalendar;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
