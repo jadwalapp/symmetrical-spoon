@@ -15,6 +15,7 @@
 \usepackage{hyperref}
 \usepackage{enumitem}
 \usepackage{indentfirst}
+\usepackage{longtable}
 
 \setlist[itemize]{leftmargin=1cm}
 \setlist[enumerate]{leftmargin=1cm}
@@ -86,27 +87,46 @@
 \listoffigures
 
 \newpage
-\listoftables
-\newpage
 
 \chapter*{List of Abbreviations and Terminology}
 \addcontentsline{toc}{chapter}{List of Abbreviations and Terminology}
 
-\begin{tabular}{ll}
-    \textbf{Calendar} & A list of events and dates within a year that are important to an organization or to the people involved in a particular activity. \cite{https://dictionary.cambridge.org/dictionary/english/calendar}\\
-    \textbf{Jadwal} & Jadwal is a comprehensive time management tool designed to aggregate and optimize your existing calendars and data sources.\\
-    \textbf{WhatsApp} & WhatsApp is an alternative to SMS and offers simple, secure, reliable messaging and calling, available on phones all over the world. \cite{whatsapp-about}\\
-    \textbf{CalDAV} & Calendaring Extensions to WebDAV \\
-    \textbf{WebDAV} & Web Distributed Authoring and Versioning \\
-    \textbf{HTTPS} & HyperText Transfer Protocol Secure \\
-    \textbf{iOS} & iPhone Operating System \\
-    \textbf{N/A} & Not Applicable \\
-    \textbf{UC} & Use Case \\
-    \textbf{ER diagram} &  Entity Relationship ER Diagram is a type of flowchart that illustrates how entities\\ 
-    \textbf{Sequence Diagram} &  An interaction diagram that details how operations are carried out.\\
-    \textbf{APIs} & Application programming interface.\\
-    \textbf{APNs} & Apple Push Notification service
-\end{tabular}
+\begin{center}
+    \begin{longtable}{p{0.2\textwidth}p{0.7\textwidth}}
+    \toprule
+    \textbf{Term} & \textbf{Definition} \\
+    \midrule
+    \endhead
+    
+    \textbf{Calendar} & A list of events and dates within a year that are important to an organization or to the people involved in a particular activity. \cite{def:calendar} \\[1ex]
+    
+    \textbf{Jadwal} & Jadwal is a comprehensive time management tool designed to aggregate and optimize your existing calendars and data sources. \\[1ex]
+    
+    \textbf{WhatsApp} & WhatsApp is an alternative to SMS and offers simple, secure, reliable messaging and calling, available on phones all over the world. \cite{whatsapp-about} \\[1ex]
+    
+    \textbf{CalDAV} & Calendaring Extensions to WebDAV \\[1ex]
+    
+    \textbf{WebDAV} & Web Distributed Authoring and Versioning \\[1ex]
+    
+    \textbf{HTTPS} & HyperText Transfer Protocol Secure \\[1ex]
+    
+    \textbf{iOS} & iPhone Operating System \\[1ex]
+    
+    \textbf{N/A} & Not Applicable \\[1ex]
+    
+    \textbf{UC} & Use Case \\[1ex]
+    
+    \textbf{ER diagram} & Entity Relationship ER Diagram is a type of flowchart that illustrates how entities \\[1ex]
+    
+    \textbf{Sequence Diagram} & An interaction diagram that details how operations are carried out. \\[1ex]
+    
+    \textbf{APIs} & Application programming interface. \\[1ex]
+    
+    \textbf{APNs} & Apple Push Notification service \\
+    
+    \bottomrule
+    \end{longtable}
+\end{center}
 
 % Main body (switch to Arabic numerals)
 \pagenumbering{arabic}
@@ -266,6 +286,15 @@ In developing Jadwal, we have drawn inspiration from and built upon existing res
 \include{parts/use-cases/view-integrated-calendar}
 \include{parts/use-cases/schedule-prayer-times}
 \include{parts/use-cases/receive-event-notifications}
+
+\section{Database Design}
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/docs/diagrams/er/database/Database Design.png}
+    \caption{Database Design}
+    \label{fig:database-design}
+\end{figure}
 
 % Bibliography
 \bibliography{references}
