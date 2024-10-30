@@ -1,0 +1,602 @@
+@startuml apimetadata
+namespace apimetadata {
+    interface ApiMetadata  {
+        + ContextWithClaims(ctx context.Context, claims tokens.TokenClaims) context.Context
+        + GetClaims(ctx context.Context) (*tokens.TokenClaims, bool)
+        + ContextWithLang(ctx context.Context, lang Lang) context.Context
+        + GetLang(ctx context.Context) (Lang, bool)
+
+    }
+    class apiMetadata << (S,Aquamarine) >> {
+        + ContextWithClaims(ctx context.Context, claims tokens.TokenClaims) context.Context
+        + GetClaims(ctx context.Context) (*tokens.TokenClaims, bool)
+        + ContextWithLang(ctx context.Context, lang Lang) context.Context
+        + GetLang(ctx context.Context) (Lang, bool)
+
+    }
+    class apimetadata.Lang << (T, #FF7700) >>  {
+    }
+    class claimsKey << (S,Aquamarine) >> {
+    }
+    class langKey << (S,Aquamarine) >> {
+    }
+}
+
+"apimetadata.ApiMetadata" <|-- "apimetadata.apiMetadata"
+@enduml
+
+@startuml auth
+namespace auth {
+    namespace auth {
+    class service << (S,Aquamarine) >> {
+        - pv protovalidate.Validator
+        - store store.Queries
+        - tokens tokens.Tokens
+        - emailer emailer.Emailer
+        - templates template.Templates
+        - apiMetadata apimetadata.ApiMetadata
+        - googleSvc google.GoogleSvc
+
+        - generateTokenWithHash() (uuid.UUID, string, error)
+
+        + InitiateEmail(ctx context.Context, r *) (*, error)
+        + CompleteEmail(ctx context.Context, r *) (*, error)
+        + UseGoogle(ctx context.Context, r *) (*, error)
+
+    }
+}
+
+"authv1connect.AuthServiceClient" <|-- "auth.service"
+"authv1connect.AuthServiceHandler" <|-- "auth.service"
+
+namespace authv1 {
+    class CompleteEmailRequest << (S,Aquamarine) >> {
+        - state protoimpl.MessageState
+        - sizeCache protoimpl.SizeCache
+        - unknownFields protoimpl.UnknownFields
+
+        + Token string
+
+        + Reset() 
+        + String() string
+        + ProtoMessage() 
+        + ProtoReflect() protoreflect.Message
+        + Descriptor() ([]byte, []int)
+        + GetToken() string
+
+    }
+    class CompleteEmailResponse << (S,Aquamarine) >> {
+        - state protoimpl.MessageState
+        - sizeCache protoimpl.SizeCache
+        - unknownFields protoimpl.UnknownFields
+
+        + AccessToken string
+
+        + Reset() 
+        + String() string
+        + ProtoMessage() 
+        + ProtoReflect() protoreflect.Message
+        + Descriptor() ([]byte, []int)
+        + GetAccessToken() string
+
+    }
+    class InitiateEmailRequest << (S,Aquamarine) >> {
+        - state protoimpl.MessageState
+        - sizeCache protoimpl.SizeCache
+        - unknownFields protoimpl.UnknownFields
+
+        + Email string
+
+        + Reset() 
+        + String() string
+        + ProtoMessage() 
+        + ProtoReflect() protoreflect.Message
+        + Descriptor() ([]byte, []int)
+        + GetEmail() string
+
+    }
+    class InitiateEmailResponse << (S,Aquamarine) >> {
+        - state protoimpl.MessageState
+        - sizeCache protoimpl.SizeCache
+        - unknownFields protoimpl.UnknownFields
+
+        + Reset() 
+        + String() string
+        + ProtoMessage() 
+        + ProtoReflect() protoreflect.Message
+        + Descriptor() ([]byte, []int)
+
+    }
+    class UseGoogleRequest << (S,Aquamarine) >> {
+        - state protoimpl.MessageState
+        - sizeCache protoimpl.SizeCache
+        - unknownFields protoimpl.UnknownFields
+
+        + GoogleToken string
+
+        + Reset() 
+        + String() string
+        + ProtoMessage() 
+        + ProtoReflect() protoreflect.Message
+        + Descriptor() ([]byte, []int)
+        + GetGoogleToken() string
+
+    }
+    class UseGoogleResponse << (S,Aquamarine) >> {
+        - state protoimpl.MessageState
+        - sizeCache protoimpl.SizeCache
+        - unknownFields protoimpl.UnknownFields
+
+        + AccessToken string
+
+        + Reset() 
+        + String() string
+        + ProtoMessage() 
+        + ProtoReflect() protoreflect.Message
+        + Descriptor() ([]byte, []int)
+        + GetAccessToken() string
+
+    }
+}
+
+
+namespace authv1connect {
+    interface AuthServiceClient  {
+        + InitiateEmail( context.Context,  *) (*, error)
+        + CompleteEmail( context.Context,  *) (*, error)
+        + UseGoogle( context.Context,  *) (*, error)
+
+    }
+    interface AuthServiceHandler  {
+        + InitiateEmail( context.Context,  *) (*, error)
+        + CompleteEmail( context.Context,  *) (*, error)
+        + UseGoogle( context.Context,  *) (*, error)
+
+    }
+    class UnimplementedAuthServiceHandler << (S,Aquamarine) >> {
+        + InitiateEmail( context.Context,  *) (*, error)
+        + CompleteEmail( context.Context,  *) (*, error)
+        + UseGoogle( context.Context,  *) (*, error)
+
+    }
+    class authServiceClient << (S,Aquamarine) >> {
+        - initiateEmail *
+        - completeEmail *
+        - useGoogle *
+
+        + InitiateEmail(ctx context.Context, req *) (*, error)
+        + CompleteEmail(ctx context.Context, req *) (*, error)
+        + UseGoogle(ctx context.Context, req *) (*, error)
+
+    }
+}
+
+"authv1connect.AuthServiceClient" <|-- "authv1connect.UnimplementedAuthServiceHandler"
+"authv1connect.AuthServiceHandler" <|-- "authv1connect.UnimplementedAuthServiceHandler"
+"authv1connect.AuthServiceClient" <|-- "authv1connect.authServiceClient"
+"authv1connect.AuthServiceHandler" <|-- "authv1connect.authServiceClient"
+}
+@enduml
+
+@startuml calendarv1
+namespace calendarv1connect {
+    interface CalendarServiceClient  {
+        + CreateCalendar( context.Context,  *) (*, error)
+        + GetCalendars( context.Context,  *) (*, error)
+        + CreateEvent( context.Context,  *) (*, error)
+        + UpdateEvent( context.Context,  *) (*, error)
+        + DeleteEvent( context.Context,  *) (*, error)
+        + GetEventsByCalendar( context.Context,  *) (*, error)
+        + ConnectCalDAVCalendar( context.Context,  *) (*, error)
+
+    }
+    interface CalendarServiceHandler  {
+        + CreateCalendar( context.Context,  *) (*, error)
+        + GetCalendars( context.Context,  *) (*, error)
+        + CreateEvent( context.Context,  *) (*, error)
+        + UpdateEvent( context.Context,  *) (*, error)
+        + DeleteEvent( context.Context,  *) (*, error)
+        + GetEventsByCalendar( context.Context,  *) (*, error)
+        + ConnectCalDAVCalendar( context.Context,  *) (*, error)
+
+    }
+    class UnimplementedCalendarServiceHandler << (S,Aquamarine) >> {
+        + CreateCalendar( context.Context,  *) (*, error)
+        + GetCalendars( context.Context,  *) (*, error)
+        + CreateEvent( context.Context,  *) (*, error)
+        + UpdateEvent( context.Context,  *) (*, error)
+        + DeleteEvent( context.Context,  *) (*, error)
+        + GetEventsByCalendar( context.Context,  *) (*, error)
+        + ConnectCalDAVCalendar( context.Context,  *) (*, error)
+
+    }
+    class calendarServiceClient << (S,Aquamarine) >> {
+        - createCalendar *
+        - getCalendars *
+        - createEvent *
+        - updateEvent *
+        - deleteEvent *
+        - getEventsByCalendar *
+        - connectCalDAVCalendar *
+
+        + CreateCalendar(ctx context.Context, req *) (*, error)
+        + GetCalendars(ctx context.Context, req *) (*, error)
+        + CreateEvent(ctx context.Context, req *) (*, error)
+        + UpdateEvent(ctx context.Context, req *) (*, error)
+        + DeleteEvent(ctx context.Context, req *) (*, error)
+        + GetEventsByCalendar(ctx context.Context, req *) (*, error)
+        + ConnectCalDAVCalendar(ctx context.Context, req *) (*, error)
+
+    }
+}
+
+"calendarv1connect.CalendarServiceClient" <|-- "calendarv1connect.UnimplementedCalendarServiceHandler"
+"calendarv1connect.CalendarServiceHandler" <|-- "calendarv1connect.UnimplementedCalendarServiceHandler"
+"calendarv1connect.CalendarServiceClient" <|-- "calendarv1connect.calendarServiceClient"
+"calendarv1connect.CalendarServiceHandler" <|-- "calendarv1connect.calendarServiceClient"
+@enduml
+
+@startuml googleclient
+namespace googleclient {
+    interface Client  {
+        + GetTokenInfo( context.Context,  *TokenInfoRequest) (*TokenInfoResponse, error)
+        + GetUserInfo( context.Context,  *UserInfoRequest) (*UserInfoResponse, error)
+
+    }
+    class TokenInfoRequest << (S,Aquamarine) >> {
+        + AccessToken string
+
+    }
+    class TokenInfoResponse << (S,Aquamarine) >> {
+        + Azp string
+        + Aud string
+        + Sub string
+        + Scope string
+        + Exp string
+        + ExpiresIn string
+        + Email string
+        + EmailVerified string
+        + AccessType string
+
+    }
+    class UserInfoRequest << (S,Aquamarine) >> {
+        + AccessToken string
+
+    }
+    class UserInfoResponse << (S,Aquamarine) >> {
+        + Sub string
+        + Name string
+        + GivenName string
+        + FamilyName string
+        + Picture string
+        + Email string
+        + EmailVerified bool
+        + Locale string
+
+    }
+    class client << (S,Aquamarine) >> {
+        - cli httpclient.HTTPClient
+        - baseUrl string
+
+        + GetTokenInfo(ctx context.Context, r *TokenInfoRequest) (*TokenInfoResponse, error)
+        + GetUserInfo(ctx context.Context, r *UserInfoRequest) (*UserInfoResponse, error)
+
+    }
+}
+"googleclient.Client" <|-- "googleclient.client"
+@enduml
+
+@startuml emailer
+namespace emailer {
+    interface Emailer  {
+        + Send(ctx context.Context, from FromEmail, to string, subject string, body string) error
+        + SendFromTemplate(ctx context.Context, from FromEmail, template template.Template, to string) error
+
+    }
+    class emailer.EmailerName << (T, #FF7700) >>  {
+    }
+    class emailer.FromEmail << (T, #FF7700) >>  {
+    }
+    class resendEmailer << (S,Aquamarine) >> {
+        - resend resend.Client
+
+        + Send(ctx context.Context, from FromEmail, to string, subject string, body string) error
+        + SendFromTemplate(ctx context.Context, from FromEmail, template template.Template, to string) error
+
+    }
+    class smtpEmailer << (S,Aquamarine) >> {
+        - host string
+        - port string
+        - username string
+        - password string
+
+        + Send(ctx context.Context, from FromEmail, to string, subject string, body string) error
+        + SendFromTemplate(ctx context.Context, from FromEmail, template template.Template, to string) error
+
+    }
+    class stdoutEmailer << (S,Aquamarine) >> {
+        + Send(ctx context.Context, from FromEmail, to string, subject string, body string) error
+        + SendFromTemplate(ctx context.Context, from FromEmail, template template.Template, to string) error
+
+    }
+}
+
+"emailer.Emailer" <|-- "emailer.resendEmailer"
+"emailer.Emailer" <|-- "emailer.smtpEmailer"
+"emailer.Emailer" <|-- "emailer.stdoutEmailer"
+@enduml
+
+@startuml googlesvc
+namespace googlesvc {
+    interface GoogleSvc  {
+        + GetUserInfoByToken(ctx context.Context, token string) (*client.UserInfoResponse, error)
+
+    }
+    class service << (S,Aquamarine) >> {
+        - googleOAuthClientId string
+        - googleClient client.Client
+
+        + GetUserInfoByToken(ctx context.Context, token string) (*client.UserInfoResponse, error)
+
+    }
+}
+
+"googlesvc.GoogleSvc" <|-- "googlesvc.service"
+@enduml
+
+@startuml httpclient
+namespace httpclient {
+    interface HTTPClient  {
+        + Get(url string, headers <font color=blue>map</font>[string]string, queryparams url.Values) (*http.Response, error)
+        + Post(url string, body <font color=blue>interface</font>{}, headers <font color=blue>map</font>[string]string) (*http.Response, error)
+
+    }
+    class client << (S,Aquamarine) >> {
+        - httpClient *http.Client
+
+        + Get(url string, headers <font color=blue>map</font>[string]string, queryparams url.Values) (*http.Response, error)
+        + Post(url string, body <font color=blue>interface</font>{}, headers <font color=blue>map</font>[string]string) (*http.Response, error)
+
+    }
+}
+@enduml
+
+@startuml template
+namespace template {
+    class Template << (S,Aquamarine) >> {
+        + Subject string
+        + HTML string
+
+    }
+    interface Templates  {
+        + MagicLinkTemplate(lang apimetadata.Lang, token string) (*Template, error)
+        + WelcomeTemplate(lang apimetadata.Lang, name string) (*Template, error)
+
+    }
+    class templates << (S,Aquamarine) >> {
+        - domain string
+
+        + MagicLinkTemplate(lang apimetadata.Lang, token string) (*Template, error)
+        + WelcomeTemplate(tl apimetadata.Lang, name string) (*Template, error)
+
+    }
+}
+
+"template.Templates" <|-- "template.templates"
+@enduml
+
+@startuml store
+namespace store {
+    class AuthGoogle << (S,Aquamarine) >> {
+        + ID uuid.UUID
+        + CustomerID uuid.UUID
+        + Sub string
+        + CreatedAt time.Time
+        + UpdatedAt time.Time
+
+    }
+    class CalendarAccount << (S,Aquamarine) >> {
+        + ID uuid.UUID
+        + CustomerID uuid.UUID
+        + Provider string
+        + CreatedAt time.Time
+        + UpdatedAt time.Time
+
+    }
+    class CreateAuthGoogleParams << (S,Aquamarine) >> {
+        + CustomerID uuid.UUID
+        + Sub string
+
+    }
+    class CreateCustomerIfNotExistsParams << (S,Aquamarine) >> {
+        + Name string
+        + Email string
+
+    }
+    class CreateCustomerIfNotExistsRow << (S,Aquamarine) >> {
+        + ID uuid.UUID
+        + Name string
+        + Email string
+        + CreatedAt time.Time
+        + UpdatedAt time.Time
+
+    }
+    class CreateMagicLinkParams << (S,Aquamarine) >> {
+        + CustomerID uuid.UUID
+        + TokenHash string
+        + ExpiresAt time.Time
+
+    }
+    class Customer << (S,Aquamarine) >> {
+        + ID uuid.UUID
+        + Name string
+        + Email string
+        + CreatedAt time.Time
+        + UpdatedAt time.Time
+
+    }
+    interface DBTX  {
+        + ExecContext( context.Context,  string,  ...<font color=blue>interface</font>{}) (sql.Result, error)
+        + PrepareContext( context.Context,  string) (*sql.Stmt, error)
+        + QueryContext( context.Context,  string,  ...<font color=blue>interface</font>{}) (*sql.Rows, error)
+        + QueryRowContext( context.Context,  string,  ...<font color=blue>interface</font>{}) *sql.Row
+
+    }
+    class MagicLink << (S,Aquamarine) >> {
+        + ID uuid.UUID
+        + CustomerID uuid.UUID
+        + TokenHash string
+        + ExpiresAt time.Time
+        + UsedAt sql.NullTime
+        + CreatedAt time.Time
+        + UpdatedAt time.Time
+
+    }
+    class Queries << (S,Aquamarine) >> {
+        - db DBTX
+
+        + CreateAuthGoogle(ctx context.Context, arg CreateAuthGoogleParams) (AuthGoogle, error)
+        + GetAuthGoogleByCustomerId(ctx context.Context, customerID uuid.UUID) (AuthGoogle, error)
+        + GetAuthGoogleBySub(ctx context.Context, sub string) (AuthGoogle, error)
+        + CreateCustomerIfNotExists(ctx context.Context, arg CreateCustomerIfNotExistsParams) (CreateCustomerIfNotExistsRow, error)
+        + DeleteCustomerById(ctx context.Context, id uuid.UUID) error
+        + GetCustomerByEmail(ctx context.Context, email string) (Customer, error)
+        + GetCustomerById(ctx context.Context, id uuid.UUID) (Customer, error)
+        + WithTx(tx *sql.Tx) *Queries
+        + CreateMagicLink(ctx context.Context, arg CreateMagicLinkParams) (MagicLink, error)
+        + GetUnusedMagicLinkByTokenHash(ctx context.Context, tokenHash string) (MagicLink, error)
+        + UpdateMagicLinkUsedAtByTokenHash(ctx context.Context, arg UpdateMagicLinkUsedAtByTokenHashParams) error
+
+    }
+    class UpdateMagicLinkUsedAtByTokenHashParams << (S,Aquamarine) >> {
+        + TokenHash string
+        + UsedAt sql.NullTime
+
+    }
+    class Valarm << (S,Aquamarine) >> {
+        + ID uuid.UUID
+        + EventUid string
+        + Action string
+        + Trigger string
+        + Description sql.NullString
+        + Summary sql.NullString
+        + Duration sql.NullString
+        + Repeat sql.NullInt32
+        + Attendees pqtype.NullRawMessage
+        + CreatedAt time.Time
+        + UpdatedAt time.Time
+
+    }
+    class Vcalendar << (S,Aquamarine) >> {
+        + Uid string
+        + AccountID uuid.UUID
+        + Prodid string
+        + Version string
+        + Calscale sql.NullString
+        + DisplayName string
+        + Description sql.NullString
+        + Color sql.NullString
+        + Timezone sql.NullString
+        + Sequence sql.NullInt32
+        + CreatedAt time.Time
+        + UpdatedAt time.Time
+
+    }
+    class Vevent << (S,Aquamarine) >> {
+        + Uid string
+        + CalendarUid string
+        + Dtstamp time.Time
+        + Dtstart time.Time
+        + Dtend sql.NullTime
+        + Duration sql.NullString
+        + Summary string
+        + Description sql.NullString
+        + Location sql.NullString
+        + Status sql.NullString
+        + Classification sql.NullString
+        + Transp sql.NullString
+        + Rrule sql.NullString
+        + Rdate pqtype.NullRawMessage
+        + Exdate pqtype.NullRawMessage
+        + Sequence sql.NullInt32
+        + CreatedAt time.Time
+        + UpdatedAt time.Time
+
+    }
+    class VeventException << (S,Aquamarine) >> {
+        + ID uuid.UUID
+        + EventUid string
+        + RecurrenceID time.Time
+        + Summary sql.NullString
+        + Description sql.NullString
+        + Location sql.NullString
+        + Dtstart sql.NullTime
+        + Dtend sql.NullTime
+        + Status sql.NullString
+        + CreatedAt time.Time
+        + UpdatedAt time.Time
+
+    }
+}
+@enduml
+
+@startuml tokens
+namespace tokens {
+    class Payload << (S,Aquamarine) >> {
+        + CustomerId string
+
+    }
+    class TokenClaims << (S,Aquamarine) >> {
+        + Payload Payload
+
+    }
+    interface Tokens  {
+        + NewToken(customerId string, aud Audience) (string, error)
+        + ParseToken(token string) (*TokenClaims, error)
+
+    }
+    class tokens << (S,Aquamarine) >> {
+        + PublicKey *rsa.PublicKey
+        + PrivateKey *rsa.PrivateKey
+
+        + NewToken(customerId string, aud Audience) (string, error)
+        + ParseToken(token string) (*TokenClaims, error)
+
+    }
+    class tokens.Audience << (T, #FF7700) >>  {
+    }
+}
+
+"jwt.StandardClaims" *-- "tokens.TokenClaims"
+"tokens.Tokens" <|-- "tokens.tokens"
+@enduml
+
+@startuml util
+namespace util {
+    class FalakConfig << (S,Aquamarine) >> {
+        + Port string
+        + JWTPublicKey string
+        + JWTPrivateKey string
+        + DBUser string
+        + DBPassword string
+        + DBHost string
+        + DBPort string
+        + DBName string
+        + DBSSLMode string
+        + EmailerName string
+        + SMTPHost string
+        + SMTPPort string
+        + SMTPUSername string
+        + SMTPPasword string
+        + Domain string
+        + ResendApiKey string
+        + GoogleClientBaseUrl string
+        + GoogleOAuthClientId string
+    }
+}
+
+"__builtin__.string" #.. "apimetadata.Lang"
+"__builtin__.string" #.. "emailer.EmailerName"
+"__builtin__.string" #.. "emailer.FromEmail"
+"__builtin__.string" #.. "tokens.Audience"
+@enduml
