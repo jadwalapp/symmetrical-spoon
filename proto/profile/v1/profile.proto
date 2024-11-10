@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+option go_package = "github.com/jadwalapp/symmetrical-spoon/falak/pkg/gen/proto/profile/v1;profilev1";
+
+package profile.v1;
+
+message GetProfileRequest {}
+
+message GetProfileResponse {
+    string name = 1;
+    string email = 2;
+}
+
+service ProfileService {
+    rpc GetProfile(GetProfileRequest) returns (GetProfileResponse);
+}
