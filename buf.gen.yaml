@@ -1,12 +1,12 @@
 version: v2
 plugins:
-  - remote: buf.build/connectrpc/swift
+  - local: protoc-gen-connect-swift
     out: mishkat/Mishkat/Generated
     opt:
       - GenerateAsyncMethods=true
       - GenerateCallbackMethods=true
       - Visibility=Public
-  - remote: buf.build/apple/swift
+  - local: protoc-gen-swift
     out: mishkat/Mishkat/Generated
     opt: Visibility=Public
   - local: protoc-gen-go
