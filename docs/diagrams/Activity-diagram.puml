@@ -1,0 +1,40 @@
+@startuml
+start
+:Login;
+if () then
+    :Continue with google;
+else
+    :Continue with email;
+endif
+:Verify Credentials;
+while (Credentials Valid?) is (no)
+    :Login;
+endwhile (yes)
+:Home Page;
+fork
+    :Profile;
+fork again
+    :History;
+fork again
+    :Connect WhatsApp;
+    :Extract event from WhatsApp;
+fork again
+    :Create calendar;
+    fork
+        :Add event;
+    fork again
+        :Connect Calendar;
+    endfork
+endfork
+if (Check Access?) then (yes)
+    :Add event to the calendar;
+    :View integrated calendar;
+    :Suggest conflict resolution;
+    :Manage Scheduling conflicts;
+    :Receive event notification;
+else (no)
+    :View event;
+endif
+:Logout;
+stop
+@enduml
