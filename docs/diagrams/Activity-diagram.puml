@@ -15,15 +15,16 @@ fork
     :Profile;
 fork again
     :History;
-fork again
-    :Connect WhatsApp;
-    :Extract event from WhatsApp;
+
 fork again
     :Create calendar;
     fork
         :Add event;
     fork again
         :Connect Calendar;
+        fork again
+    :Connect WhatsApp;
+    :Extract event from WhatsApp;
     endfork
 endfork
 if (Check Access?) then (yes)
