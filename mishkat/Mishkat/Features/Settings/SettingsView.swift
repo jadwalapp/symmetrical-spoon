@@ -10,37 +10,58 @@ import SwiftUI
 struct SettingsView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
         
-        var body: some View {
-            List {
-                Section {
+    var body: some View {
+        List {
+            Section {
+                HStack {
+                    Circle()
+                        .frame(width: 60)
+                        .padding(.trailing, 16)
+                    VStack(alignment: .leading) {
+                        Text("Hello Yazeed!")
+                            .font(.headline)
+                        Text("yazeedfady@gmail.com")
+                            .font(.subheadline)
+                    }
+                    Spacer()
+                }
+            }
+            Section {
+                Button {
+                    print("connect whatsapp")
+                } label: {
                     HStack {
-                        Circle()
-                            .frame(width: 60)
-                            .padding(.trailing, 16)
-                        VStack(alignment: .leading) {
-                            Text("Hello Yazeed!")
-                                .font(.headline)
-                            Text("yazeedfady@gmail.com")
-                                .font(.subheadline)
-                        }
-                        Spacer()
+                        Image(systemName: "message.fill")
+                        Text("Connect WhatsApp")
                     }
                 }
-                Section {
-                    
-                }
-                Section {
+                
+                Button {
+                    print("connect caldav")
+                } label: {
                     HStack {
-                        Spacer()
-                        Button("Logout") {
-                            authViewModel.logout()
-                        }
-                        .foregroundStyle(.red)
-                        Spacer()
+                        Image(systemName: "calendar")
+                        Text("Connect CalDAV")
                     }
                 }
             }
+            Section {
+                HStack {
+                    Spacer()
+                    Button {
+                        authViewModel.logout()
+                    } label: {
+                        HStack {
+                            Image(systemName: "rectangle.portrait.and.arrow.right")
+                            Text("Logout")
+                        }
+                        .foregroundStyle(.red)
+                    }
+                    Spacer()
+                }
+            }
         }
+    }
 }
 
 #Preview {
