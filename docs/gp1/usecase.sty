@@ -5,6 +5,7 @@
 \RequirePackage{enumitem}
 \RequirePackage{changepage}
 \RequirePackage{hyperref}
+\RequirePackage{caption}
 
 % Color definitions
 \definecolor{darkgreen}{RGB}{0,100,0}
@@ -13,11 +14,14 @@
 % Counter for use cases
 \newcounter{usecasecount}
 
+% Command to store the title temporarily
+\newcommand{\usecasetitle}{}
+
 % Use case environment
 \newenvironment{usecase}[1]{%
   \stepcounter{usecasecount}%
+  \renewcommand{\usecasetitle}{#1}%
   \phantomsection % For correct hyperlinking
-  \addcontentsline{lot}{table}{Table \theusecasecount: #1}
   \noindent
   \begin{tcolorbox}[
     colback=darkgreen,
@@ -31,10 +35,12 @@
     boxsep=0pt,
   ]
     \centering
-    \textcolor{white}{\LARGE Table \theusecasecount: #1}
+    \textcolor{white}{\LARGE Use Case \theusecasecount: #1}
   \end{tcolorbox}
   \vspace{2mm}
 }{%
+  \vspace{2mm}
+  \captionof{table}{\usecasetitle}
   \vspace{5mm}
 }
 
