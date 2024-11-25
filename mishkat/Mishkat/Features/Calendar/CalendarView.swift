@@ -10,12 +10,38 @@ import SwiftUI
 struct CalendarView: View {
     @State private var selectedDate: DateComponents?
     @State private var displayEvents = false
+    @State private var showingAddEventSheet = false
     
     var body: some View {
-        CalendarViewRepresentable(
-            selectedDate: $selectedDate,
-            displayEvents: $displayEvents
-        )
+        NavigationStack {
+            CalendarViewRepresentable(
+                selectedDate: $selectedDate,
+                displayEvents: $displayEvents
+            )
+            .navigationTitle("Calendar")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    HStack(spacing: 16) {
+                        Button {
+                            // Handle notifications
+                        } label: {
+                            Image(systemName: "bell")
+                                .foregroundStyle(.primary)
+                        }
+                        
+                        Button {
+                            showingAddEventSheet = true
+                        } label: {
+                            Image(systemName: "plus.circle.fill")
+                                .foregroundStyle(.accent)
+                        }
+                    }
+                }
+            }
+            .sheet(isPresented: $showingAddEventSheet) {
+                AddEventView(isPresented: $showingAddEventSheet, selectedDate: selectedDate)
+            }
+        }
     }
 }
 
