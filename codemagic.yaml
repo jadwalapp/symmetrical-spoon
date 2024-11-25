@@ -14,6 +14,8 @@ workflows:
         XCODE_SCHEME: Mishkat
       xcode: 16.0
     scripts:
+      - name: Run the hack for making next step work hopefully
+        script: gem update xcodeproj
       - name: Set up code signing settings on Xcode project
         script: xcode-project use-profiles
       - name: Build ipa for distribution
