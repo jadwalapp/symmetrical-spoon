@@ -265,17 +265,18 @@ Our project plan can be illustrated in the following gantt chart, \textbf{Figure
     \centering
     \includegraphics[width=\textwidth]{images/gantt.png}
     \caption{Project Gantt Chart}
-    \label{fig:project-gantt-chart}  
-    \item In Figure \ref{fig:project-gantt-chart} shows the project plan and how the project has been distributed throughout the term. 
-    \section{Conclusion}
-    \item In conclusion, the shift from traditional calendars to digital ones has changed how people organize their schedule. While digital calendars offer easy and conflict free scheduling which makes managing easy. Discussion on informal communication channels like WhatsApp has impacted the planning events and commitments. This impact often leads to missed appointments and scheduling conflicts, especially for someone who is busy.
-    Jadwal aims to solve this issue by providing a seamless and automated solution for integrating informal communication with the application so that no one misses an event and have conflicts. 
-        
+    \label{fig:project-gantt-chart}
 \end{figure}
+
+\section{Conclusion}
+
+In conclusion, the shift from traditional calendars to digital ones has changed how people organize their schedule. While digital calendars offer easy and conflict free scheduling which makes managing easy. Discussion on informal communication channels like WhatsApp has impacted the planning events and commitments. This impact often leads to missed appointments and scheduling conflicts, especially for someone who is busy.
+
+Jadwal aims to solve this issue by providing a seamless and automated solution for integrating informal communication with the application so that no one misses an event and have conflicts. 
 
 \chapter{Literature Review}
 \section{Introduction}
-\item In the modern world, managing time effectively is important for balancing personal and professional responsibilities. The increasing complexity of schedules usually results in missing an important event and overlapping commitments. To solve these challenges, we introduce Jadwal, an innovative iOS-based schedule management application, aims to help individuals and professionals to organize their daily lives.
+In the modern world, managing time effectively is important for balancing personal and professional responsibilities. The increasing complexity of schedules usually results in missing an important event and overlapping commitments. To solve these challenges, we introduce Jadwal, an innovative iOS-based schedule management application, aims to help individuals and professionals to organize their daily lives.
 Jadwal focuses on solving the issue by drawing inspiration from existing solutions like Clockwise, Motion, Reclaim AI, and Calendi, Jadwal outstands by introducing advance features such as conflict resolution, task prioritization, event extraction from informal communicating channels and prioritizing prayer times, which is a unique feature which is not found in any competing applications. 
 \\
 In developing Jadwal, we have drawn inspiration from and built upon existing research and products in the field of intelligent calendar management. Some key references include:
@@ -315,8 +316,11 @@ In Figure \ref{fig:features-table} The table compares \textit{Jadwal}, our proje
 \chapter{System Analysis and Design}
 
 \section{Introduction}
-\item A well-designed system requires a good understanding of both functional and non-functional requirements to meet user expectations and deliver a seamless experience. Jadwal, an iOS-based intelligent scheduling application. 
+
+A well-designed system requires a good understanding of both functional and non-functional requirements to meet user expectations and deliver a seamless experience. Jadwal, an iOS-based intelligent scheduling application. 
+
 This section shows the functional and non-functional requirements which is the backbone of Jadwal's development. The functional requirements focus on core features, such as user authentication, calendar integration and event management. Ensuring the users can effectively manage their schedules. The non-functional requirements focuses on performance, security, compatibility, and user experience, ensuring the application stands well with the industry standards by providing efficient interface.
+
 Combining all these requirements helps in the design and implementation of Jadwal which will lead to a better application solving real issues and meeting the needs of the user.
 
 
@@ -345,8 +349,6 @@ Combining all these requirements helps in the design and implementation of Jadwa
     \item \textbf{User Experience:} The user interface shall follow iOS Human Interface Guidelines for consistency and ease of use.
     \item \textbf{Security:} All data transmissions between the app and servers shall be encrypted using HTTPS.
     \item \textbf{Localization:} The app shall support Arabic and English languages.
-    % todo: check if we should remove this or keep it before submission
-    \item \textbf{Data Privacy:} The app shall comply with the data protection regulations and laws in Saudi Arabia.
 \end{itemize}
 \newpage
 \section{System use-cases}
@@ -394,12 +396,13 @@ Combining all these requirements helps in the design and implementation of Jadwa
 In Figure \ref{fig:database-design}, the tables and the relations between them in Jadwal's system is shown. The \texttt{customer} is the main table. Three tables have foreign keys that reference it. The \texttt{auth\_google} and \texttt{magic\_link} tables are used for auth, and they both save the info required to the authentication and hint at which authentication methods are allowed for a specific customer.
 
 A third table related to the \texttt{customer} table is the \texttt{calendar\_accounts} table. It makes it possible to link multiple calendars to one customer under a calendar account. Then the heirarchy continues, each \texttt{calendar\_accounts} entry contains many \texttt{vcalendar} entries. And each \texttt{vcalendar} entry contains many \texttt{vevent} entries. And each \texttt{vevent} entry has exceptions and alarms related to it\\via \texttt{vevent\_exception} and \texttt{valarm} respectively.
+
 \section{Conclusion}
-\item Jadwal stands as a comprehensive and innovative solution for scheduling with great design. The use cases and database architecture are well described that helps in creating the application systematically. The use cases clearly define how users interact with the system, covering all the features like Continue with email, Resolve conflicts, WhatsApp integration, scheduling prayer time and many more. The database design is the backbone of Jadwal, which clearly shows how the system works and how the data is managed perfectly. In conclusion, Jadwal is well described which makes it easy to understand how everything is working and would be easy to track everything that is happening in the backend. 
+
+Jadwal stands as a comprehensive and innovative solution for scheduling with great design. The use cases and database architecture are well described that helps in creating the application systematically. The use cases clearly define how users interact with the system, covering all the features like Continue with email, Resolve conflicts, WhatsApp integration, scheduling prayer time and many more. The database design is the backbone of Jadwal, which clearly shows how the system works and how the data is managed perfectly. In conclusion, Jadwal is well described which makes it easy to understand how everything is working and would be easy to track everything that is happening in the backend. 
+
 % Bibliography
 \bibliography{references}
 \bibliographystyle{apalike}
-
-
 
 \end{document}
