@@ -11,9 +11,6 @@
 \usepackage{graphicx}
 \usepackage{booktabs}
 \usepackage{usecase}
-\usepackage{xcolor}
-\usepackage{hyperref}
-\usepackage{enumitem}
 \usepackage{longtable}
 \usepackage{ragged2e}
 
@@ -23,13 +20,11 @@
 \fancyhf{}
 \fancyhead[R]{\color{lightgrey}\leftmark}
 \fancyfoot[C]{\thepage}
+\setlength{\headheight}{25pt}
 
 \renewcommand{\chaptermark}[1]{\markboth{Chapter \thechapter: #1}{}}
 \renewcommand{\headrulewidth}{0.4pt}
 \renewcommand{\headrule}{\hbox to\headwidth{\color{lightgrey}\leaders\hrule height \headrulewidth\hfill}}
-
-\setlength{\headheight}{14.5pt}
-
 
 \doublespacing
 
@@ -53,143 +48,143 @@
 
 % Title Page
 \begin{singlespace}
-\begin{titlepage}
-    \begin{center}
-        \vspace*{1cm}
-        \includegraphics[height=1cm]{images/yu-logo.png}\\[1cm]
-        {\Large\bfseries AL YAMAMAH UNIVERSITY}\\[0.5cm]
-        {\large College of Engineering and Architecture}\\[0.5cm]
-        {\large Bachelor of Science in Software and Network Engineering}\\[2cm]
-        {\Huge\bfseries 
+    \begin{titlepage}
+        \begin{center}
+            \vspace*{1cm}
+            \includegraphics[height=1cm]{images/yu-logo.png}\\[1cm]
+            {\Large\bfseries AL YAMAMAH UNIVERSITY}\\[0.5cm]
+            {\large College of Engineering and Architecture}\\[0.5cm]
+            {\large Bachelor of Science in Software and Network Engineering}\\[2cm]
+            {\Huge\bfseries
             \begin{spacing}{1}
                 Jadwal: An Elegant, iOS-based Calendar Manager
             \end{spacing}
-        }
-        \vspace{2cm}
-        {\Large\bfseries Graduation Project}\\[2cm]
-        \begin{center}
-            \setlength{\fboxsep}{10pt}
-            \setlength{\fboxrule}{1pt}
-            \fbox{
-                \begin{tabular}{p{0.45\linewidth}p{0.45\linewidth}}
-                    \multicolumn{2}{c}{\textbf{Group Project Submission}} \\
-                    \midrule
-                    \textbf{Student Names} & \textbf{Student IDs} \\
-                    \midrule
-                    YAZED ALKHALAF & 202211123 \\
-                    SAIMAN TAKLAS & 202021400 \\
-                    AFFAN MOHAMMAD & 202211086 \\
-                    ALI BA WAZIR & 202211018 \\
-                    \midrule
-                    \multicolumn{2}{l}{\textbf{Submission Date}: 27 Nov 2024} \\
-                    \multicolumn{2}{l}{\textbf{Supervised By}: Dr. Inayatullah} \\
-                \end{tabular}
             }
+            \vspace{2cm}
+            {\Large\bfseries Graduation Project}\\[2cm]
+            \begin{center}
+                \setlength{\fboxsep}{10pt}
+                \setlength{\fboxrule}{1pt}
+                \fbox{
+                    \begin{tabular}{p{0.45\linewidth}p{0.45\linewidth}}
+                        \multicolumn{2}{c}{\textbf{Group Project Submission}}       \\
+                        \midrule
+                        \textbf{Student Names} & \textbf{Student IDs}               \\
+                        \midrule
+                        YAZED ALKHALAF         & 202211123                          \\
+                        SAIMAN TAKLAS          & 202021400                          \\
+                        AFFAN MOHAMMAD         & 202211086                          \\
+                        ALI BA WAZIR           & 202211018                          \\
+                        \midrule
+                        \multicolumn{2}{l}{\textbf{Submission Date}: 27 Nov 2024}   \\
+                        \multicolumn{2}{l}{\textbf{Supervised By}: Dr. Inayatullah} \\
+                    \end{tabular}
+                }
+            \end{center}
+            \vfill
+            {\large First Semester 2024--2025}
         \end{center}
-        \vfill
-        {\large First Semester 2024--2025}
-    \end{center}
-\end{titlepage}
+    \end{titlepage}
 \end{singlespace}
 
 \begin{singlespace}
 
-\chapter*{Abstract}
-\addcontentsline{toc}{chapter}{Abstract}
-    
-\begin{justify}
-In response to the rapid globalization of modernization, time management has been a real challenge. This paper introduces Jadwal, that proposes an automatic schedule managing system where an individual can integrate multiple calendars and extract the events that have been discussed informal communication channels,such as Whatsapp
-  
-\textbf{Key Objectives:}
-\begin{itemize}
-    \item To develop an intelligent calendar management system that automatically extracts events from the informal communication channels like WhatsApp and adds them to the user's main calendar.
-    \item To create a user friendly interface that allows users to easily add events to the calendar.
-    \item To implement a smart resolution system that notifies users of scheduling conflicts and provides easy options for resolution.
-    \item To integrate all the calendars into Jadwal's single calendar view to make viewing and managing all the events easy.
-    \item To prioritize and automatically schedule daily routines such as waking time, sleeping time and prayer time.
-    \item To significantly reduce the time users spend on manual calendar management.
-    
-\end{itemize}
+    \chapter*{Abstract}
+    \addcontentsline{toc}{chapter}{Abstract}
+
+    \begin{justify}
+        In response to the rapid globalization of modernization, time management has been a real challenge. This paper introduces Jadwal, that proposes an automatic schedule managing system where an individual can integrate multiple calendars and extract the events that have been discussed informal communication channels,such as Whatsapp
+
+        \textbf{Key Objectives:}
+        \begin{itemize}
+            \item To develop an intelligent calendar management system that automatically extracts events from the informal communication channels like WhatsApp and adds them to the user's main calendar.
+            \item To create a user friendly interface that allows users to easily add events to the calendar.
+            \item To implement a smart resolution system that notifies users of scheduling conflicts and provides easy options for resolution.
+            \item To integrate all the calendars into Jadwal's single calendar view to make viewing and managing all the events easy.
+            \item To prioritize and automatically schedule daily routines such as waking time, sleeping time and prayer time.
+            \item To significantly reduce the time users spend on manual calendar management.
+
+        \end{itemize}
 
 
-\begin{center}
-    The system will be a mobile application, designed for iOS devices.
+        \begin{center}
+            The system will be a mobile application, designed for iOS devices.
+        \end{center}
+    \end{justify}
+
+
+    \chapter*{Acknowledgment}
+    \addcontentsline{toc}{chapter}{Acknowledgment}
+
+    \begin{justify}
+        First and foremost, we would like to thank our Graduation project supervisor Dr. Inayathullah for his invaluable guidance and precious time. His advise was instrumental in shaping our project and by providing support in challenging times.Moreove,he emphasized that all member should involve in each phase of the project and gain core knowledge and contribute efficiently .
+        His stimulus and help to complete the project successful.
+
+
+
+        Secondly, we would like to thank all the professors and friends for their insightful recommendations which helped us to enhance our project.
+
+
+
+        Lastly, we would like to thank our parents for their unwavering support and for preparing us mentally and physically throughout this journey.
+    \end{justify}
+
+    \newpage
+
+    \tableofcontents
+
+    \newpage
+    \listoffigures
+
+
+    \newpage
+    \listoftables
+
+    \chapter*{List of Abbreviations and Terminology}
+    \addcontentsline{toc}{chapter}{List of Abbreviations and Terminology}
+
+    \begin{center}
+        \begin{longtable}{p{0.2\textwidth}p{0.7\textwidth}}
+            \toprule
+            \textbf{Term}             & \textbf{Definition}                                                                                                                                        \\
+            \midrule
+            \endhead
+
+            \textbf{Calendar}         & A list of events and dates within a year that are important to an organization or to the people involved in a particular activity. \cite{def:calendar}     \\[1ex]
+
+            \textbf{Jadwal}           & Jadwal is a comprehensive time management tool designed to aggregate and optimize your existing calendars and data sources.                                \\[1ex]
+
+            \textbf{WhatsApp}         & WhatsApp is an alternative to SMS and offers simple, secure, reliable messaging and calling, available on phones all over the world. \cite{whatsapp-about} \\[1ex]
+
+            \textbf{CalDAV}           & Calendaring Extensions to WebDAV                                                                                                                           \\[1ex]
+
+            \textbf{Golang}           & Go is an open source project developed by a team at Google and many contributors from the open source community. \cite{def:Golang}                         \\[1ex]
+
+            \textbf{JWT}              & JSON Web Tokens are an open, industry standard RFC 7519 method for representing claims securely between two parties. \cite{def:JWT}                        \\[1ex]
+
+            \textbf{WebDAV}           & Web Distributed Authoring and Versioning                                                                                                                   \\[1ex]
+
+            \textbf{HTTPS}            & HyperText Transfer Protocol Secure                                                                                                                         \\[1ex]
+
+            \textbf{iOS}              & iPhone Operating System                                                                                                                                    \\[1ex]
+
+            \textbf{N/A}              & Not Applicable                                                                                                                                             \\[1ex]
+
+            \textbf{UC}               & Use Case                                                                                                                                                   \\[1ex]
+
+            \textbf{ER diagram}       & Entity Relationship ER Diagram is a type of flowchart that illustrates how entities                                                                        \\[1ex]
+
+            \textbf{Sequence Diagram} & An interaction diagram that details how operations are carried out.                                                                                        \\[1ex]
+
+            \textbf{APIs}             & Application programming interface.                                                                                                                         \\[1ex]
+
+            \textbf{APNs}             & Apple Push Notification service                                                                                                                            \\
+
+            \textbf{Magic Link}       & A link sent via email that allows for passwordless sign in.                                                                                                \\
+
+            \bottomrule
+        \end{longtable}
     \end{center}
-\end{justify}
-
-    
-\chapter*{Acknowledgment}
-\addcontentsline{toc}{chapter}{Acknowledgment}
-    
-\begin{justify}
-First and foremost, we would like to thank our Graduation project supervisor Dr. Inayathullah for his invaluable guidance and precious time. His advise was instrumental in shaping our project and by providing support in challenging times.Moreove,he emphasized that all member should involve in each phase of the project and gain core knowledge and contribute efficiently .
-His stimulus and help to complete the project successful.
-  
-
-
-Secondly, we would like to thank all the professors and friends for their insightful recommendations which helped us to enhance our project.
-    
-
-
-Lastly, we would like to thank our parents for their unwavering support and for preparing us mentally and physically throughout this journey.
-\end{justify}
-    
-\newpage
-
-\tableofcontents
-
-\newpage
-\listoffigures
-
-
-\newpage
-\listoftables
-
-\chapter*{List of Abbreviations and Terminology}
-\addcontentsline{toc}{chapter}{List of Abbreviations and Terminology}
-
-\begin{center}
-    \begin{longtable}{p{0.2\textwidth}p{0.7\textwidth}}
-    \toprule
-    \textbf{Term} & \textbf{Definition} \\
-    \midrule
-    \endhead
-    
-    \textbf{Calendar} & A list of events and dates within a year that are important to an organization or to the people involved in a particular activity. \cite{def:calendar} \\[1ex]
-    
-    \textbf{Jadwal} & Jadwal is a comprehensive time management tool designed to aggregate and optimize your existing calendars and data sources. \\[1ex]
-    
-    \textbf{WhatsApp} & WhatsApp is an alternative to SMS and offers simple, secure, reliable messaging and calling, available on phones all over the world. \cite{whatsapp-about} \\[1ex]
-    
-    \textbf{CalDAV} & Calendaring Extensions to WebDAV \\[1ex]
-    
-    \textbf{Golang} & Go is an open source project developed by a team at Google and many contributors from the open source community. \cite{def:Golang}\\[1ex]
-    
-    \textbf{JWT} & JSON Web Tokens are an open, industry standard RFC 7519 method for representing claims securely between two parties. \cite{def:JWT}\\[1ex]
-    
-    \textbf{WebDAV} & Web Distributed Authoring and Versioning \\[1ex]
-    
-    \textbf{HTTPS} & HyperText Transfer Protocol Secure \\[1ex]
-    
-    \textbf{iOS} & iPhone Operating System \\[1ex]
-    
-    \textbf{N/A} & Not Applicable \\[1ex]
-    
-    \textbf{UC} & Use Case \\[1ex]
-    
-    \textbf{ER diagram} & Entity Relationship ER Diagram is a type of flowchart that illustrates how entities \\[1ex]
-    
-    \textbf{Sequence Diagram} & An interaction diagram that details how operations are carried out. \\[1ex]
-    
-    \textbf{APIs} & Application programming interface. \\[1ex]
-    
-    \textbf{APNs} & Apple Push Notification service \\
-
-    \textbf{Magic Link} & A link sent via email that allows for passwordless sign in. \\
-    
-    \bottomrule
-    \end{longtable}
-\end{center}
 
 \end{singlespace}
 
@@ -201,7 +196,7 @@ Lastly, we would like to thank our parents for their unwavering support and for 
 
 \section{Background of the Project}
 
- Calendars have been around a long time now, and they are a handy tool for humans. Both who are busy and who want to plan their days. People throughout history have used paper for calendars, but now with technology, things have changed. Calendars are digital now, and they can even be shared with others!
+Calendars have been around a long time now, and they are a handy tool for humans. Both who are busy and who want to plan their days. People throughout history have used paper for calendars, but now with technology, things have changed. Calendars are digital now, and they can even be shared with others!
 
 As the world is becoming one big village with globalization, people tend to squeeze every last minute of their days since competition is higher. Calendars help in that since they allow people to plan their days easily and keep track of when to meet people and do other activies.
 
@@ -214,7 +209,7 @@ Keeping your calendar up to date with event information is challenging, especial
 
 The main objectives of Jadwal are:
 \begin{itemize}
-    
+
     \item To integrate all the calendars into Jadwal's single calendar view to make viewing and managing all the events easy.
     \item To develop an intelligent calendar management system that automatically extracts events from the informal communication channels like WhatsApp and adds them to the user's main calendar.
     \item To significantly reduce the time users spend on manual calendar management.
@@ -232,10 +227,10 @@ Jadwal is not just another calendar application; it's a comprehensive time manag
     \item WhatsApp message parsing for event extraction (subject to technical feasibility).
     \item Target audience: Busy professionals, students, and anyone juggling multiple schedules.
     \item User testing phase to ensure ease of use and effectiveness. Our testing methods will include:
-    \begin{itemize}
-            \item Beta testing with a diverse group of users.
-            \item Analytics to track user behavior and app performance.
-        \end{itemize}
+          \begin{itemize}
+              \item Beta testing with a diverse group of users.
+              \item Analytics to track user behavior and app performance.
+          \end{itemize}
 \end{itemize}
 
 
@@ -267,7 +262,7 @@ Nothing is perfect, and our project is not an outlier. The limitations we have f
 
 \section{Organization of the Senior Project}
 
-Our project plan can be illustrated in the following gantt chart, \textbf{Figure \ref{fig:project-gantt-chart}}.
+Our project plan can be illustrated in the following gantt chart, \textbf{Figure~\ref{fig:project-gantt-chart}}.
 
 \begin{figure}[!h]
     \centering
@@ -278,17 +273,23 @@ Our project plan can be illustrated in the following gantt chart, \textbf{Figure
 
 \section{Conclusion}
 
-In conclusion, the shift from traditional calendars to digital ones has changed how people organize their schedule. While digital calendars offer easy and conflict free scheduling which makes managing easy. Discussion on informal communication channels like WhatsApp has impacted the planning events and commitments. This impact often leads to missed appointments and scheduling conflicts, especially for someone who is busy.
+In conclusion, the shift from traditional calendars to digital ones has changed how people organize their schedule.
+While digital calendars offer easy and conflict free scheduling which makes managing easy.
+Discussion on informal communication channels like WhatsApp has impacted the planning events and commitments.
+This impact often leads to missed appointments and scheduling conflicts, especially for someone who is busy.
 
-Jadwal aims to solve this issue by providing a seamless and automated solution for integrating informal communication with the application so that no one misses an event and have conflicts. 
+Jadwal aims to solve this issue by providing a seamless and automated solution for integrating informal communication with the application so that no one misses an event and have conflicts.
 
 \chapter{Literature Review}
 
 \section{Introduction}
-In the modern world, managing time effectively is important for balancing personal and professional responsibilities. The increasing complexity of schedules usually results in missing an important event and overlapping commitments. To solve these challenges, we introduce Jadwal, an innovative iOS-based schedule management application, aims to help individuals and professionals to organize their daily lives.
-Jadwal focuses on solving the issue by drawing inspiration from existing solutions like Clockwise, Motion, Reclaim AI, and Calendi, Jadwal outstands by introducing advance features such as conflict resolution, task prioritization, event extraction from informal communicating channels and prioritizing prayer times, which is a unique feature which is not found in any competing applications. 
+In the modern world, managing time effectively is important for balancing personal and professional responsibilities.
+The increasing complexity of schedules usually results in missing an important event and overlapping commitments.
+To solve these challenges, we introduce Jadwal, an innovative iOS-based schedule management application, aims to help individuals and professionals to organize their daily lives.
+Jadwal focuses on solving the issue by drawing inspiration from existing solutions like Clockwise, Motion, Reclaim AI, and Calendi, Jadwal stands out by introducing advance features such as conflict resolution, task prioritization, event extraction from informal communicating channels and prioritizing prayer times, which is a unique feature which is not found in any competing applications.
 
-In developing Jadwal, we have drawn inspiration from and built upon existing research and products in the field of intelligent calendar management. Some key references include:
+In developing Jadwal, we have drawn inspiration from and built upon existing research and products in the field of intelligent calendar management.
+Some key references include:
 \begin{itemize}
     \item \textbf{Clockwise (https://www.getclockwise.com/):} A smart calendar assistant that optimizes schedules and manages team coordination \cite{clockwise}. Clockwise's approach to intelligent time blocking and meeting optimization provides valuable insights for Jadwal's automated scheduling features.
     \item \textbf{Motion (https://www.usemotion.com/):} Motion's Intelligent Calendar takes your meetings, your tasks, your to-do list, your activities, and creates one perfect, optimized schedule to get it all done \cite{motion}.
@@ -307,7 +308,7 @@ In developing Jadwal, we have drawn inspiration from and built upon existing res
 
 \newpage
 
-In Figure \ref{fig:features-table} The table compares \textit{Jadwal}, our project, with four other scheduling applications—Clockwise, Motion, Reclaim AI, and Calendi—based based on several key features:
+In Figure~\ref{fig:features-table} The table compares \textit{Jadwal}, our project, with four other scheduling applications—Clockwise, Motion, Reclaim AI, and Calendi—based based on several key features:
 \begin{itemize}
     \item \textbf{Open Source}: \textit{Jadwal} stands out as the only application that is open-source, allowing users and developers to access, modify, and improve the code. The other applications do not provide this.
     \item \textbf{WhatsApp Integration}: \textit{Jadwal} stands out again as the only application that connects and extract the event discussed over the platform by the user.
@@ -323,7 +324,7 @@ Below we will compare competitors in depth, before we have only talked about the
 
 \subsection{Clockwise}
 
-Clockwise's website tries to touch the user's misery by saying "Your calendar doesn't have to suck" as shown in Figure \ref{fig:clockwise-landing}.
+Clockwise's website tries to touch the user's misery by saying ``Your calendar doesn't have to suck'' as shown in Figure~\ref{fig:clockwise-landing}.
 
 \begin{figure}[!h]
     \centering
@@ -332,7 +333,7 @@ Clockwise's website tries to touch the user's misery by saying "Your calendar do
     \label{fig:clockwise-landing}
 \end{figure}
 
-Based on Figure \ref{fig:clockwise-features}, Clockwise has the following features:
+Based on Figure~\ref{fig:clockwise-features}, Clockwise has the following features:
 \begin{itemize}
     \item Connect your calendar and set your preferences
     \item Decide which meetings are flexible
@@ -348,7 +349,9 @@ Based on Figure \ref{fig:clockwise-features}, Clockwise has the following featur
 
 \subsection{Motion}
 
-The Motion website states that their platform offers the following features: Motion is an AI-powered productivity tool that organizes your tasks, schedules, and meetings into a single platform. Its features include a dynamic calendar that automatically prioritizes tasks, suggests optimized schedules, and helps users adapt to changes seamlessly. The tool also provides team collaboration features, allowing shared schedules and streamlined task management to enhance team productivity. These features ensure that users can achieve maximum efficiency with minimal effort, but Motion lacks some of the features found in the 
+The Motion website states that their platform offers the following features: Motion is an AI-powered productivity tool that organizes your tasks, schedules, and meetings into a single platform.
+Its features include a dynamic calendar that automatically prioritizes tasks, suggests optimized schedules, and helps users adapt to changes seamlessly.
+The tool also provides team collaboration features, allowing shared schedules and streamlined task management to enhance team productivity. These features ensure that users can achieve maximum efficiency with minimal effort, but Motion lacks some of the features found in the
 
 Jadwal platform, such as linking the calendar to WhatsApp for automatic event addition and integrating prayer times, which adds a unique level of customization and day organization.
 
@@ -366,7 +369,7 @@ Calendi.ai claims to offer features focused on speeding up scheduling with AI-po
 
 We have conducted a survey using Google Forms, and have sent it out to our peers in the university, and also shared it on our social media, especially LinkedIn, to get more diverse responses. That is since our main audiences are students, employees, and who do both at the same time. The results were fascinating. Especially since 75 responses were recorded with their email to authenticate the responses.
 
-As shown in Figure \ref{fig:survey-status}, the results showed that 8\% only were both employed and students, while 53\% were students only and 39\% were employed only. We beleive this is a good mix between the two audeince we are aiming to get responses from.
+As shown in Figure~\ref{fig:survey-status}, the results showed that 8\% only were both employed and students, while 53\% were students only and 39\% were employed only. We beleive this is a good mix between the two audeince we are aiming to get responses from.
 
 \begin{figure}[!h]
     \centering
@@ -375,7 +378,7 @@ As shown in Figure \ref{fig:survey-status}, the results showed that 8\% only wer
     \label{fig:survey-status}
 \end{figure}
 
-Based on Figure \ref{fig:age-range}, it is important to note that 72\% of our respondents were of the age range 20-30 years.
+Based on Figure~\ref{fig:age-range}, it is important to note that 72\% of our respondents were of the age range 20-30 years.
 
 \begin{figure}[!h]
     \centering
@@ -384,7 +387,7 @@ Based on Figure \ref{fig:age-range}, it is important to note that 72\% of our re
     \label{fig:age-range}
 \end{figure}
 
-As shown in Figure \ref{fig:use-calendar}, 66.7\% of people reported that they a calendar application to manage their daily schedule. This shows that people might be interested in a better way of managing their schedules that could elevate their time management skills.
+As shown in Figure~\ref{fig:use-calendar}, 66.7\% of people reported that they a calendar application to manage their daily schedule. This shows that people might be interested in a better way of managing their schedules that could elevate their time management skills.
 
 \begin{figure}[!h]
     \centering
@@ -393,7 +396,7 @@ As shown in Figure \ref{fig:use-calendar}, 66.7\% of people reported that they a
     \label{fig:use-calendar}
 \end{figure}
 
-In Figure \ref{fig:platform-to-discuss}, the results showed us the need for our app to exist, since 70.7\% of the population use WhatsApp to discuss upcoming events! Another big percentage, 53.3\% used Email also. Our app won't be focusing on this, nevertheless, this is also an oppurtunity in the future to help those people who use Emails and might not find the flow easy to schedule the events in the calendar.
+In Figure~\ref{fig:platform-to-discuss}, the results showed us the need for our app to exist, since 70.7\% of the population use WhatsApp to discuss upcoming events! Another big percentage, 53.3\% used Email also. Our app won't be focusing on this, nevertheless, this is also an oppurtunity in the future to help those people who use Emails and might not find the flow easy to schedule the events in the calendar.
 
 \begin{figure}[!h]
     \centering
@@ -402,7 +405,7 @@ In Figure \ref{fig:platform-to-discuss}, the results showed us the need for our 
     \label{fig:platform-to-discuss}
 \end{figure}
 
-Although 21.3\% might not seem like a lot, but as shown in Figure \ref{fig:usefullness}, 58.7\% of the population reported they would find it extremely useful to have a WhatsApp integration that automatically adds events from your conversations to the calendar?
+Although 21.3\% might not seem like a lot, but as shown in Figure~\ref{fig:usefullness}, 58.7\% of the population reported they would find it extremely useful to have a WhatsApp integration that automatically adds events from your conversations to the calendar?
 
 \begin{figure}[!h]
     \centering
@@ -411,7 +414,7 @@ Although 21.3\% might not seem like a lot, but as shown in Figure \ref{fig:usefu
     \label{fig:usefullness}
 \end{figure}
 
-As shown in Figure \ref{fig:forget-to-add}, on average, 21.3\% forget to add events to their calendar. That is great news, since our differentiating factor is the direct WhatsApp integration that should be able to solve this.
+As shown in Figure~\ref{fig:forget-to-add}, on average, 21.3\% forget to add events to their calendar. That is great news, since our differentiating factor is the direct WhatsApp integration that should be able to solve this.
 
 \begin{figure}[!h]
     \centering
@@ -420,7 +423,7 @@ As shown in Figure \ref{fig:forget-to-add}, on average, 21.3\% forget to add eve
     \label{fig:forget-to-add}
 \end{figure}
 
-As shown in Figure \ref{fig:number-of-calendars}, 41.3\% use 2 calendars, that shows the need for a integared view of calendars.
+As shown in Figure~\ref{fig:number-of-calendars}, 41.3\% use 2 calendars, that shows the need for a integared view of calendars.
 
 \begin{figure}[!h]
     \centering
@@ -429,7 +432,7 @@ As shown in Figure \ref{fig:number-of-calendars}, 41.3\% use 2 calendars, that s
     \label{fig:number-of-calendars}
 \end{figure}
 
-As shown in Figure \ref{fig:events-per-week}, 53.3\% of people have 1-3 calendar events per week. That might seem a little, but 33.3\% have 4-6 calendar events per week.
+As shown in Figure~\ref{fig:events-per-week}, 53.3\% of people have 1-3 calendar events per week. That might seem a little, but 33.3\% have 4-6 calendar events per week.
 
 \begin{figure}[!h]
     \centering
@@ -442,13 +445,13 @@ As shown in Figure \ref{fig:events-per-week}, 53.3\% of people have 1-3 calendar
 
 Jadwal represents itself by offering a seamless calendar application which is user friendly and outstands by providing solution to all the problems which is not yet addressed by other tools like Clockwise, Motion, Reclaim AI, and Calendi. WhatsApp integration is Jadwal’s unique features for event extraction. These features distinguish Jadwal from existing applications, Jadwal addresses to the issues that is not yet solved.
 
-The comparison highlights Jadwal's abilities that integrate multiple calendars, resolve scheduling conflicts. 
+The comparison highlights Jadwal's abilities that integrate multiple calendars, resolve scheduling conflicts.
 
 \chapter{System Analysis and Design}
 
 \section{Introduction}
 
-A well-designed system requires a good understanding of both functional and non-functional requirements to meet user expectations and deliver a seamless experience. Jadwal, an iOS-based intelligent scheduling application. 
+A well-designed system requires a good understanding of both functional and non-functional requirements to meet user expectations and deliver a seamless experience. Jadwal, an iOS-based intelligent scheduling application.
 
 This section shows the functional and non-functional requirements which is the backbone of Jadwal's development. The functional requirements focus on core features, such as user authentication, calendar integration and event management. Ensuring the users can effectively manage their schedules. The non-functional requirements focuses on performance, security, compatibility, and user experience, ensuring the application stands well with the industry standards by providing efficient interface.
 
@@ -483,8 +486,8 @@ Combining all these requirements helps in the design and implementation of Jadwa
 \end{itemize}
 \newpage
 \section{System use-cases}
-   
-\textbf{Figure \ref{fig:use-case-diagram}} shows the use case diagram for the system of Jadwal.
+
+\textbf{Figure~\ref{fig:use-case-diagram}} shows the use case diagram for the system of Jadwal.
 
 \begin{figure}[!h]
     \centering
@@ -525,7 +528,7 @@ Combining all these requirements helps in the design and implementation of Jadwa
 
 \newpage
 
-In Figure \ref{fig:database-design}, the tables and the relations between them in Jadwal's system is shown. The \texttt{customer} is the main table. Three tables have foreign keys that reference it. The \texttt{auth\_google} and \texttt{magic\_link} tables are used for auth, and they both save the info required to the authentication and hint at which authentication methods are allowed for a specific customer.
+In Figure~\ref{fig:database-design}, the tables and the relations between them in Jadwal's system is shown. The \texttt{customer} is the main table. Three tables have foreign keys that reference it. The \texttt{auth\_google} and \texttt{magic\_link} tables are used for auth, and they both save the info required to the authentication and hint at which authentication methods are allowed for a specific customer.
 
 A third table related to the \texttt{customer} table is the \texttt{calendar\_accounts} table. It makes it possible to link multiple calendars to one customer under a calendar account. Then the heirarchy continues, each \texttt{calendar\_accounts} entry contains many \texttt{vcalendar} entries. And each \texttt{vcalendar} entry contains many \texttt{vevent} entries. And each \texttt{vevent} entry has exceptions and alarms related to it\\via \texttt{vevent\_exception} and \texttt{valarm} respectively.
 
@@ -533,7 +536,7 @@ A third table related to the \texttt{customer} table is the \texttt{calendar\_ac
 
 \section{Conclusion}
 
-Jadwal stands as a comprehensive and innovative solution for scheduling with great design. The use cases and database architecture are well described that helps in creating the application systematically. The use cases clearly define how users interact with the system, covering all the features like Continue with email, Resolve conflicts, WhatsApp integration, scheduling prayer time and many more. The database design is the backbone of Jadwal, which clearly shows how the system works and how the data is managed perfectly. In conclusion, Jadwal is well described which makes it easy to understand how everything is working and would be easy to track everything that is happening in the backend. 
+Jadwal stands as a comprehensive and innovative solution for scheduling with great design. The use cases and database architecture are well described that helps in creating the application systematically. The use cases clearly define how users interact with the system, covering all the features like Continue with email, Resolve conflicts, WhatsApp integration, scheduling prayer time and many more. The database design is the backbone of Jadwal, which clearly shows how the system works and how the data is managed perfectly. In conclusion, Jadwal is well described which makes it easy to understand how everything is working and would be easy to track everything that is happening in the backend.
 
 
 \chapter*{Conclusion}
@@ -542,7 +545,7 @@ Jadwal stands as a comprehensive and innovative solution for scheduling with gre
 
 In a fast paced and interconnected world everyone struggles to manage their time efficiently especially for someone who has multiple tasks every day. Jadwal addresses all these challenges by introducing features that helps to bridge all the gaps that other platforms are unable to offer. Jadwal ensures user friendly interface for the user to manage their schedule and avoid missing any event
 
-Jadwal integrates with CalDAV, a standardized protocol that facilitates seamless synchronization across various calendar platforms. This allows the users to effortlessly connect and manage their calendars from different devices and applications, such as Apple Calendar and Google Calendar, making everything in one ecosystem. 
+Jadwal integrates with CalDAV, a standardized protocol that facilitates seamless synchronization across various calendar platforms. This allows the users to effortlessly connect and manage their calendars from different devices and applications, such as Apple Calendar and Google Calendar, making everything in one ecosystem.
 
 Jadwal's feature state-of-the-art LLM WhatsApp event extraction enhances the application that extract events from WhatsApp which is informal communication channel and people most likely uses it for discussing events which creates a gap that could lead to missing or conflicting an event. Jadwal aims to solve this problem.
 
@@ -550,7 +553,7 @@ The feature scheduling of prayer times highlights Jadwal as it is unique and Jad
 
 The feature that makes Jadwal stand out is managing events effectively by offering features like suggesting conflict resolution and integrating other calendars. This would reduce the chances of the user missing any event.
 
-Integration with CalDav allows Jadwal to connect all the calendars that the user has and bring it to one platform. Which helps a lot in managing the day. Why do we separate calendars to organize one day for one person. 
+Integration with CalDav allows Jadwal to connect all the calendars that the user has and bring it to one platform. Which helps a lot in managing the day. Why do we separate calendars to organize one day for one person.
 
 In conclusion, Jadwal stands out from all the existing solutions and provides an innovative calendar application that bridges the gaps and helps the user to manage their day more efficiently.
 
