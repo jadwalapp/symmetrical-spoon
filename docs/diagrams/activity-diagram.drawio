@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36" version="24.9.1" pages="2">
   <diagram name="Page-1" id="nKtN6wIFg5wTzeQDNyON">
-    <mxGraphModel dx="977" dy="629" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="1466" dy="856" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -96,7 +96,7 @@
         </UserObject>
         <UserObject label="&lt;div style=&quot;font-size: 1px&quot;&gt;&lt;font style=&quot;font-size:11.64px;font-family:Helvetica;color:#000000;direction:ltr;letter-spacing:0px;line-height:120%;opacity:1&quot;&gt;Suggest conflict resolution&lt;/font&gt;&lt;/div&gt;" tags="Background" id="j5F-Mz4OmRAsj-ysuy_4-20">
           <mxCell style="verticalAlign=middle;align=center;overflow=width;vsdxID=46;fillColor=#ffffff;gradientColor=none;shape=stencil(nZBdDsIgEIRPs+8UEi9Q6wU8AZFVNiI0FH9PL+3EBI1PfduZ+SabDJl+8nZk0moqOZ35Lq54MlvSWqLnLKVeZAYy/TFlPuV0jQ56tJXUanHYodPNtFY2H/byYngbeChd0m1+9kCkED1btQMYJDZgp1ajH/0XXo1+gfVYxsBMEgK2bPPf8aqF4c3wBg==);strokeColor=#000000;spacingTop=-3;spacingBottom=-3;spacingLeft=-3;spacingRight=-3;points=[];labelBackgroundColor=none;rounded=1;html=1;whiteSpace=wrap;" vertex="1" parent="1">
-            <mxGeometry x="671.97" y="1105" width="130" height="40" as="geometry" />
+            <mxGeometry x="647" y="1065" width="130" height="40" as="geometry" />
           </mxCell>
         </UserObject>
         <UserObject label="&lt;div style=&quot;font-size: 1px&quot;&gt;&lt;font style=&quot;font-size:11.64px;font-family:Helvetica;color:#000000;direction:ltr;letter-spacing:0px;line-height:120%;opacity:1&quot;&gt;Is Calendar Created?&lt;/font&gt;&lt;/div&gt;" tags="Background" id="j5F-Mz4OmRAsj-ysuy_4-21">
@@ -123,7 +123,7 @@
         </mxCell>
         <UserObject label="&lt;div style=&quot;font-size: 1px&quot;&gt;&lt;font style=&quot;font-size:11.64px;font-family:Helvetica;color:#000000;direction:ltr;letter-spacing:0px;line-height:120%;opacity:1&quot;&gt;Manage Scheduling conflict&lt;/font&gt;&lt;/div&gt;" tags="Background" id="j5F-Mz4OmRAsj-ysuy_4-23">
           <mxCell style="verticalAlign=middle;align=center;overflow=width;vsdxID=49;fillColor=#ffffff;gradientColor=none;shape=stencil(nZBdDsIgEIRPs+8UEi9Q6wU8AZFVNiI0FH9PL+3EBI1PfduZ+SabDJl+8nZk0moqOZ35Lq54MlvSWqLnLKVeZAYy/TFlPuV0jQ56tJXUanHYodPNtFY2H/byYngbeChd0m1+9kCkED1btQMYJDZgp1ajH/0XXo1+gfVYxsBMEgK2bPPf8aqF4c3wBg==);strokeColor=#000000;spacingTop=-3;spacingBottom=-3;spacingLeft=-3;spacingRight=-3;points=[];labelBackgroundColor=none;rounded=1;html=1;whiteSpace=wrap;" vertex="1" parent="1">
-            <mxGeometry x="466.97" y="1105" width="130" height="40" as="geometry" />
+            <mxGeometry x="466.97" y="1065" width="130" height="40" as="geometry" />
           </mxCell>
         </UserObject>
         <UserObject label="&lt;div style=&quot;font-size: 1px&quot;&gt;&lt;font style=&quot;font-size:11.64px;font-family:Helvetica;color:#000000;direction:ltr;letter-spacing:0px;line-height:120%;opacity:1&quot;&gt;No&lt;/font&gt;&lt;/div&gt;" tags="Background" id="j5F-Mz4OmRAsj-ysuy_4-31">
@@ -221,8 +221,8 @@
             <mxPoint x="584" y="535" as="targetPoint" />
             <Array as="points">
               <mxPoint x="742" y="765" />
-              <mxPoint x="814" y="765" />
-              <mxPoint x="814" y="540" />
+              <mxPoint x="810" y="765" />
+              <mxPoint x="810" y="540" />
             </Array>
           </mxGeometry>
         </mxCell>
@@ -333,15 +333,6 @@
         <mxCell id="j5F-Mz4OmRAsj-ysuy_4-138" value="" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="352" y="975" width="80" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="j5F-Mz4OmRAsj-ysuy_4-142" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.501;entryY=1.03;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="j5F-Mz4OmRAsj-ysuy_4-138" target="j5F-Mz4OmRAsj-ysuy_4-28">
-          <mxGeometry relative="1" as="geometry">
-            <mxPoint x="462" y="1075" as="targetPoint" />
-            <Array as="points">
-              <mxPoint x="392" y="925" />
-              <mxPoint x="462" y="925" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
         <mxCell id="j5F-Mz4OmRAsj-ysuy_4-145" value="Has Conflicts?" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;" vertex="1" parent="1">
           <mxGeometry x="211.97000000000003" y="885" width="120" height="40" as="geometry" />
         </mxCell>
@@ -382,6 +373,16 @@
             <Array as="points">
               <mxPoint x="432" y="170" />
               <mxPoint x="234" y="170" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="j5F-Mz4OmRAsj-ysuy_4-167" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="j5F-Mz4OmRAsj-ysuy_4-138" target="j5F-Mz4OmRAsj-ysuy_4-91">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="320" y="1015" />
+              <mxPoint x="320" y="1140" />
+              <mxPoint x="810" y="1140" />
+              <mxPoint x="810" y="540" />
             </Array>
           </mxGeometry>
         </mxCell>
