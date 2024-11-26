@@ -1,0 +1,17 @@
+# Custom Dictionary Words
+Jadwal
+YAZED
+ALKHALAF
+SAIMAN
+TAKLAS
+AFFAN
+WAZIR
+Calendi
+vevent
+vcalendar
+valarm
+Gantt
+YAMAMAH
+Inayatullah
+Asana
+mpbs
