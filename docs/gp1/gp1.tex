@@ -17,6 +17,19 @@
 \usepackage{longtable}
 \usepackage{ragged2e}
 
+\definecolor{lightgrey}{RGB}{120,120,120}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[R]{\color{lightgrey}\leftmark}
+\fancyfoot[C]{\thepage}
+
+
+\renewcommand{\chaptermark}[1]{\markboth{Chapter \thechapter: #1}{}}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{lightgrey}\leaders\hrule height \headrulewidth\hfill}}
+
+\setlength{\headheight}{14.5pt}
 
 \doublespacing
 
