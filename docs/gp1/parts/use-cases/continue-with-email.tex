@@ -20,18 +20,18 @@
   \ucmainflow{
     \begin{enumerate}
       \item The user enters their email.
-        \ucinfo{System displays an email input field.}
+            \ucinfo{System displays an email input field.}
       \item System creates an account if the user has no account, and then generates and sends the magic link.
-        \ucinfo{App displays ``Check your email'' message.}
+            \ucinfo{App displays ``Check your email'' message.}
       \item The user clicks the magic link in the email.
-        \ucinfo{The app is opened on the device of the user.}
+            \ucinfo{The app is opened on the device of the user.}
       \item The app sends the token to the system to log the user in.
-        \ucinfo{System verifies token and logs user in.}
+            \ucinfo{System verifies token and logs user in.}
     \end{enumerate}
   }
   \ucalternateflows{
     \begin{itemize}
-      \item 
+      \item The user cancels the authentication request.
     \end{itemize}
   }
   \ucexceptions{
