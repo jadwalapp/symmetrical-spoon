@@ -1,5 +1,13 @@
 {
   "plantuml.server": "http://localhost:8094",
   "plantuml.render": "PlantUMLServer",
-  "plantuml.exportOutDir": "docs/gp1/images"
+  "plantuml.exportOutDir": "docs/gp1/images",
+  "cSpell.customDictionaries": {
+    "custom-dictionary-workspace": {
+      "name": "custom-dictionary-workspace",
+      "path": "${workspaceFolder:symmetrical-spoon}/.cspell/custom-dictionary-workspace.txt",
+      "addWords": true,
+      "scope": "workspace"
+    }
+  }
 }

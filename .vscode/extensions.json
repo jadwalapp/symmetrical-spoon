@@ -3,6 +3,7 @@
     "golang.go",
     "jebbs.plantuml",
     "ms-azuretools.vscode-docker",
-    "theumletteam.umlet"
+    "theumletteam.umlet",
+    "streetsidesoftware.code-spell-checker"
   ]
 }
