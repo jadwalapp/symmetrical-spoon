@@ -198,25 +198,33 @@ participant "Apple Push Notification service (APNs)" as APN
 
 activate WhatsApp
 loop Listen for Messages
-    note over WhatsApp: Client receives\nnew message
+    note over WhatsApp: Client receives\nnew message and waits\n30 seconds for context
+
     WhatsApp -> WhatsApp: Get last 15 messages\nfrom chat context
     
     WhatsApp ->> Backend ++: Send messages context\nfor analysis
-    Backend -> LLM ++: Analyze Context for Event
+
+    Backend -> LLM ++: Send context with engineered prompt\nfor event extraction
+    note right of LLM: Prompt designed to:\n- Identify events\n- Extract date, time, location\n- Handle informal language\n- Return structured JSON
     
     alt Event Found
         LLM --> Backend: Return Event JSON
+        
+        Backend -> Backend: Validate extracted\nevent information
+        
         Backend -> Database ++: Store Event
         Database --> Backend: Confirm Storage
 
-        Backend -> Database : Ask For Device IDs Of Customer Owning Event
-        Database --> Backend -- : Device IDs of Customer Owning Event
-        Backend -> APN ++ : Send Push Notification "Telling User Event Was Added" to Device IDs
-        APN --> Backend -- : Push Notification Sending Result
-    else No Event
-        LLM --> Backend --: No Event Detected
+        Backend -> Database: Get Device IDs of Event Owner
+        Database --> Backend --: Return Device IDs
+        
+        Backend -> APN ++: Send "New Event Added" notification
+        APN --> Backend --: Notification Result
+        
+    else No Event Detected
+        LLM --> Backend --: No Event Found
         deactivate Backend
-        note over WhatsApp: Continue listening\nfor messages
+        note over WhatsApp: Continue monitoring\nmessages
     end
 end
 

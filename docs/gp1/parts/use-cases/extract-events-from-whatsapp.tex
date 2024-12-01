@@ -1,25 +1,31 @@
 \begin{usecase}{Extract Events from WhatsApp}
   \ucbasicinfo{High}{Regular}
-  \ucshortdescription{System monitors WhatsApp messages of connected WhatsApp accounts and extract event details adding them to the user's calendar.}
-  \uctrigger{A messages is sent to the connected WhatsApp account of an arbitrary user in our system.}
+  \ucshortdescription{System monitors WhatsApp messages of connected WhatsApp accounts and extracts event details using Large Language Models (LLMs), adding them to the user's calendar.}
+  \uctrigger{A message is sent to the connected WhatsApp account of an arbitrary user in our system.}
   \ucactors{WhatsApp}{}
   \ucpreconditions{At least one WhatsApp account must be connected.}
   \ucrelationships{Suggest Conflict Resolution}{N/A}{N/A}
   \ucinputsoutputs{
     \begin{itemize}
       \item \textbf{Messages sent to currently selected user} (Source: WhatsApp)
+      \item \textbf{Context window of last 15 messages} (Source: WhatsApp)
     \end{itemize}
   }{
     \begin{itemize}
-      \item \textbf{Extracted event details} (Destination: System)
+      \item \textbf{Extracted event details in JSON format} (Destination: System)
+      \item \textbf{Push notification to user} (Destination: User's Device)
     \end{itemize}
   }
   \ucmainflow{
     \begin{enumerate}
       \item A sent message is received and the user has replied and 30 seconds have passed without any interruptions.
-        \ucinfo{System reads a few messages before the current one to have context.}
+            \ucinfo{System reads the last 15 messages to establish conversation context.}
+      \item The conversation context is sent to the LLM service with a carefully engineered prompt.
+            \ucinfo{The prompt instructs the LLM to analyze messages for event details (date, time, location), consider context, and return structured JSON output while handling various date/time formats.}
+      \item The LLM processes the context and returns event details if found.
+            \ucinfo{The system validates the extracted information and prepares it for calendar insertion.}
       \item Add the detected event to the user's calendar.
-        \ucinfo{Send a notification to the user telling them about the newly added event.}
+            \ucinfo{System notifies user via push notification about the newly added event.}
     \end{enumerate}
   }
   \ucalternateflows{
@@ -39,9 +45,15 @@
       \item Only messages with events and its surrounding context shall be analyzed.
       \item System must wait for user's reply before analyzing the messages.
       \item System must wait for 30 seconds before initiating the analysis on messages after the user replies and reset as long the conversation is onggoing.
+      \item The LLM prompt must be engineered to identify potential events, extract key details, and handle various conversation patterns.
     \end{itemize}
   }
-  \ucspecialrequirements{The system must have access to the user's WhatsApp account as a client to receive and read messages.}
+  \ucspecialrequirements{
+    \begin{itemize}
+      \item The system must have access to the user's WhatsApp account as a client to receive and read messages.
+      \item The LLM service must be configured to handle natural language processing of informal conversations.
+    \end{itemize}
+  }
 \end{usecase}
 
 \begin{figure}[!h]
@@ -50,3 +62,5 @@
   \caption{Extract Events from WhatsApp Sequence Diagram}
   \label{fig:seq/extract-events-whatsapp}
 \end{figure}
+
+The sequence diagram in Figure \ref{fig:seq/extract-events-whatsapp} illustrates the event extraction flow from WhatsApp. The process begins when the WhatsApp service receives a new message. It collects the last 15 messages for context and sends them to our backend. The backend then forwards this context to our LLM service, which uses a specialized prompt, engineered specifically for this use case, to extract event information. The prompt is designed to understand natural conversation flow and identify potential events even when they're discussed informally. When an event is detected, the LLM returns a structured JSON response containing all relevant event details. This information is then stored in the database, and the user is notified through Apple's Push Notification service (APNs).
