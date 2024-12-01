@@ -122,7 +122,7 @@
         Lastly, we would like to thank our parents for their unwavering support and for preparing us mentally and physically throughout this journey.
     \end{justify}
 
-	\newpage
+    \newpage
 
     \tableofcontents
 
@@ -585,6 +585,37 @@ While functional requirements define what the system does, non-functional requir
     \item \textbf{User Experience:} The user interface shall follow iOS Human Interface Guidelines for consistency and ease of use.
     \item \textbf{Security:} All data transmissions between the app and servers shall be encrypted using HTTPS.
 \end{itemize}
+
+
+\section{Security Architecture}
+
+In today's digital world, security is a key concern for any application that handles user data. Jadwal places a strong emphasis on ensuring the security and trustworthiness of the platform for its users, implementing multiple layers of security measures to protect user data and access.
+
+\subsection{Authentication: Magic Link and JWT Tokens}
+
+To provide secure authentication, Jadwal implements Magic Link authentication. Instead of relying on traditional username and password combinations, which can be vulnerable to various attacks, Jadwal sends users a secure magic link to their verified email address. A magic link is a special URL that contains a secure token. For example:
+
+\begin{verbatim}
+    https://jadwal.app/magic-link?token=some-uuid
+\end{verbatim}
+
+In this URL, \texttt{some-uuid} is the secure token, and the complete URL is what we call the magic link. When sent to the user's email, clicking this link proves they have access to the email account they're trying to use.
+
+When a user logs in using the Magic Link sent to their email, Jadwal secures the user's account by verifying the magic token provided. This ensures that the account can only be accessed by the legitimate user who has access to the registered email account. To enhance security, the magic token has a limited lifetime of 15 minutes, significantly reducing the window of opportunity for potential attacks.
+
+Upon successful magic link verification, Jadwal issues a JWT (JSON Web Token) signed with the platform's private key. This digital signature serves as a cryptographic guarantee of the token's authenticity, allowing the system to verify that tokens haven't been tampered with and were legitimately issued by Jadwal.
+
+\subsection{Token Storage and Security}
+
+To ensure the security of authentication tokens, Jadwal implements secure storage practices. Magic tokens are never stored in their original form; instead, they are protected using the SHA-256 hashing algorithm before being saved in the database. When verifying user tokens, the system hashes the provided token and compares it with the stored hash, ensuring that even in the unlikely event of a database breach, the original tokens remain secure.
+
+\subsection{Secure Logout Implementation}
+
+Jadwal implements a secure logout mechanism by removing the authentication token from the user's device upon logout. This practice ensures that once a user logs out, their session token cannot be reused for unauthorized access, maintaining the integrity of user sessions.
+
+\subsection{Transparency Through Open Source}
+
+As part of our commitment to security and privacy, Jadwal will be released as open-source software. This transparency allows security experts and users to verify our security implementations and privacy practices. Users can inspect exactly how their data is handled and verify that our privacy commitments are upheld through code review.
 
 
 \section{System Use Cases}
