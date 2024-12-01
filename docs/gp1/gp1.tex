@@ -658,8 +658,8 @@ One of Jadwal's key features is its ability to automatically extract events from
 \subsection{Event Management and Conflict Resolution}
 Managing events and resolving scheduling conflicts are daily challenges for users. These use cases demonstrate how Jadwal handles event creation, conflict detection, and provides smart resolution options.
 
-\include{parts/use-cases/suggest-conflict-resolutions}
-\include{parts/use-cases/manage-scheduling-conflicts}
+\input{parts/use-cases/suggest-conflict-resolutions}
+\input{parts/use-cases/manage-scheduling-conflicts}
 \include{parts/use-cases/add-event-manually}
 
 \subsection{Prayer Time and Notification Management}
@@ -679,8 +679,6 @@ Prayer time scheduling is a unique feature of Jadwal, and timely notifications e
 The foundation of Jadwal's robust functionality lies in its carefully structured database architecture. This section presents the entity-relationship model and schema design that support the application's core features, from user authentication to calendar integration and event management. The database design ensures efficient data organization while maintaining the flexibility needed for future scalability.
 
 \subsection{ER Diagram}
-
-\subsection{Database Schema Design}
 
 The Entity-Relationship diagram in \textbf{Figure~\ref{fig:er-diagram}} illustrates Jadwal's database schema, which implements a calendar system following the iCalendar (RFC 5545) specification. The schema is organized around the \texttt{customer} entity and consists of authentication, calendar management, and event management components.
 
@@ -758,6 +756,8 @@ All entities in the schema include audit fields (\texttt{created\_at} and \textt
     \caption{ER Diagram}
     \label{fig:er-diagram}
 \end{figure}
+
+\subsection{Database Schema Design}
 
 \include{parts/ui-prototype}
 

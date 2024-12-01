@@ -18,14 +18,14 @@
   }
   \ucmainflow{
     \begin{enumerate}
-      \item The system detection conflicts 
-        \ucinfo{The system detects overlapping of events either added manually or extracted from WhatsApp and gives a notification to the user.}
+      \item The system detection conflicts
+            \ucinfo{The system detects overlapping of events either added manually or extracted from WhatsApp and gives a notification to the user.}
       \item The system gives the suggestions for Conflicts.
-        \ucinfo{The system provides the user with the list of resolution options.
-        \begin{itemize}
-          \item By moving the overlapping event to another time slot.   
-          \item Keep both events with a conflict warning. 
-        \end{itemize}}
+            \ucinfo{The system provides the user with the list of resolution options.
+              \begin{itemize}
+                \item By moving the overlapping event to another time slot.
+                \item Keep both events with a conflict warning.
+              \end{itemize}}
     \end{enumerate}
   }
   \ucalternateflows{
@@ -49,3 +49,20 @@
   \caption{Suggest Conflict Resolutions Sequence Diagram}
   \label{fig:seq/suggest-conflict-resolutions}
 \end{figure}
+
+The sequence diagram in Figure~\ref{fig:seq/suggest-conflict-resolutions} illustrates the conflict detection and resolution workflow in Jadwal. When events are added to the calendar (either manually or through WhatsApp extraction), the System initiates a conflict check in the Database. This check specifically looks for temporal overlaps between events and identifies potential alternative time slots.
+
+If conflicts are detected, the System follows a structured resolution process:
+\begin{enumerate}
+  \item Retrieves resolution options from the Database, which include:
+        \begin{itemize}
+          \item Moving the overlapping event to an alternative time slot
+          \item Keeping both events with an explicit conflict warning
+        \end{itemize}
+  \item Obtains the device IDs associated with the customer who owns the conflicting events
+  \item Utilizes Apple Push Notification service (APNs) to notify users about the conflict and present them with resolution options
+\end{enumerate}
+
+If no conflicts are detected, the System continues without any additional actions. This approach ensures users are promptly informed of scheduling conflicts while maintaining the flexibility to either reschedule events or knowingly maintain overlapping appointments. The workflow aligns with Jadwal's goal of providing straightforward conflict management while respecting user preferences in calendar organization.
+
+This process specifically implements the use case requirements, focusing on practical conflict resolution through user notification and simple resolution options, rather than attempting automated resolution or complex prioritization schemes.

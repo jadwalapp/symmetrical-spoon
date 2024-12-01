@@ -238,12 +238,29 @@ participant "Apple Push Notification service (APNs)" as APN
 activate System
 
 System -> Database ++ : Check If Conflicts Exist Between Events
+note right
+  Checks for:
+  1. Time overlap between events
+  2. Available alternative time slots
+end note
 Database --> System : ConflictedEvents Result
+
 alt ConflictedEvents are not empty
+    System -> Database : GetResolutionOptions(ConflictedEvents)
+    note right
+      Options are:
+      1. Move event to another time slot
+      2. Keep both with conflict warning
+    end note
+    Database --> System : ResolutionOptions Result
+
     System -> Database : Ask For Device IDs Of Customer Owning Event
     Database --> System -- : Device IDs of Customer Owning Event
+
     System -> APN ++ : Send Push Notification "Telling User There is Conflict" to Device IDs
+    note right: Includes both resolution options
     APN --> System -- : Push Notification Sending Result
+
 else ConflictedEvents are empty
     note over System, Database : Do Nothing
 end
