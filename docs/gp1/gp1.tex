@@ -122,19 +122,21 @@
         Lastly, we would like to thank our parents for their unwavering support and for preparing us mentally and physically throughout this journey.
     \end{justify}
 
-    \newpage
+
 
     \tableofcontents
 
-    \newpage
+
     \listoffigures
 
 
-    \newpage
+
     \listoftables
 
     \chapter*{List of Abbreviations and Terminology}
     \addcontentsline{toc}{chapter}{List of Abbreviations and Terminology}
+
+    This chapter provides a comprehensive list of technical terms, abbreviations, and specialized vocabulary used throughout this document. Understanding these terms is crucial for comprehending the technical aspects of Jadwal's architecture, functionality, and implementation. The following table defines each term in clear, accessible language.
 
     \begin{center}
         \begin{longtable}{p{0.2\textwidth}p{0.7\textwidth}}
@@ -165,7 +167,7 @@
 
             \textbf{UC}               & Use Case                                                                                                                                                                                                                                                                                                            \\[1ex]
 
-            \textbf{ER diagram}       & Entity Relationship ER Diagram is a type of flowchart that illustrates how entities                                                                                                                                                                                                                                 \\[1ex]
+            \textbf{ER diagram}       & Entity Relationship (ER) Diagram is a type of flowchart that illustrates how entities (people, objects, concepts, or data) relate to each other within a system or database.                                                                                                                                        \\[1ex]
 
             \textbf{Sequence Diagram} & An interaction diagram that details how operations are carried out.                                                                                                                                                                                                                                                 \\[1ex]
 
@@ -186,6 +188,8 @@
 
 \chapter{Introduction}
 
+Time management has become increasingly complex in our interconnected world, where individuals juggle multiple calendars, commitments, and communication channels. This chapter introduces Jadwal, an intelligent iOS-based calendar management system designed to address these modern challenges. We will explore the background, objectives, scope, and significance of this project, highlighting how it aims to revolutionize personal time management through intelligent automation and integration with communication platforms.
+
 
 \section{Background of the Project}
 
@@ -200,6 +204,8 @@ People these days use multiple calendars and sometimes forget to insert an event
 Keeping your calendar up to date with event information is challenging, especially with the rise of many informal communication channels like WhatsApp. People nowadays discuss when and where they will meet using those informal communication tools. This leads to calendars being out of sync from real life events you are committed to and might harm relations. The problem lies in the cumbersomeness of adding events to a calendar manually, and sometimes people are busy, you just forget that you didn't add the event to your calendar. Our Jadwal app aims to solve this issue for users in an intelligent way that makes it seamless to manage your time confidently.
 
 \section{Objectives of the Project}
+
+The development of Jadwal is driven by clear, measurable objectives that address the current challenges in calendar management. These objectives focus on creating an intelligent system that seamlessly integrates multiple calendars, automates event extraction, and prioritizes user efficiency while maintaining prayer schedules. Each objective has been carefully defined to ensure the final product delivers meaningful value to users.
 
 The main objectives of Jadwal are:
 \begin{itemize}
@@ -218,7 +224,7 @@ Jadwal is not just another calendar application; it's a comprehensive time manag
 \begin{itemize}
     \item Development of an iOS application as the primary platform.
     \item Integration with calendars using CalDAV.
-    \item WhatsApp message parsing for event extraction (subject to technical feasibility).
+    \item WhatsApp message parsing for event extraction using state-of-the-art LLMs (subject to technical feasibility).
     \item Target audience: Busy professionals, students, and anyone juggling multiple schedules.
     \item User testing phase to ensure ease of use and effectiveness. Our testing methods will include:
           \begin{itemize}
@@ -229,6 +235,8 @@ Jadwal is not just another calendar application; it's a comprehensive time manag
 
 
 \section{Significance of the Project}
+
+In today's fast-paced environment, effective time management is not just a convenience—it's a necessity. Jadwal addresses critical gaps in existing calendar solutions by introducing innovative features that align with modern users' needs. The project's significance extends beyond simple calendar management, offering transformative benefits for personal productivity, religious observance, and professional organization. By tackling the challenges of fragmented schedules and missed commitments, Jadwal represents a significant advancement in how people manage their time in the digital age.
 
 Jadwal's significance can be summarized in the following points:
 \begin{enumerate}
@@ -241,9 +249,11 @@ Jadwal's significance can be summarized in the following points:
 
 \section{Limitations of the Project}
 
+While Jadwal introduces innovative solutions to calendar management, it is essential to acknowledge and understand its current constraints and limitations. These limitations stem from various factors including technological boundaries, privacy concerns, third-party dependencies, and resource constraints. By identifying these limitations early in the development process, we can better manage user expectations and plan future improvements to address these challenges.
+
 Nothing is perfect, and our project is not an outlier. The limitations we have figured out about it are as follows:
 \begin{itemize}
-    \item WhatsApp integration allows the app to read the users messages, so it would be difficult to prove that privacy risk associated with our integration isn't compromised.
+    \item WhatsApp integration allows the app to read the users messages, so it would be difficult to prove that privacy hasn't been breached.
     \item WhatsApp integration might not always be there, they are a third-party.
     \item Learning new technologies for iOS development might require more time than anticipated.
     \item Accuracy of our algorithms to detect keywords indicating an event agreement has happened, especially for languages other than English.
@@ -252,9 +262,9 @@ Nothing is perfect, and our project is not an outlier. The limitations we have f
     \item We may face a challenges to test the app due to lack of users for testing our app
 \end{itemize}
 
-\newpage
-
 \section{Organization of the Senior Project}
+
+To ensure systematic development and timely delivery of Jadwal, we have established a detailed project timeline with clear milestones and deliverables. The following Gantt chart illustrates our project's phases, tasks, and their respective durations.
 
 Our project plan can be illustrated in the following gantt chart, \textbf{Figure~\ref{fig:project-gantt-chart}}.
 
@@ -276,10 +286,14 @@ Jadwal aims to solve this issue by providing a seamless and automated solution f
 
 \chapter{Literature Review}
 
+The landscape of calendar management and scheduling applications has evolved significantly with technological advancement and changing user needs. This chapter presents a comprehensive analysis of existing solutions, market research, and technological foundations that inform Jadwal's development. Through examining current tools, academic research, and user behavior patterns, we identify gaps in existing solutions and validate Jadwal's innovative approach to calendar management.
+
 \section{Introduction}
+
 In the modern world, managing time effectively is important for balancing personal and professional responsibilities.
 The increasing complexity of schedules usually results in missing an important event and overlapping commitments.
 To solve these challenges, we introduce Jadwal, an innovative iOS-based schedule management application, aims to help individuals and professionals to organize their daily lives.
+
 Jadwal focuses on solving the issue by drawing inspiration from existing solutions like Clockwise, Motion, Reclaim AI, and Calendi, Jadwal stands out by introducing advance features such as conflict resolution, task prioritization, event extraction from informal communicating channels and prioritizing prayer times, which is a unique feature which is not found in any competing applications.
 
 In developing Jadwal, we have drawn inspiration from and built upon existing research and products in the field of intelligent calendar management.
@@ -300,7 +314,7 @@ Some key references include:
     \label{fig:features-table}
 \end{figure}
 
-\newpage
+
 
 In Figure~\ref{fig:features-table} The table compares \textit{Jadwal}, our project, with four other scheduling applications—Clockwise, Motion, Reclaim AI, and Calendi—based based on several key features:
 \begin{itemize}
@@ -314,7 +328,7 @@ In Figure~\ref{fig:features-table} The table compares \textit{Jadwal}, our proje
 
 \section{Comparing Competitors}
 
-Below we will compare competitors in depth, before we have only talked about them in general and shown a features comparison table.
+To thoroughly understand Jadwal's position in the market and its unique value proposition, a detailed analysis of existing calendar management solutions is essential. This section examines four major competitors—Clockwise, Motion, Reclaim AI, and Calendi—evaluating their features, strengths, and limitations to highlight how Jadwal addresses gaps in current offerings.
 
 \subsection{Clockwise}
 
@@ -523,11 +537,19 @@ As shown in Figure~\ref{fig:events-per-week}, 53.3\% of people have 1-3 calendar
 
 \section{Conclusion}
 
-Jadwal represents itself by offering a seamless calendar application which is user friendly and outstands by providing solution to all the problems which is not yet addressed by other tools like Clockwise, Motion, Reclaim AI, and Calendi. WhatsApp integration is Jadwal’s unique features for event extraction. These features distinguish Jadwal from existing applications, Jadwal addresses to the issues that is not yet solved.
+Through this literature review, we have identified several key gaps in existing calendar management solutions. While platforms like Clockwise, Motion, Reclaim AI, and Calendi have made significant strides in intelligent scheduling and calendar integration, none provide a comprehensive solution that addresses the full spectrum of modern scheduling challenges. The review reveals three primary opportunities for innovation:
 
-The comparison highlights Jadwal's abilities that integrate multiple calendars, resolve scheduling conflicts.
+First, while existing solutions focus on traditional calendar management, there remains an untapped potential in integrating informal communication channels. Jadwal's WhatsApp integration addresses this gap, offering automated event extraction from everyday conversations—a feature notably absent in current market offerings.
+
+Second, our analysis shows that while many applications offer conflict resolution features, none combine this with prayer time prioritization, creating a unique opportunity to serve users who prioritize religious obligations alongside professional commitments.
+
+Finally, the review demonstrates that current solutions often operate in isolation, whereas Jadwal's approach of unifying multiple calendars while maintaining intelligent event extraction and conflict resolution presents a more holistic solution to modern scheduling challenges.
+
+These findings validate Jadwal's approach and highlight its potential to address significant unmet needs in the calendar management space, particularly in combining automation, religious considerations, and comprehensive calendar integration.
 
 \chapter{System Analysis and Design}
+
+The development of a complex calendar management system like Jadwal requires careful analysis of requirements and thoughtful system design to ensure robust functionality and seamless user experience. This chapter presents a detailed examination of Jadwal's architecture, from its core requirements to the intricate relationships between system components. Through use case diagrams, activity diagrams, class diagrams, and database design (both ER and Relational), we provide a comprehensive blueprint of how Jadwal transforms its innovative concepts into a practical, functioning system.
 
 \section{Introduction}
 
@@ -537,10 +559,9 @@ This section shows the functional and non-functional requirements which is the b
 
 Combining all these requirements helps in the design and implementation of Jadwal which will lead to a better application solving real issues and meeting the needs of the user.
 
-\newpage
-
 \section{Functional Requirements}
 
+The following requirements outline the core features and capabilities that Jadwal must provide to fulfill its purpose as an intelligent calendar management system:
 \begin{itemize}
     \item The user shall be able to access their account using either Google OAuth or magic link via Email. For new users, a new account is created, and for existing users, they are given access to their account directly.
     \item The system shall send a welcome email to new users.
@@ -555,9 +576,9 @@ Combining all these requirements helps in the design and implementation of Jadwa
     \item The system shall add the WhatsApp extracted events to the calendar. If a conflict occurs, the user shall get a notification to resolve the conflict with suggestions.
 \end{itemize}
 
-\newpage
-
 \section{Non-Functional Requirements}
+
+While functional requirements define what the system does, non-functional requirements specify how the system performs its functions. These requirements focus on the quality attributes, performance standards, and technical constraints that ensure Jadwal delivers a reliable, secure, and user-friendly experience.
 
 \begin{itemize}
     \item \textbf{Platform Compatibility:} The app shall be compatible with iOS devices running iOS 16.0 or later.
@@ -565,10 +586,11 @@ Combining all these requirements helps in the design and implementation of Jadwa
     \item \textbf{User Experience:} The user interface shall follow iOS Human Interface Guidelines for consistency and ease of use.
     \item \textbf{Security:} All data transmissions between the app and servers shall be encrypted using HTTPS.
 \end{itemize}
-\newpage
-\section{System use-cases}
 
-\textbf{Figure~\ref{fig:use-case-diagram}} shows the use case diagram for the system of Jadwal.
+
+\section{System Use Cases}
+
+The functionality of Jadwal can be best understood through its various use cases, which demonstrate how users interact with the system. \textbf{Figure~\ref{fig:use-case-diagram}} shows the use case diagram for the system of Jadwal, and it includes 14 use cases.
 
 \begin{figure}[!h]
     \centering
@@ -576,8 +598,6 @@ Combining all these requirements helps in the design and implementation of Jadwa
     \caption{Use Case Diagram of Jadwal}
     \label{fig:use-case-diagram}
 \end{figure}
-
-
 
 \include{parts/use-cases/continue-with-email}
 \include{parts/use-cases/continue-with-google}
@@ -600,6 +620,8 @@ Combining all these requirements helps in the design and implementation of Jadwa
 
 \section{Database Design}
 
+The foundation of Jadwal's robust functionality lies in its carefully structured database architecture. This section presents the entity-relationship model and schema design that support the application's core features, from user authentication to calendar integration and event management. The database design ensures efficient data organization while maintaining the flexibility needed for future scalability.
+
 \begin{figure}[!h]
     \centering
     \includegraphics[width=0.9\textwidth]{images/docs/diagrams/er/database/Database Design.png}
@@ -607,7 +629,7 @@ Combining all these requirements helps in the design and implementation of Jadwa
     \label{fig:database-design}
 \end{figure}
 
-\newpage
+
 
 In Figure~\ref{fig:database-design}, the tables and the relations between them in Jadwal's system is shown. The \texttt{customer} is the main table. Three tables have foreign keys that reference it. The \texttt{auth\_google} and \texttt{magic\_link} tables are used for auth, and they both save the info required to the authentication and hint at which authentication methods are allowed for a specific customer.
 
@@ -618,7 +640,6 @@ A third table related to the \texttt{customer} table is the \texttt{calendar\_ac
 \section{Conclusion}
 
 Jadwal stands as a comprehensive and innovative solution for scheduling with great design. The use cases and database architecture are well described that helps in creating the application systematically. The use cases clearly define how users interact with the system, covering all the features like Continue with email, Resolve conflicts, WhatsApp integration, scheduling prayer time and many more. The database design is the backbone of Jadwal, which clearly shows how the system works and how the data is managed perfectly. In conclusion, Jadwal is well described which makes it easy to understand how everything is working and would be easy to track everything that is happening in the backend.
-
 
 \chapter*{Conclusion}
 \addcontentsline{toc}{chapter}{Conclusion}

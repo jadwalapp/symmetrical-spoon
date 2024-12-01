@@ -10,8 +10,6 @@ Of course that doesn't mean they can't be used for implementing in other languag
     \item I - \texttt{interface} (Go interface definition)
 \end{itemize}
 
-\newpage
-
 \begin{figure}[!h]
     \centering
     \includegraphics[width=0.9\textwidth]{images/docs/diagrams/class/class-diagram/apimetadata.png}
@@ -21,7 +19,7 @@ Of course that doesn't mean they can't be used for implementing in other languag
 
 In Figure~\ref{fig:api-metadata-class-diagram}, the diagram shows the Api Metadata interface and its implementation along with important fields. It basically extracts data from the headers and includes it in the context of the requests. It helps you put stuff into the context and extract it from them. Context in Golang allows you to attach stuff to it, but it is not type safe, so we are making a wrapper to make it safe. Below we are adding wrappers for \texttt{Claims} and \texttt{Lang}. \texttt{Claims} are extracted from the JWT (JSON Web Token). \texttt{Lang} is self-explanatory.
 
-\newpage
+
 
 \begin{figure}[!h]
     \centering
@@ -34,7 +32,7 @@ In Figure~\ref{fig:auth-class-diagram}, the diagram shows the Auth API interface
 It also shows the \texttt{authv1connect} which is the generated code for the API\@.
 This includes the flow for using email to authenticate and using Google.
 
-\newpage
+
 
 \begin{figure}[!h]
     \centering
@@ -47,7 +45,7 @@ In Figure~\ref{fig:calendar-v1-class-diagram}, the diagram shows the api layer s
 It allows Jadwal's clients to manage their calendar data easily.
 It shows the interfaces and the implementation structs with their fields and methods.
 
-\newpage
+
 
 \begin{figure}[!h]
     \centering
@@ -59,7 +57,7 @@ It shows the interfaces and the implementation structs with their fields and met
 In Figure~\ref{fig:googleclient-class-diagram}, the Google client, and its methods.
 It allows Jadawl to verify with Google that tokens its gets are good, and it also allows Jadwal system to get the user info the system was granted access for.
 
-\newpage
+
 
 \begin{figure}[!h]
     \centering
@@ -70,7 +68,7 @@ It allows Jadawl to verify with Google that tokens its gets are good, and it als
 
 In Figure~\ref{fig:emailer-class-diagram}, the diagram shows the \texttt{emailer} interface with its three implementations. This allows for using the texttt{stdoutEmailer} when testing locally, and using either of the \texttt{resendEmailer} or \texttt{smtpEmailer} in production to send real emails.
 
-\newpage
+
 
 \begin{figure}[!h]
     \centering
@@ -81,7 +79,7 @@ In Figure~\ref{fig:emailer-class-diagram}, the diagram shows the \texttt{emailer
 
 In Figure~\ref{fig:store-class-diagram}, the diagram shows the store, or in other words the database. The store holds all the methods needed to query the database for information it holds. More methods can be added as needed, but those are the core methods.
 
-\newpage
+
 
 \begin{figure}[!h]
     \centering
@@ -92,7 +90,7 @@ In Figure~\ref{fig:store-class-diagram}, the diagram shows the store, or in othe
 
 In Figure~\ref{fig:tokens-class-diagram}, the diagram shows the tokens service implementation along with its interface. The diagram also illustartes the needed \texttt{struct} representation for any data passed to and from the service.
 
-\newpage
+
 
 \begin{figure}[!h]
     \centering
