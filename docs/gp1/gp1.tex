@@ -624,7 +624,7 @@ In today's digital world, security is a key concern for any application that han
 
 \subsection{Authentication: Magic Link and JWT Tokens}
 
-To provide secure authentication, Jadwal implements Magic Link authentication. Instead of relying on traditional username and password combinations, which is vulnerable to various attacks, such as credentials leakage thorugh database dumps. To mitigate this, Jadwal sends the users trying to authenticate a secure magic link to their verified email address. A magic link is a special URL that contains a secure token. For example:
+To provide secure authentication, Jadwal implements Magic Link authentication. Instead of relying on traditional username and password combinations, which is vulnerable to various attacks, such as credentials leakage through database dumps. To mitigate this, Jadwal sends the users trying to authenticate a secure magic link to their verified email address. A magic link is a special URL that contains a secure token. For example:
 
 \begin{verbatim}
     https://jadwal.app/magic-link?token=some-uuid
