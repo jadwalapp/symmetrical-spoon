@@ -18,9 +18,9 @@
   \ucmainflow{
     \begin{enumerate}
       \item The user click continue with Google.
-        \ucinfo{App uses OAuth to authenticate with Google}
+            \ucinfo{App uses OAuth to authenticate with Google}
       \item App sends Google access token to the system.
-        \ucinfo{System verifies the token is issued for us and then issues JWT for usage within the app.}
+            \ucinfo{System verifies the token is issued for us and then issues JWT for usage within the app.}
     \end{enumerate}
   }
   \ucalternateflows{
@@ -46,4 +46,4 @@
   \label{fig:seq/continue-with-google}
 \end{figure}
 
-The "Continue with Google Sequence Diagram", shown in \textbf{Figure~\ref{fig:seq/continue-with-google }}, the user obtains an access token from GoogleAuth and shares it with the backend. The backend validates the token and retrieves user details through GoogleAuth. If the token is valid, the backend ensures the user exists in the database, creating a record if necessary, and associates the user’s Google account. It then verifies the session ID, issuing a JSON Web Token (JWT) for successful authentication or returning an error, such as Permission Denied, for invalid credentials. This process ensures secure and efficient authentication.
+The "Continue with Google Sequence Diagram", shown in \textbf{Figure~\ref{fig:seq/continue-with-google}}, illustrates how users can authenticate with Jadwal using their Google account. The user first obtains an access token from GoogleAuth through our application and shares it with the backend. The backend validates the token and retrieves user details through GoogleAuth. If the token is valid, the backend ensures the user exists in the database, creating a record if necessary, and associates the user’s Google account with it. It then verifies the ``sid'', issuing a JSON Web Token (JWT) for successful authentication or returning an error, such as Permission Denied, for invalid credentials. This process ensures secure and efficient authentication.
