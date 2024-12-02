@@ -3,139 +3,110 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>جدول | Jadwal: سياسة الخصوصية</title>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <title>سياسة الخصوصية - جدول</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link
-      href="https://fonts.googleapis.com/css2?family=Lalezar&display=swap"
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
     />
-
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              primary: "#2ecc71",
-              secondary: "#27ae60",
-            },
-          },
-        },
-      };
-    </script>
     <style>
-      * {
-        font-family: "Lalezar", system-ui;
-      }
-      .blur-header {
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
+      body {
+        font-family: "IBM Plex Sans Arabic", sans-serif;
       }
     </style>
   </head>
-  <body class="bg-gray-900 text-white font-sans">
-    <header
-      class="bg-black bg-opacity-50 py-4 px-6 sticky top-0 z-50 blur-header"
-    >
-      <nav class="container mx-auto flex justify-between items-center">
-        <div class="text-2xl text-primary">جدول | Jadwal</div>
-        <div class="flex gap-4">
+  <body class="bg-white">
+    <nav class="fixed w-full bg-white/80 backdrop-blur-md z-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16 items-center">
+          <div class="flex items-center">
+            <a href="/" class="text-xl font-semibold">جدول</a>
+          </div>
           <a
-            href="/index.html"
-            class="hover:text-primary transition duration-300"
-            >الرئيسية</a
+            href="/en/privacy-policy.html"
+            class="text-gray-600 hover:text-gray-900"
+            >English</a
           >
-          <button
-            onclick="toggleLanguage()"
-            class="hover:text-primary transition duration-300"
-          >
-            English
-          </button>
         </div>
-      </nav>
-    </header>
+      </div>
+    </nav>
 
-    <main class="container mx-auto px-6 py-12">
-      <h1 class="text-4xl text-primary mb-8">سياسة الخصوصية</h1>
+    <main class="max-w-3xl mx-auto px-4 pt-32 pb-20">
+      <h1 class="text-4xl font-bold mb-8">سياسة الخصوصية</h1>
 
-      <section class="mb-8">
-        <h2 class="text-2xl text-primary mb-4">1. جمع المعلومات</h2>
-        <p>نحن نجمع المعلومات التالية:</p>
-        <ul class="list-disc list-inside">
-          <li>معلومات الحساب (مثل الاسم وعنوان البريد الإلكتروني)</li>
-          <li>بيانات التقويم من التقويمات المتصلة</li>
-          <li>محتوى الرسائل من حسابات واتساب المتصلة لاستخراج الأحداث</li>
-          <li>تفضيلات المستخدم وإعدادات التطبيق</li>
-        </ul>
-      </section>
+      <div class="space-y-6 text-gray-600">
+        <p>آخر تحديث: ٢ ديسمبر ٢٠٢٤</p>
 
-      <section class="mb-8">
-        <h2 class="text-2xl text-primary mb-4">2. استخدام المعلومات</h2>
-        <p>نستخدم معلوماتك لـ:</p>
-        <ul class="list-disc list-inside">
-          <li>توفير وصيانة تطبيق جدول</li>
-          <li>استخراج وإدارة الأحداث من التقويمات والرسائل</li>
-          <li>حل تعارضات الجدولة وتحسين تقويمك</li>
-          <li>إرسال إشعارات حول الأحداث وتحديثات التطبيق</li>
-        </ul>
-      </section>
+        <section class="space-y-4">
+          <h2 class="text-2xl font-semibold text-gray-900">١. مقدمة</h2>
+          <p>
+            مرحباً بك في جدول. نحن نحترم خصوصيتك ونلتزم بحماية بياناتك الشخصية.
+          </p>
+        </section>
 
-      <section class="mb-8">
-        <h2 class="text-2xl text-primary mb-4">3. أمان البيانات</h2>
-        <p>
-          نحن نتخذ تدابير أمنية مناسبة لحماية معلوماتك الشخصية. ومع ذلك، لا توجد
-          طريقة آمنة 100٪ لنقل البيانات عبر الإنترنت.
-        </p>
-      </section>
+        <section class="space-y-4">
+          <h2 class="text-2xl font-semibold text-gray-900">
+            ٢. البيانات التي نجمعها
+          </h2>
+          <p>لتقديم خدماتنا، نقوم بجمع:</p>
+          <ul class="list-disc pr-6 space-y-2">
+            <li>عنوان البريد الإلكتروني للمصادقة</li>
+            <li>بيانات التقويم للجدولة</li>
+            <li>رسائل واتساب لاستخراج الأحداث</li>
+            <li>بيانات الموقع لمواقيت الصلاة (بإذنك)</li>
+          </ul>
+        </section>
 
-      <section class="mb-8">
-        <h2 class="text-2xl text-primary mb-4">4. حقوقك</h2>
-        <p>
-          لديك الحق في الوصول إلى معلوماتك الشخصية وتصحيحها أو حذفها. يمكنك
-          أيضًا الانسحاب من بعض جمع البيانات أو استخدامها.
-        </p>
-      </section>
+        <section class="space-y-4">
+          <h2 class="text-2xl font-semibold text-gray-900">
+            ٣. كيف نستخدم بياناتك
+          </h2>
+          <p>نستخدم بياناتك من أجل:</p>
+          <ul class="list-disc pr-6 space-y-2">
+            <li>تقديم خدمات إدارة التقويم</li>
+            <li>استخراج الأحداث من رسائل واتساب</li>
+            <li>حساب مواقيت الصلاة بدقة</li>
+            <li>تحسين خدماتنا</li>
+          </ul>
+        </section>
 
-      <section class="mb-8">
-        <h2 class="text-2xl text-primary mb-4">5. التغييرات على هذه السياسة</h2>
-        <p>
-          قد نقوم بتحديث سياسة الخصوصية هذه من وقت لآخر. سنخطرك بأي تغييرات عن
-          طريق نشر السياسة الجديدة على هذه الصفحة.
-        </p>
-      </section>
+        <section class="space-y-4">
+          <h2 class="text-2xl font-semibold text-gray-900">٤. أمن البيانات</h2>
+          <p>نقوم بتنفيذ إجراءات أمنية مناسبة لحماية بياناتك:</p>
+          <ul class="list-disc pr-6 space-y-2">
+            <li>تشفير البيانات أثناء النقل والتخزين</li>
+            <li>طرق مصادقة آمنة</li>
+            <li>تدقيق أمني منتظم</li>
+          </ul>
+        </section>
 
-      <section>
-        <h2 class="text-2xl text-primary mb-4">6. اتصل بنا</h2>
-        <p>
-          إذا كانت لديك أي أسئلة حول سياسة الخصوصية هذه، يرجى الاتصال بنا على:
-          privacy@jadwal.app
-        </p>
-      </section>
+        <section class="space-y-4">
+          <h2 class="text-2xl font-semibold text-gray-900">٥. حقوقك</h2>
+          <p>لديك الحق في:</p>
+          <ul class="list-disc pr-6 space-y-2">
+            <li>الوصول إلى بياناتك الشخصية</li>
+            <li>طلب تصحيح البيانات</li>
+            <li>حذف حسابك وبياناتك</li>
+            <li>تصدير بياناتك</li>
+          </ul>
+        </section>
+
+        <section class="space-y-4">
+          <h2 class="text-2xl font-semibold text-gray-900">٦. اتصل بنا</h2>
+          <p>
+            إذا كان لديك أي أسئلة حول سياسة الخصوصية هذه، يرجى الاتصال بنا على:
+          </p>
+          <p>البريد الإلكتروني: privacy@jadwal.app</p>
+        </section>
+      </div>
     </main>
 
-    <footer class="bg-black py-8">
-      <div class="container mx-auto px-6">
-        <div class="flex flex-col md:flex-row justify-between items-center">
-          <div class="mb-4 md:mb-0">
-            <p>جميع الحقوق محفوظة &copy; 2024 جدول.</p>
-          </div>
-          <div class="flex space-x-4">
-            <a
-              href="/terms-of-service.html"
-              class="text-gray-400 hover:text-primary transition duration-300"
-              >شروط الخدمة</a
-            >
-          </div>
+    <footer class="bg-white py-12">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center text-gray-600">
+          <p>© ٢٠٢٤ جدول. جميع الحقوق محفوظة.</p>
         </div>
       </div>
     </footer>
-
-    <script>
-      function toggleLanguage() {
-        window.location.href = "/en/privacy-policy.html";
-      }
-    </script>
   </body>
 </html>

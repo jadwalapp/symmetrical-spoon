@@ -3,144 +3,131 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Jadwal | جدول: Elegant iOS Calendar Manager</title>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Lalezar&display=swap"
-      rel="stylesheet"
-    />
-    
+    <title>Jadwal - Intelligent Calendar Management</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              primary: "#2ecc71",
-              secondary: "#27ae60",
-            },
-          },
-        },
-      };
-    </script>
     <style>
-        * {
-        font-family: "Lalezar", system-ui;
-      }
-
-      @keyframes float {
-        0% { transform: translateY(0px); }
-        50% { transform: translateY(-20px); }
-        100% { transform: translateY(0px); }
-      }
-      .logo-container {
-        animation: float 6s ease-in-out infinite;
-      }
-      .blur-header {
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+      body {
+        font-family: "Inter", sans-serif;
       }
     </style>
   </head>
-  <body class="bg-gray-900 text-white font-sans">
-    <header class="bg-black bg-opacity-50 py-4 px-6 sticky top-0 z-50 blur-header">
-      <nav class="container mx-auto flex justify-between items-center">
-        <div class="text-2xl text-primary">Jadwal | جدول</div>
-        <div class="flex space-x-6">
-          <a href="#features" class="hover:text-primary transition duration-300">Features</a>
-          <a href="#about" class="hover:text-primary transition duration-300">About</a>
-          <button onclick="toggleLanguage()" class="hover:text-primary transition duration-300">العربية</button>
-        </div>
-      </nav>
-    </header>
-
-    <main>
-      <section class="py-20 bg-gradient-to-b from-black to-gray-900">
-        <div class="container mx-auto px-6">
-          <div class="flex flex-col md:flex-row items-center">
-            <div class="md:w-1/2 mb-10 md:mb-0">
-              <h1 class="text-5xl md:text-6xl leading-tight mb-5">
-                Revolutionize Your Time Management
-              </h1>
-              <p class="text-xl mb-10">
-                Jadwal is an elegant, iOS-based calendar manager that intelligently integrates your schedules, extracts events from WhatsApp, and prioritizes your commitments - including prayer times.
-              </p>
-              <a
-                href="#"
-                class="bg-primary hover:bg-secondary text-white py-3 px-8 rounded-full transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-110"
-              >
-                Download Now
-              </a>
-            </div>
-            <div class="md:w-1/2 flex justify-center">
-              <div class="logo-container relative">
-                <div class="absolute inset-0 bg-gradient-to-br from-primary to-secondary opacity-75 rounded-full blur-xl"></div>
-                <img
-                  src="/images/logo-light.png"
-                  alt="Jadwal App Logo"
-                  class="w-64 h-64 object-contain relative z-10 rounded-full"
-                />
-              </div>
-            </div>
+  <body class="bg-white">
+    <!-- Navigation -->
+    <nav class="fixed w-full bg-white/80 backdrop-blur-md z-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16 items-center">
+          <div class="flex items-center">
+            <svg
+              class="h-8 w-8"
+              viewBox="0 0 1024 1024"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <!-- Your SVG path here -->
+            </svg>
+            <span class="ml-2 text-xl font-semibold">Jadwal</span>
+          </div>
+          <div class="hidden md:flex space-x-8">
+            <a href="#features" class="text-gray-600 hover:text-gray-900"
+              >Features</a
+            >
+            <a href="#whatsapp" class="text-gray-600 hover:text-gray-900"
+              >WhatsApp Integration</a
+            >
+            <a href="#prayer" class="text-gray-600 hover:text-gray-900"
+              >Prayer Times</a
+            >
           </div>
         </div>
-      </section>
+      </div>
+    </nav>
 
-      <section id="features" class="py-20 bg-gray-800">
-        <div class="container mx-auto px-6">
-          <h2 class="text-4xl text-center mb-12 text-primary">
-            Unparalleled Features
-          </h2>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+    <!-- Hero Section -->
+    <section class="pt-32 pb-20 text-center">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 class="text-6xl font-bold tracking-tight mb-6">
+          Your Time, <span class="text-green-600">Intelligently Managed</span>
+        </h1>
+        <p class="text-xl text-gray-600 mb-12 max-w-3xl mx-auto">
+          Jadwal revolutionizes calendar management with automatic event
+          extraction from WhatsApp, prayer time scheduling, and intelligent
+          conflict resolution.
+        </p>
+        <div class="flex justify-center gap-4">
+          <a
+            href="#"
+            class="bg-green-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-green-700 transition-colors"
+          >
+            Download for iOS
+          </a>
+          <a
+            href="#"
+            class="border border-green-600 text-green-600 px-8 py-4 rounded-lg font-semibold hover:bg-green-50 transition-colors"
+          >
+            Learn More
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Feature Section -->
+    <section id="features" class="py-20 bg-gray-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-4xl font-bold text-center mb-16">One More Thing...</h2>
+        <div class="grid md:grid-cols-3 gap-8">
+          <!-- WhatsApp Integration -->
+          <div class="bg-white p-8 rounded-2xl shadow-lg">
             <div
-              class="bg-gray-900 rounded-lg p-8 hover:shadow-lg transition duration-300 transform hover:-translate-y-2"
+              class="h-12 w-12 bg-green-100 rounded-lg flex items-center justify-center mb-4"
             >
-              <h3 class="text-2xl mb-4 text-primary">
-                Smart Event Extraction
-              </h3>
-              <p>
-                Automatically extract events from WhatsApp messages and add them to your calendar, saving you time and reducing manual input errors.
-              </p>
+              <span class="text-2xl">💬</span>
             </div>
+            <h3 class="text-xl font-semibold mb-4">WhatsApp Integration</h3>
+            <p class="text-gray-600">
+              Automatically extract events from your WhatsApp conversations and
+              add them to your calendar.
+            </p>
+          </div>
+
+          <!-- Prayer Times -->
+          <div class="bg-white p-8 rounded-2xl shadow-lg">
             <div
-              class="bg-gray-900 rounded-lg p-8 hover:shadow-lg transition duration-300 transform hover:-translate-y-2"
+              class="h-12 w-12 bg-green-100 rounded-lg flex items-center justify-center mb-4"
             >
-              <h3 class="text-2xl mb-4 text-primary">
-                Integrated Calendars
-              </h3>
-              <p>
-                View and manage all your calendars in one place, with seamless integration using CalDAV technology.
-              </p>
+              <span class="text-2xl">🕌</span>
             </div>
+            <h3 class="text-xl font-semibold mb-4">Prayer Times</h3>
+            <p class="text-gray-600">
+              Never miss a prayer with automatic scheduling based on your
+              location.
+            </p>
+          </div>
+
+          <!-- Smart Conflict Resolution -->
+          <div class="bg-white p-8 rounded-2xl shadow-lg">
             <div
-              class="bg-gray-900 rounded-lg p-8 hover:shadow-lg transition duration-300 transform hover:-translate-y-2"
+              class="h-12 w-12 bg-green-100 rounded-lg flex items-center justify-center mb-4"
             >
-              <h3 class="text-2xl mb-4 text-primary">
-                Prayer Time Priority
-              </h3>
-              <p>
-                Automatically schedule and prioritize prayer times in your calendar, ensuring your spiritual commitments come first.
-              </p>
+              <span class="text-2xl">🔄</span>
             </div>
+            <h3 class="text-xl font-semibold mb-4">Smart Conflicts</h3>
+            <p class="text-gray-600">
+              Intelligent conflict detection and resolution suggestions keep
+              your schedule organized.
+            </p>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <section id="about" class="py-20 bg-gray-900">
-        <div class="container mx-auto px-6">
-          <h2 class="text-4xl text-center mb-12 text-primary">
-            About Jadwal
-          </h2>
-          <p class="text-xl text-center mb-8">
-            Developed by a team of passionate students at Al Yamamah University, Jadwal aims to revolutionize how people manage their time in the digital age. Our app combines cutting-edge technology with user-friendly design to create a comprehensive time management solution.
-          </p>
-          <p class="text-xl text-center">
-            Whether you're a busy professional, a student juggling multiple schedules, or anyone looking to optimize their time, Jadwal is here to help you stay organized and productive.
-          </p>
+    <!-- Footer -->
+    <footer class="bg-white py-12">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center">
+          <p class="text-gray-600">© 2024 Jadwal. All rights reserved.</p>
         </div>
-      </section>
-    </main>
-
-    <footer
+      </div>
+    </footer>
+  </body>
+</html>

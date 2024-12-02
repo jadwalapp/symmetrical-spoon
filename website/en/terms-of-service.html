@@ -3,147 +3,114 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Jadwal | جدول: Terms of Service</title>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Lalezar&display=swap"
-      rel="stylesheet"
-    />
-
+    <title>Terms of Service - Jadwal</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              primary: "#2ecc71",
-              secondary: "#27ae60",
-            },
-          },
-        },
-      };
-    </script>
     <style>
-      * {
-        font-family: "Lalezar", system-ui;
-      }
-      .blur-header {
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+      body {
+        font-family: "Inter", sans-serif;
       }
     </style>
   </head>
-  <body class="bg-gray-900 text-white font-sans">
-    <header
-      class="bg-black bg-opacity-50 py-4 px-6 sticky top-0 z-50 blur-header"
-    >
-      <nav class="container mx-auto flex justify-between items-center">
-        <div class="text-2xl text-primary">Jadwal | جدول</div>
-        <div class="flex space-x-6">
+  <body class="bg-white">
+    <nav class="fixed w-full bg-white/80 backdrop-blur-md z-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16 items-center">
+          <div class="flex items-center">
+            <a href="/en/" class="text-xl font-semibold">Jadwal</a>
+          </div>
           <a
-            href="/en/index.html"
-            class="hover:text-primary transition duration-300"
-            >Home</a
+            href="/terms-of-service.html"
+            class="text-gray-600 hover:text-gray-900"
+            >العربية</a
           >
-          <button
-            onclick="toggleLanguage()"
-            class="hover:text-primary transition duration-300"
-          >
-            العربية
-          </button>
         </div>
-      </nav>
-    </header>
+      </div>
+    </nav>
 
-    <main class="container mx-auto px-6 py-12">
-      <h1 class="text-4xl text-primary mb-8">Terms of Service</h1>
+    <main class="max-w-3xl mx-auto px-4 pt-32 pb-20">
+      <h1 class="text-4xl font-bold mb-8">Terms of Service</h1>
 
-      <section class="mb-8">
-        <h2 class="text-2xl text-primary mb-4">1. Acceptance of Terms</h2>
-        <p>
-          By using the Jadwal application, you agree to be bound by these Terms
-          of Service. If you do not agree to these terms, please do not use the
-          app.
-        </p>
-      </section>
+      <div class="space-y-6 text-gray-600">
+        <p>Last updated: December 2, 2024</p>
 
-      <section class="mb-8">
-        <h2 class="text-2xl text-primary mb-4">2. Description of Service</h2>
-        <p>
-          Jadwal is an iOS-based calendar management application that integrates
-          multiple calendars, extracts events from WhatsApp messages, and
-          provides intelligent scheduling features.
-        </p>
-      </section>
+        <section class="space-y-4">
+          <h2 class="text-2xl font-semibold text-gray-900">
+            1. Acceptance of Terms
+          </h2>
+          <p>
+            By accessing or using Jadwal, you agree to be bound by these Terms
+            of Service and our Privacy Policy.
+          </p>
+        </section>
 
-      <section class="mb-8">
-        <h2 class="text-2xl text-primary mb-4">3. User Accounts</h2>
-        <p>
-          You are responsible for maintaining the confidentiality of your
-          account credentials and for all activities that occur under your
-          account.
-        </p>
-      </section>
+        <section class="space-y-4">
+          <h2 class="text-2xl font-semibold text-gray-900">
+            2. Service Description
+          </h2>
+          <p>Jadwal provides:</p>
+          <ul class="list-disc pl-6 space-y-2">
+            <li>Calendar management services</li>
+            <li>WhatsApp message event extraction</li>
+            <li>Prayer time scheduling</li>
+            <li>Conflict resolution features</li>
+          </ul>
+        </section>
 
-      <section class="mb-8">
-        <h2 class="text-2xl text-primary mb-4">4. User Content</h2>
-        <p>
-          You retain all rights to the content you provide through the Jadwal
-          app. By using the app, you grant us a license to use, store, and
-          process this content to provide and improve our services.
-        </p>
-      </section>
+        <section class="space-y-4">
+          <h2 class="text-2xl font-semibold text-gray-900">3. User Accounts</h2>
+          <p>You are responsible for:</p>
+          <ul class="list-disc pl-6 space-y-2">
+            <li>Maintaining the confidentiality of your account</li>
+            <li>All activities that occur under your account</li>
+            <li>Notifying us of any unauthorized use</li>
+          </ul>
+        </section>
 
-      <section class="mb-8">
-        <h2 class="text-2xl text-primary mb-4">5. Intellectual Property</h2>
-        <p>
-          The Jadwal app and its original content, features, and functionality
-          are owned by Jadwal and are protected by international copyright,
-          trademark, patent, trade secret, and other intellectual property laws.
-        </p>
-      </section>
+        <section class="space-y-4">
+          <h2 class="text-2xl font-semibold text-gray-900">4. Data Usage</h2>
+          <p>By using Jadwal, you grant us permission to:</p>
+          <ul class="list-disc pl-6 space-y-2">
+            <li>Process your calendar data</li>
+            <li>Access and analyze your WhatsApp messages</li>
+            <li>Use your location for prayer times</li>
+            <li>Store necessary data for service functionality</li>
+          </ul>
+        </section>
 
-      <section class="mb-8">
-        <h2 class="text-2xl text-primary mb-4">6. Changes to Terms</h2>
-        <p>
-          We reserve the right to modify or replace these Terms of Service at
-          any time. We will provide notice of any significant changes by posting
-          the new Terms of Service on this page.
-        </p>
-      </section>
+        <section class="space-y-4">
+          <h2 class="text-2xl font-semibold text-gray-900">
+            5. Service Modifications
+          </h2>
+          <p>We reserve the right to:</p>
+          <ul class="list-disc pl-6 space-y-2">
+            <li>Modify or discontinue services</li>
+            <li>Update these terms</li>
+            <li>Change pricing with notice</li>
+          </ul>
+        </section>
 
-      <section>
-        <h2 class="text-2xl text-primary mb-4">7. Contact Us</h2>
-        <p>
-          If you have any questions about these Terms of Service, please contact
-          us at: legal@jadwal.app
-        </p>
-      </section>
+        <section class="space-y-4">
+          <h2 class="text-2xl font-semibold text-gray-900">6. Termination</h2>
+          <p>
+            We may terminate or suspend your account if you violate these terms.
+          </p>
+        </section>
+
+        <section class="space-y-4">
+          <h2 class="text-2xl font-semibold text-gray-900">7. Contact</h2>
+          <p>For any questions about these Terms, please contact us at:</p>
+          <p>Email: legal@jadwal.app</p>
+        </section>
+      </div>
     </main>
 
-    <footer class="bg-black py-8">
-      <div class="container mx-auto px-6">
-        <div class="flex flex-col md:flex-row justify-between items-center">
-          <div class="mb-4 md:mb-0">
-            <p>&copy; 2024 Jadwal. All rights reserved.</p>
-          </div>
-          <div class="flex space-x-4">
-            <a
-              href="/en/privacy-policy.html"
-              class="text-gray-400 hover:text-primary transition duration-300"
-              >Privacy Policy</a
-            >
-          </div>
+    <footer class="bg-white py-12">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center text-gray-600">
+          <p>© 2024 Jadwal. All rights reserved.</p>
         </div>
       </div>
     </footer>
-
-    <script>
-      function toggleLanguage() {
-        window.location.href = "/en/terms-of-service.html";
-      }
-    </script>
   </body>
 </html>

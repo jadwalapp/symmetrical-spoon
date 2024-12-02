@@ -3,143 +3,115 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>جدول | Jadwal: شروط الخدمة</title>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <title>شروط الاستخدام - جدول</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link
-      href="https://fonts.googleapis.com/css2?family=Lalezar&display=swap"
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
     />
-
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              primary: "#2ecc71",
-              secondary: "#27ae60",
-            },
-          },
-        },
-      };
-    </script>
     <style>
-      * {
-        font-family: "Lalezar", system-ui;
-      }
-      .blur-header {
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
+      body {
+        font-family: "IBM Plex Sans Arabic", sans-serif;
       }
     </style>
   </head>
-  <body class="bg-gray-900 text-white font-sans">
-    <header
-      class="bg-black bg-opacity-50 py-4 px-6 sticky top-0 z-50 blur-header"
-    >
-      <nav class="container mx-auto flex justify-between items-center">
-        <div class="text-2xl text-primary">جدول | Jadwal</div>
-        <div class="flex gap-4">
+  <body class="bg-white">
+    <nav class="fixed w-full bg-white/80 backdrop-blur-md z-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16 items-center">
+          <div class="flex items-center">
+            <a href="/" class="text-xl font-semibold">جدول</a>
+          </div>
           <a
-            href="/index.html"
-            class="hover:text-primary transition duration-300"
-            >الرئيسية</a
+            href="/en/terms-of-service.html"
+            class="text-gray-600 hover:text-gray-900"
+            >English</a
           >
-          <button
-            onclick="toggleLanguage()"
-            class="hover:text-primary transition duration-300"
-          >
-            English
-          </button>
         </div>
-      </nav>
-    </header>
+      </div>
+    </nav>
 
-    <main class="container mx-auto px-6 py-12">
-      <h1 class="text-4xl text-primary mb-8">شروط الخدمة</h1>
+    <main class="max-w-3xl mx-auto px-4 pt-32 pb-20">
+      <h1 class="text-4xl font-bold mb-8">شروط الاستخدام</h1>
 
-      <section class="mb-8">
-        <h2 class="text-2xl text-primary mb-4">1. قبول الشروط</h2>
-        <p>
-          باستخدام تطبيق جدول، فإنك توافق على الالتزام بهذه الشروط. إذا كنت لا
-          توافق على هذه الشروط، يرجى عدم استخدام التطبيق.
-        </p>
-      </section>
+      <div class="space-y-6 text-gray-600">
+        <p>آخر تحديث: ٢ ديسمبر ٢٠٢٤</p>
 
-      <section class="mb-8">
-        <h2 class="text-2xl text-primary mb-4">2. وصف الخدمة</h2>
-        <p>
-          جدول هو تطبيق إدارة تقويم يعمل على نظام iOS ويدمج تقويمات متعددة
-          ويستخرج الأحداث من رسائل واتساب ويوفر ميزات جدولة ذكية.
-        </p>
-      </section>
+        <section class="space-y-4">
+          <h2 class="text-2xl font-semibold text-gray-900">١. قبول الشروط</h2>
+          <p>
+            باستخدامك لجدول، فإنك توافق على الالتزام بشروط الاستخدام هذه وسياسة
+            الخصوصية الخاصة بنا.
+          </p>
+        </section>
 
-      <section class="mb-8">
-        <h2 class="text-2xl text-primary mb-4">3. حسابات المستخدمين</h2>
-        <p>
-          أنت مسؤول عن الحفاظ على سرية بيانات اعتماد حسابك وعن جميع الأنشطة التي
-          تحدث تحت حسابك.
-        </p>
-      </section>
+        <section class="space-y-4">
+          <h2 class="text-2xl font-semibold text-gray-900">٢. وصف الخدمة</h2>
+          <p>يوفر جدول:</p>
+          <ul class="list-disc pr-6 space-y-2">
+            <li>خدمات إدارة التقويم</li>
+            <li>استخراج المواعيد من رسائل واتساب</li>
+            <li>جدولة مواقيت الصلاة</li>
+            <li>ميزات حل التعارضات</li>
+          </ul>
+        </section>
 
-      <section class="mb-8">
-        <h2 class="text-2xl text-primary mb-4">4. محتوى المستخدم</h2>
-        <p>
-          أنت تحتفظ بجميع حقوق المحتوى الذي تقدمه من خلال تطبيق جدول. باستخدام
-          التطبيق، فإنك تمنحنا ترخيصًا لاستخدام هذا المحتوى وتخزينه ومعالجته
-          لتوفير خدماتنا وتحسينها.
-        </p>
-      </section>
+        <section class="space-y-4">
+          <h2 class="text-2xl font-semibold text-gray-900">
+            ٣. حسابات المستخدمين
+          </h2>
+          <p>أنت مسؤول عن:</p>
+          <ul class="list-disc pr-6 space-y-2">
+            <li>الحفاظ على سرية حسابك</li>
+            <li>جميع الأنشطة التي تتم تحت حسابك</li>
+            <li>إخطارنا بأي استخدام غير مصرح به</li>
+          </ul>
+        </section>
 
-      <section class="mb-8">
-        <h2 class="text-2xl text-primary mb-4">5. الملكية الفكرية</h2>
-        <p>
-          تطبيق جدول ومحتواه الأصلي وميزاته ووظائفه مملوكة لشركة جدول ومحمية
-          بموجب قوانين حقوق النشر والعلامات التجارية وبراءات الاختراع والأسرار
-          التجارية وغيرها من قوانين الملكية الفكرية.
-        </p>
-      </section>
+        <section class="space-y-4">
+          <h2 class="text-2xl font-semibold text-gray-900">
+            ٤. استخدام البيانات
+          </h2>
+          <p>باستخدامك لجدول، فإنك تمنحنا الإذن بـ:</p>
+          <ul class="list-disc pr-6 space-y-2">
+            <li>معالجة بيانات التقويم الخاص بك</li>
+            <li>الوصول إلى رسائل واتساب وتحليلها</li>
+            <li>استخدام موقعك لمواقيت الصلاة</li>
+            <li>تخزين البيانات اللازمة لوظائف الخدمة</li>
+          </ul>
+        </section>
 
-      <section class="mb-8">
-        <h2 class="text-2xl text-primary mb-4">6. التغييرات على الشروط</h2>
-        <p>
-          نحتفظ بالحق في تعديل أو استبدال هذه الشروط في أي وقت. سنوفر إشعارًا
-          بأي تغييرات كبيرة عن طريق نشر الشروط الجديدة على هذه الصفحة.
-        </p>
-      </section>
+        <section class="space-y-4">
+          <h2 class="text-2xl font-semibold text-gray-900">
+            ٥. تعديلات الخدمة
+          </h2>
+          <p>نحتفظ بالحق في:</p>
+          <ul class="list-disc pr-6 space-y-2">
+            <li>تعديل أو إيقاف الخدمات</li>
+            <li>تحديث هذه الشروط</li>
+            <li>تغيير الأسعار مع إشعار</li>
+          </ul>
+        </section>
 
-      <section>
-        <h2 class="text-2xl text-primary mb-4">7. اتصل بنا</h2>
-        <p>
-          إذا كانت لديك أي أسئلة حول هذه الشروط، يرجى الاتصال بنا على:
-          legal@jadwal.app
-        </p>
-      </section>
+        <section class="space-y-4">
+          <h2 class="text-2xl font-semibold text-gray-900">٦. إنهاء الخدمة</h2>
+          <p>قد نقوم بإنهاء أو تعليق حسابك إذا قمت بانتهاك هذه الشروط.</p>
+        </section>
+
+        <section class="space-y-4">
+          <h2 class="text-2xl font-semibold text-gray-900">٧. اتصل بنا</h2>
+          <p>لأي أسئلة حول هذه الشروط، يرجى الاتصال بنا على:</p>
+          <p>البريد الإلكتروني: legal@jadwal.app</p>
+        </section>
+      </div>
     </main>
 
-    <footer class="bg-black py-8">
-      <div class="container mx-auto px-6">
-        <div class="flex flex-col md:flex-row justify-between items-center">
-          <div class="mb-4 md:mb-0">
-            <p>جميع الحقوق محفوظة &copy; 2024 جدول.</p>
-          </div>
-          <div class="flex space-x-4">
-            <a
-              href="/privacy-policy.html"
-              class="text-gray-400 hover:text-primary transition duration-300"
-              >سياسة الخصوصية</a
-            >
-          </div>
+    <footer class="bg-white py-12">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center text-gray-600">
+          <p>© ٢٠٢٤ جدول. جميع الحقوق محفوظة.</p>
         </div>
       </div>
     </footer>
-
-    <script>
-      function toggleLanguage() {
-        window.location.href = "/en/terms-of-service.html";
-      }
-    </script>
   </body>
 </html>
