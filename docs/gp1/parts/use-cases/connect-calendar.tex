@@ -17,11 +17,11 @@
   \ucmainflow{
     \begin{enumerate}
       \item The user clicks the ``Connect Calendar'' option in the app.
-        \ucinfo{The app asks the user to enter their CalDAV credentials along with a user provided name.}
+            \ucinfo{The app asks the user to enter their CalDAV credentials along with a user provided name.}
       \item The system talks to the external calendar system via the credentials provided by the user.
-        \ucinfo{The system adds the received calendar data to the database and a connection success status is shown to the user.}
+            \ucinfo{The system adds the received calendar data to the database and a connection success status is shown to the user.}
       \item The system saves the CalDAV credentials securely in the database.
-        \ucinfo{The credentials are encrypted before storing them.}
+            \ucinfo{The credentials are encrypted before storing them.}
     \end{enumerate}
   }
   \ucalternateflows{
@@ -46,3 +46,9 @@
   \caption{Connect Calendar Sequence Diagram}
   \label{fig:seq/connect-calendar}
 \end{figure}
+
+The "Connect Calendar Sequence Diagram", shown in \textbf{Figure~\ref{fig:seq/connect-calendar}}, illustrates the process of connecting an external calendar using CalDAV integration. The sequence begins when the user initiates a calendar connection request through the ConnectCalDAVCalendar gRPC call.
+
+The Backend first authenticates the provided CalDAV credentials with the external calendar service. Upon successful authentication, the Backend securely stores the calendar connection details in the Database, ensuring encrypted storage of sensitive credentials. The Backend then initiates calendar data synchronization, retrieving calendar events and metadata from the CalDAV server.
+
+The synchronized calendar data is stored in the Database, establishing a persistent connection between Jadwal and the user's external calendar. Throughout this process, all communication between system components uses gRPC, enabling efficient and type-safe data transfer. The sequence concludes with the Backend sending a ConnectCalDAVCalendar response to the user, confirming successful calendar integration. This workflow ensures secure and reliable calendar connectivity while maintaining data consistency across the system.

@@ -19,9 +19,9 @@
   \ucmainflow{
     \begin{enumerate}
       \item The user clicks the ``Create Calendar'' button in the app.
-        \ucinfo{The app asks the user to enter the calendar name and choose a calendar color.}
+            \ucinfo{The app asks the user to enter the calendar name and choose a calendar color.}
       \item The user submits the form for calendar information.
-        \ucinfo{The system creates a calendar for the user in the system.}
+            \ucinfo{The system creates a calendar for the user in the system.}
     \end{enumerate}
   }
   \ucalternateflows{
@@ -44,3 +44,9 @@
   \caption{Create Calendar Sequence Diagram}
   \label{fig:seq/create-calendar}
 \end{figure}
+
+The "Create Calendar Sequence Diagram", shown in \textbf{Figure~\ref{fig:seq/create-calendar}}, illustrates the straightforward process of creating a new calendar within Jadwal. The sequence begins when the user initiates a CreateCalendarRequest gRPC call to the Backend, providing essential calendar details such as name and color preferences.
+
+The Backend processes this request by executing a StoreCalendarInfo operation with the Database, which creates a new calendar record associated with the user's account. Upon successful storage, the Database confirms the creation with a CalendarCreated response. The Backend then sends a CalendarResponse back to the user through the gRPC channel, completing the calendar creation process.
+
+This streamlined sequence ensures efficient calendar creation while maintaining data consistency. The process is designed to be quick and reliable, with proper error handling for network issues or database failures, allowing users to organize their schedules effectively within the Jadwal ecosystem.

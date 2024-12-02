@@ -1,43 +1,43 @@
 \begin{usecase}{Receive Event Notifications}
-    \ucbasicinfo{High}{Regular}
-    \ucshortdescription{Users receive notifications about upcoming events.}
-    \uctrigger{The UC is triggered when the choosen time of an event's reminder has arrived}
-    \ucactors{User}{None}
-    \ucpreconditions{User must be logged into the system and set a reminder of the specific event.}
-    \ucrelationships{N/A}{N/A}{N/A}
-    \ucinputsoutputs{
-      \begin{itemize}
-        \item \textbf{Time of the event reminder} (Source: User)
-      \end{itemize}
-    }{
-      \begin{itemize}
-        
-        \item \textbf{Notifications sent to users.} (Destination: System)
-      \end{itemize}
-    }
-    \ucmainflow{
-      \begin{enumerate}
-          \item The system checks the alarms set for every event.
-        \ucinfo{The system checks every 1 minute for set alarms for every event.}      
-        \item Notifications sent to users.
-        \ucinfo{The user is reminded about the event by sending the notification}
-      \end{enumerate}
-    }
-    \ucalternateflows{
-      \begin{itemize}
-        \item \textbf{If user denys the access to the notification the notifications are not sent.} 
-      \end{itemize}  
-    }
-    \ucexceptions{
-      \begin{itemize}
-        \item \textbf{Netwok issue} 
-      \end{itemize}
-    }
-    \ucconclusion{The system checks for set alarm every 1 minute and if the event is detected the system sends the notification.}
-    \ucpostconditions{Notifications are sent.}
-    \ucspecialrequirements{Notification permission.}
-    \ucbusinessrules{The system has to check every minute for the set alarm.
-    }
+  \ucbasicinfo{High}{Regular}
+  \ucshortdescription{Users receive notifications about upcoming events.}
+  \uctrigger{The UC is triggered when the choosen time of an event's reminder has arrived}
+  \ucactors{User}{None}
+  \ucpreconditions{User must be logged into the system and set a reminder of the specific event.}
+  \ucrelationships{N/A}{N/A}{N/A}
+  \ucinputsoutputs{
+    \begin{itemize}
+      \item \textbf{Time of the event reminder} (Source: User)
+    \end{itemize}
+  }{
+    \begin{itemize}
+
+      \item \textbf{Notifications sent to users.} (Destination: System)
+    \end{itemize}
+  }
+  \ucmainflow{
+    \begin{enumerate}
+      \item The system checks the alarms set for every event.
+            \ucinfo{The system checks every 1 minute for set alarms for every event.}
+      \item Notifications sent to users.
+            \ucinfo{The user is reminded about the event by sending the notification}
+    \end{enumerate}
+  }
+  \ucalternateflows{
+    \begin{itemize}
+      \item \textbf{If user denys the access to the notification the notifications are not sent.}
+    \end{itemize}
+  }
+  \ucexceptions{
+    \begin{itemize}
+      \item \textbf{Netwok issue}
+    \end{itemize}
+  }
+  \ucconclusion{The system checks for set alarm every 1 minute and if the event is detected the system sends the notification.}
+  \ucpostconditions{Notifications are sent.}
+  \ucspecialrequirements{Notification permission.}
+  \ucbusinessrules{The system has to check every minute for the set alarm.
+  }
 \end{usecase}
 
 \begin{figure}[!h]
@@ -46,3 +46,19 @@
   \caption{Receive Event Notifications Sequence Diagram}
   \label{fig:seq/receive-event-notifications}
 \end{figure}
+
+The "Receive Event Notifications Sequence Diagram", shown in \textbf{Figure~\ref{fig:seq/receive-event-notifications}}, illustrates Jadwal's continuous event notification monitoring and delivery system. The sequence operates in a continuous polling loop that executes every minute, ensuring timely notification delivery for all scheduled events.
+
+The polling process consists of several key steps:
+\begin{enumerate}
+  \item The System queries the Database for active alarms through regular checks
+  \item For each batch of active alarms found:
+        \begin{itemize}
+          \item Retrieves associated device IDs for notification targets
+          \item Iterates through each event requiring notification
+          \item Dispatches push notifications via Apple Push Notification service (APNs)
+        \end{itemize}
+  \item If no active alarms are found, the system continues its polling cycle
+\end{enumerate}
+
+This robust notification system ensures reliable delivery of event reminders while efficiently managing system resources. The one-minute polling interval provides a balance between timely notifications and system performance, while the batch processing of notifications optimizes the interaction with APNs. The system's ability to handle multiple device IDs per user ensures notifications reach users across all their registered devices.
