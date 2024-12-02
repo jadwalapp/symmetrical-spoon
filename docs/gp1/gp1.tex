@@ -676,88 +676,105 @@ Prayer time scheduling is a unique feature of Jadwal, and timely notifications e
 
 \section{Database Design}
 
-The foundation of Jadwal's robust functionality lies in its carefully structured database architecture. This section presents the entity-relationship model and schema design that support the application's core features, from user authentication to calendar integration and event management. The database design ensures efficient data organization while maintaining the flexibility needed for future scalability.
+The foundation of Jadwal's robust functionality lies in its carefully structured relational database architecture. This section presents both the Entity-Relationship model and Relational Schema that support the application's core features, from user authentication to calendar integration and event management. The database design ensures efficient data organization while maintaining the flexibility needed for future scalability.
 
-\subsection{ER Diagram}
+\subsection{Entity-Relationship Model}
 
-The Entity-Relationship diagram in \textbf{Figure~\ref{fig:er-diagram}} illustrates Jadwal's database schema, which implements a calendar system following the iCalendar (RFC 5545) specification. The schema is organized around the \texttt{customer} entity and consists of authentication, calendar management, and event management components.
+The Entity-Relationship model, illustrated in \textbf{Figure~\ref{fig:er-diagram}}, depicts the conceptual structure of Jadwal's database system. This model follows standard ER notation and demonstrates the relationships between the system's primary entities.
 
-\subsubsection{Core Entity}
-The \texttt{customer} table serves as the central entity with primary attributes:
-\begin{itemize}
-    \item \texttt{id} (UUID): Primary identifier
-    \item \texttt{name} (VARCHAR(100)): Customer's name
-    \item \texttt{email} (VARCHAR(320)): Customer's email address
-\end{itemize}
+\subsubsection{Core Entities and Relationships}
 
-\subsubsection{Authentication System}
-Two authentication mechanisms are supported through one-to-many relationships:
-\begin{itemize}
-    \item \texttt{auth\_google}: Stores Google OAuth credentials
-          \begin{itemize}
-              \item Links to \texttt{customer} via \texttt{customer\_id} (UUID)
-              \item Maintains \texttt{sub} field for Google's subject identifier
-          \end{itemize}
-    \item \texttt{magic\_link}: Manages email-based authentication
-          \begin{itemize}
-              \item Contains \texttt{token\_hash} (CHAR(44)) for secure authentication
-              \item Tracks token usage with \texttt{expires\_at} and \texttt{used\_at} timestamps
-          \end{itemize}
-\end{itemize}
-
-\subsubsection{Calendar Management Hierarchy}
-The calendar structure follows a three-tier hierarchy:
 \begin{enumerate}
-    \item \texttt{calendar\_accounts}
+    \item \textbf{User Management}
           \begin{itemize}
-              \item Links to \texttt{customer} via \texttt{customer\_id} (UUID)
-              \item Supports multiple calendar providers through the \texttt{provider} field
+              \item \texttt{customer}: Central entity with attributes \texttt{id} (UUID), \texttt{name}, and \texttt{email}
+              \item \texttt{auth\_google}: Represents Google OAuth authentication
+              \item \texttt{magic\_link}: Manages email-based authentication tokens
           \end{itemize}
 
-    \item \texttt{vcalendar}
+    \item \textbf{Calendar Organization}
           \begin{itemize}
-              \item Identified by \texttt{uid} (VARCHAR)
-              \item Links to \texttt{calendar\_accounts} via \texttt{account\_id} (UUID)
-              \item Stores calendar metadata including \texttt{display\_name}, \texttt{description}, \texttt{color}, and \texttt{timezone}
+              \item \texttt{calendar\_accounts}: Links customers to calendar providers
+              \item \texttt{vcalendar}: Represents individual calendars with metadata
+              \item One-to-many relationship from accounts to calendars
           \end{itemize}
 
-    \item \texttt{vevent}
+    \item \textbf{Event Management}
           \begin{itemize}
-              \item Identified by \texttt{uid} (VARCHAR)
-              \item Links to \texttt{vcalendar} via \texttt{calendar\_uid} (VARCHAR)
-              \item Manages event details including timing (\texttt{dtstart}, \texttt{dtend}, \texttt{duration})
-              \item Handles recurring events through \texttt{rrule}, \texttt{rdate}, and \texttt{exdate} fields
+              \item \texttt{vevent}: Core event entity with timing and details
+              \item \texttt{vevent\_exception}: Handles recurring event modifications
+              \item \texttt{valarm}: Manages event notifications
           \end{itemize}
 \end{enumerate}
 
-\subsubsection{Event-Related Entities}
-Each \texttt{vevent} can have associated records in:
-\begin{itemize}
-    \item \texttt{vevent\_exception}
-          \begin{itemize}
-              \item Manages modifications to recurring event instances
-              \item Identifies specific instances via \texttt{recurrence\_id} (TIMESTAMPTZ)
-              \item Allows overriding of event properties for specific occurrences
-          \end{itemize}
+\subsubsection{Key Relationships}
 
-    \item \texttt{valarm}
-          \begin{itemize}
-              \item Configures event notifications and reminders
-              \item Specifies notification details through \texttt{action}, \texttt{trigger}, and \texttt{description}
-              \item Supports repeated notifications via \texttt{duration} and \texttt{repeat} fields
-          \end{itemize}
+\begin{itemize}
+    \item Customer "has" authentication methods (one-to-many)
+    \item Customer "owns" calendar accounts (one-to-many)
+    \item Calendar accounts "contain" calendars (one-to-many)
+    \item Calendars "schedule" events (one-to-many)
+    \item Events "have" exceptions and alarms (one-to-many)
 \end{itemize}
 
-All entities in the schema include audit fields (\texttt{created\_at} and \texttt{updated\_at}) for tracking record modifications. The schema design ensures referential integrity through foreign key constraints while maintaining flexibility for different authentication methods and calendar providers.
+\subsection{Relational Schema}
+
+The relational schema, shown in \textbf{Figure~\ref{fig:relational-schema}}, provides the detailed logical structure of the database implementation. This representation demonstrates the actual table structures, attributes, and relationships as implemented in the database system.
+
+\subsubsection{Table Structures}
+
+\begin{enumerate}
+    \item \textbf{Authentication Tables}
+          \begin{itemize}
+              \item \texttt{customer} (\underline{id}, name, email, created\_at, updated\_at)
+              \item \texttt{auth\_google} (\underline{id}, customer\_id, sub, created\_at, updated\_at)
+              \item \texttt{magic\_link} (\underline{id}, customer\_id, token\_hash, expires\_at, used\_at, created\_at, updated\_at)
+          \end{itemize}
+
+    \item \textbf{Calendar Tables}
+          \begin{itemize}
+              \item \texttt{calendar\_accounts} (\underline{id}, customer\_id, provider, created\_at, updated\_at)
+              \item \texttt{vcalendar} (\underline{uid}, account\_id, prodid, version, display\_name, description, color, timezone, created\_at, updated\_at)
+          \end{itemize}
+
+    \item \textbf{Event Tables}
+          \begin{itemize}
+              \item \texttt{vevent} (\underline{uid}, calendar\_uid, dtstamp, dtstart, dtend, duration, summary, location, status, classification, transp, rrule, rdate, exdate, sequence, created\_at, updated\_at)
+              \item \texttt{vevent\_exception} (\underline{id}, event\_uid, recurrence\_id, summary, description, location, dtstart, dtend, status, created\_at, updated\_at)
+              \item \texttt{valarm} (\underline{id}, event\_uid, action, trigger, description, summary, duration, repeat, attendees, created\_at, updated\_at)
+          \end{itemize}
+\end{enumerate}
+
+\subsubsection{Implementation Details}
+
+\begin{itemize}
+    \item \textbf{Primary Keys}: Underlined attributes represent primary keys
+    \item \textbf{Foreign Keys}: Attributes ending in "\_id" or "\_uid" represent foreign key relationships
+    \item \textbf{Audit Fields}: All tables include created\_at and updated\_at timestamps
+    \item \textbf{Data Types}:
+          \begin{itemize}
+              \item UUID for unique identifiers
+              \item VARCHAR for variable-length strings
+              \item TIMESTAMPTZ for timezone-aware timestamps
+              \item JSONB for complex data structures (rdate, exdate, attendees)
+          \end{itemize}
+\end{itemize}
 
 \begin{figure}[!h]
     \centering
     \includegraphics[width=0.9\textwidth]{images/docs/diagrams/er/database/Database Design.png}
-    \caption{ER Diagram}
+    \caption{Entity-Relationship Diagram}
     \label{fig:er-diagram}
 \end{figure}
 
-\subsection{Database Schema Design}
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=\textwidth]{images/database-schema.png}
+    \caption{Relational Schema}
+    \label{fig:relational-schema}
+\end{figure}
+
+% ==========
 
 \include{parts/ui-prototype}
 
