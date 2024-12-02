@@ -63,4 +63,22 @@
   \label{fig:seq/extract-events-whatsapp}
 \end{figure}
 
-The sequence diagram in Figure \ref{fig:seq/extract-events-whatsapp} illustrates the event extraction flow from WhatsApp. The process begins when the WhatsApp service receives a new message. It collects the last 15 messages for context and sends them to our backend. The backend then forwards this context to our LLM service, which uses a specialized prompt, engineered specifically for this use case, to extract event information. The prompt is designed to understand natural conversation flow and identify potential events even when they're discussed informally. When an event is detected, the LLM returns a structured JSON response containing all relevant event details. This information is then stored in the database, and the user is notified through Apple's Push Notification service (APNs).
+The "Extract Events from WhatsApp Sequence Diagram", shown in \textbf{Figure~\ref{fig:seq/extract-events-whatsapp}}, illustrates the automated event extraction process from WhatsApp conversations. The system operates in a continuous monitoring loop where the WhatsApp Service (implemented using whatsapp-web.js) listens for incoming messages. Upon receiving a message, the service implements a 30-second delay to gather conversation context, collecting the last 15 messages from the chat history to ensure comprehensive event detection.
+
+The gathered context is then forwarded to the Backend, which interfaces with the LLM Service using a specialized prompt engineered for event detection. This prompt is specifically designed to:
+\begin{itemize}
+  \item Identify potential events within informal conversations
+  \item Extract crucial details including date, time, and location
+  \item Process various date and time formats
+  \item Generate structured JSON output for system processing
+\end{itemize}
+
+When the LLM Service detects an event, it returns a structured JSON response to the Backend. The Backend then:
+\begin{enumerate}
+  \item Validates the extracted event information for accuracy
+  \item Stores the validated event in the Database
+  \item Retrieves the relevant Device IDs for the event owner
+  \item Triggers a push notification through Apple's Push Notification service (APNs)
+\end{enumerate}
+
+If no event is detected in the analyzed context, the system silently continues its monitoring loop without user notification. This automated workflow ensures efficient event capture from natural conversations while maintaining user awareness through targeted notifications. The system's ability to understand context and process informal language patterns makes it particularly effective for extracting event details from casual WhatsApp conversations.
