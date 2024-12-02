@@ -135,52 +135,79 @@
 
     This chapter provides a comprehensive list of technical terms, abbreviations, and specialized vocabulary used throughout this document. Understanding these terms is crucial for comprehending the technical aspects of Jadwal's architecture, functionality, and implementation. The following table defines each term in clear, accessible language.
 
-    \begin{center}
-        \begin{longtable}{p{0.2\textwidth}p{0.7\textwidth}}
-            \toprule
-            \textbf{Term}             & \textbf{Definition}                                                                                                                                                          \\
-            \midrule
-            \endhead
+    \begin{tabbing}
+        \hspace{1.5in} \= \kill
+        Term \> Definition \\[0.5em]
 
-            \textbf{Calendar}         & A list of events and dates within a year that are important to an organization or to the people involved in a particular activity. \cite{def:calendar}                       \\[1ex]
+        Calendar \> A list of events and dates within a year that are important to an \\
+        \> organization or to the people involved in a particular activity. \cite{def:calendar} \\[0.5em]
 
-            \textbf{Jadwal}           & Jadwal is a comprehensive time management tool designed to aggregate and optimize your existing calendars and data sources.                                                  \\[1ex]
+        Jadwal \> Jadwal is a comprehensive time management tool designed to \\
+        \> aggregate and optimize your existing calendars and data sources. \\[0.5em]
 
-            \textbf{WhatsApp}         & WhatsApp is an alternative to SMS and offers simple, secure, reliable messaging and calling, available on phones all over the world. \cite{whatsapp-about}                   \\[1ex]
+        WhatsApp \> WhatsApp is an alternative to SMS and offers simple, secure, \\
+        \> reliable messaging and calling, available on phones all over \\
+        \> the world. \cite{whatsapp-about} \\[0.5em]
 
-            \textbf{CalDAV}           & Calendaring Extensions to WebDAV                                                                                                                                             \\[1ex]
+        CalDAV \> Calendaring Extensions to WebDAV \\[0.5em]
 
-            \textbf{WebDAV}           & Web Distributed Authoring and Versioning (WebDAV) consists of a set
-            of methods, headers, and content-types ancillary to HTTP/1.1 for the
-            management of resource properties, creation and management of
-            resource collections, URL namespace manipulation, and resource
-            locking (collision avoidance). \cite{def:WebDAV}                                                                                                                                                         \\[1ex]
+        WebDAV \> Web Distributed Authoring and Versioning (WebDAV) consists of \\
+        \> a set of methods, headers, and content-types ancillary to HTTP/1.1 \\
+        \> for the management of resource properties, creation and management \\
+        \> of resource collections, URL namespace manipulation, and resource \\
+        \> locking (collision avoidance). \cite{def:WebDAV} \\[0.5em]
 
-            \textbf{Golang}           & Go is an open source project developed by a team at Google and many contributors from the open source community. \cite{def:Golang}                                           \\[1ex]
+        Golang \> Go is an open source project developed by a team at Google and \\
+        \> many contributors from the open source community. \cite{def:Golang} \\[0.5em]
 
-            \textbf{JWT}              & JSON Web Tokens are an open, industry standard RFC 7519 method for representing claims securely between two parties. \cite{def:JWT}                                          \\[1ex]
+        JWT \> JSON Web Tokens are an open, industry standard RFC 7519 method \\
+        \> for representing claims securely between two parties. \cite{def:JWT} \\[0.5em]
 
-            \textbf{HTTPS}            & HyperText Transfer Protocol Secure                                                                                                                                           \\[1ex]
+        gRPC \> A high-performance, open-source universal RPC framework that \\
+        \> enables efficient communication between services. \cite{def:grpc} \\[0.5em]
 
-            \textbf{iOS}              & iPhone Operating System                                                                                                                                                      \\[1ex]
+        Protocol Buffers \> A language-neutral, platform-neutral extensible mechanism for \\
+        \> serializing structured data. \cite{def:protobuf} \\[0.5em]
 
-            \textbf{N/A}              & Not Applicable                                                                                                                                                               \\[1ex]
+        RabbitMQ \> An open-source message broker that enables asynchronous \\
+        \> communication between services. \cite{def:rabbitmq} \\[0.5em]
 
-            \textbf{UC}               & Use Case                                                                                                                                                                     \\[1ex]
+        PostgreSQL \> A powerful, open-source object-relational database system \\
+        \> used for storing application data. \cite{def:postgresql} \\[0.5em]
 
-            \textbf{ER diagram}       & Entity Relationship (ER) Diagram is a type of flowchart that illustrates how entities (people, objects, concepts, or data) relate to each other within a system or database. \\[1ex]
+        SwiftUI \> Apple's declarative framework for building user interfaces \\
+        \> across all Apple platforms. \cite{def:swiftui} \\[0.5em]
 
-            \textbf{Sequence Diagram} & An interaction diagram that details how operations are carried out.                                                                                                          \\[1ex]
+        WhatsApp Web.js \> A WhatsApp client library that enables programmatic \\
+        \> interaction with WhatsApp Web. \cite{def:whatsappwebjs} \\[0.5em]
 
-            \textbf{APIs}             & Application programming interface.                                                                                                                                           \\[1ex]
+        Node.js \> A JavaScript runtime built on Chrome's V8 JavaScript engine. \\
+        \> \cite{def:nodejs} \\[0.5em]
 
-            \textbf{APNs}             & Apple Push Notification service                                                                                                                                              \\
+        HTTP/2 \> The second major version of the HTTP protocol, offering \\
+        \> improved performance and features. \cite{def:http2} \\[0.5em]
 
-            \textbf{Magic Link}       & A link sent via email that allows for password-less sign in.                                                                                                                 \\
+        HTTPS \> HyperText Transfer Protocol Secure \\[0.5em]
 
-            \bottomrule
-        \end{longtable}
-    \end{center}
+        iOS \> iPhone Operating System \\[0.5em]
+
+        N/A \> Not Applicable \\[0.5em]
+
+        UC \> Use Case \\[0.5em]
+
+        ER diagram \> Entity Relationship (ER) Diagram is a type of flowchart that \\
+        \> illustrates how entities (people, objects, concepts, or data) \\
+        \> relate to each other within a system or database. \\[0.5em]
+
+        Sequence Dia- \> An interaction diagram that details how operations are \\
+        gram \> carried out. \\[0.5em]
+
+        APIs \> Application programming interface. \\[0.5em]
+
+        APNs \> Apple Push Notification service \\[0.5em]
+
+        Magic Link \> A link sent via email that allows for password-less sign in.
+    \end{tabbing}
 
 \end{singlespace}
 
@@ -621,6 +648,64 @@ Jadwal implements a secure logout mechanism by removing the authentication token
 
 As part of our commitment to security and privacy, Jadwal will be released as open-source software. This transparency allows security experts and users to verify our security implementations and privacy practices. Users can inspect exactly how their data is handled and verify that our privacy commitments are upheld through code review.
 
+
+\section{System Architecture}
+
+Jadwal implements a modern, distributed architecture leveraging gRPC (Google Remote Procedure Call) for efficient communication between its components. The system is divided into several key services, each responsible for specific functionality while maintaining high performance and reliability.
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=\textwidth]{images/architecture.png}
+    \caption{Jadwal System Architecture}
+    \label{fig:architecture}
+\end{figure}
+
+The architecture, shown in \textbf{Figure~\ref{fig:architecture}}, consists of the following main components:
+
+\begin{enumerate}
+    \item \textbf{Frontend (Mishkat)}
+          \begin{itemize}
+              \item iOS SwiftUI application implementing the client-side gRPC communication
+              \item Handles user interface and local state management
+          \end{itemize}
+
+    \item \textbf{Backend (Falak)}
+          \begin{itemize}
+              \item Core gRPC server implementing the primary business logic
+              \item Auth Service managing user authentication and session management
+              \item Calendar Service handling calendar operations and integration
+              \item CalDAV Client enabling connection to external calendar services
+              \item Event Consumer processing WhatsApp events from the message queue
+          \end{itemize}
+
+    \item \textbf{WhatsApp Service}
+          \begin{itemize}
+              \item Node.js gRPC server managing WhatsApp communication
+              \item WhatsApp Web.js client for message monitoring
+              \item Event Producer publishing detected events to the message queue
+          \end{itemize}
+
+    \item \textbf{Message Queue}
+          \begin{itemize}
+              \item RabbitMQ handling asynchronous event processing
+              \item Ensures reliable delivery of WhatsApp events to the backend
+          \end{itemize}
+
+    \item \textbf{Database}
+          \begin{itemize}
+              \item PostgreSQL storing user data, calendar information, and events
+              \item Maintains data consistency across all services
+          \end{itemize}
+\end{enumerate}
+
+This architecture enables several key benefits:
+
+\begin{itemize}
+    \item \textbf{Performance}: gRPC's use of Protocol Buffers and HTTP/2 ensures efficient communication between services
+    \item \textbf{Scalability}: Separate services can be scaled independently based on load
+    \item \textbf{Reliability}: Message queue ensures no events are lost during processing
+    \item \textbf{Maintainability}: Clear separation of concerns makes the system easier to maintain and update
+\end{itemize}
 
 \section{System Use Cases}
 The functionality of Jadwal can be best understood through its various use cases, which demonstrate how users interact with the system. Each use case details specific interactions and flows that make up the core functionality of Jadwal. The diagram in Figure~\ref{fig:use-case-diagram} provides an overview of all use cases and their relationships.
