@@ -13,6 +13,7 @@
 \usepackage{usecase}
 \usepackage{longtable}
 \usepackage{ragged2e}
+\usepackage{emptypage}
 
 \definecolor{lightgrey}{RGB}{120,120,120}
 
@@ -87,6 +88,8 @@
     \end{titlepage}
 \end{singlespace}
 
+\cleardoublepage
+
 \begin{singlespace}
 
     \chapter*{Abstract}
@@ -111,6 +114,8 @@
         \end{center}
     \end{justify}
 
+    \cleardoublepage
+
     \chapter*{Acknowledgment}
     \addcontentsline{toc}{chapter}{Acknowledgment}
 
@@ -122,13 +127,19 @@
         Lastly, we would like to thank our parents for their unwavering support and for preparing us mentally and physically throughout this journey.
     \end{justify}
 
-    \newpage
+    \cleardoublepage
 
     \tableofcontents
 
+    \cleardoublepage
+
     \listoffigures
 
+    \cleardoublepage
+
     \listoftables
+
+    \cleardoublepage
 
     \chapter*{List of Abbreviations and Terminology}
     \addcontentsline{toc}{chapter}{List of Abbreviations and Terminology}
@@ -139,8 +150,9 @@
         \hspace{1.5in} \= \kill
         Term \> Definition \\[0.5em]
 
-        Calendar \> A list of events and dates within a year that are important to an \\
-        \> organization or to the people involved in a particular activity. \cite{def:calendar} \\[0.5em]
+        Calendar \> A list of events and dates within a year that are \\
+        \> important to an organization or to the people involved in \\
+        \> a particular activity. \cite{def:calendar} \\[0.5em]
 
         Jadwal \> Jadwal is a comprehensive time management tool designed to \\
         \> aggregate and optimize your existing calendars and data sources. \\[0.5em]
@@ -210,6 +222,8 @@
     \end{tabbing}
 
 \end{singlespace}
+
+\cleardoublepage
 
 % Main body (switch to Arabic numerals)
 \pagenumbering{arabic}
@@ -309,6 +323,8 @@ Discussion on informal communication channels like WhatsApp has impacted the pla
 This impact often leads to missed appointments and scheduling conflicts, especially for someone who is busy.
 
 Jadwal aims to solve this issue by providing a seamless and automated solution for integrating informal communication with the application so that no one misses an event or have conflicts.
+
+\cleardoublepage
 
 \chapter{Literature Review}
 
@@ -572,6 +588,8 @@ Second, our analysis shows that while many applications offer conflict resolutio
 Finally, the review demonstrates that current solutions often operate in isolation, whereas Jadwal's approach of unifying multiple calendars while maintaining intelligent event extraction and conflict resolution presents a more holistic solution to modern scheduling challenges.
 
 These findings validate Jadwal's approach and highlight its potential to address significant unmet needs in the calendar management space, particularly in combining automation, religious considerations, and comprehensive calendar integration.
+
+\cleardoublepage
 
 \chapter{System Analysis and Design}
 
@@ -866,6 +884,8 @@ The relational database schema, shown in \textbf{Figure~\ref{fig:relational-sche
 \include{parts/ui-prototype-and-conlusion}
 
 % ==========
+
+\cleardoublepage
 
 \chapter*{Conclusion}
 \addcontentsline{toc}{chapter}{Conclusion}
