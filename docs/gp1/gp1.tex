@@ -602,7 +602,7 @@ The following requirements outline the core features and capabilities that Jadwa
     \item The system shall add the WhatsApp extracted events to the calendar. If a conflict occurs, the user shall get a notification to resolve the conflict with suggestions.
 \end{itemize}
 
-Each functional requirment listed above will be explained through a use case description in the coming sections.
+Each functional requirement listed above will be explained in details through a use case description in the coming sections.
 
 \newpage
 
@@ -655,7 +655,7 @@ Jadwal implements a modern, distributed architecture leveraging gRPC (Google Rem
 
 \begin{figure}[!h]
     \centering
-    \includegraphics[width=\textwidth]{images/architecture.png}
+    \includegraphics[width=0.6\textwidth]{images/architecture.png}
     \caption{Jadwal System Architecture}
     \label{fig:architecture}
 \end{figure}
@@ -723,35 +723,35 @@ The functionality of Jadwal can be best understood through its various use cases
 User authentication is the first interaction point with Jadwal. We support both email-based authentication through magic links and Google OAuth to provide secure and convenient access options. The following use cases detail the login flows and account management features.
 
 \input{parts/use-cases/continue-with-email}
-\include{parts/use-cases/continue-with-google}
-\include{parts/use-cases/send-welcome-email}
-\include{parts/use-cases/logout}
+\input{parts/use-cases/continue-with-google}
+\input{parts/use-cases/send-welcome-email}
+\input{parts/use-cases/logout}
 
 \subsection{Calendar Management}
 At its core, Jadwal helps users manage their calendars effectively. These use cases show how users can create new calendars, connect existing ones through CalDAV, and view all their calendars in one integrated interface.
 
 \input{parts/use-cases/connect-calendar}
-\include{parts/use-cases/create-calendar}
-\include{parts/use-cases/view-integrated-calendar}
+\input{parts/use-cases/create-calendar}
+\input{parts/use-cases/view-integrated-calendar}
 
 \subsection{WhatsApp Integration and Event Extraction}
 One of Jadwal's key features is its ability to automatically extract events from WhatsApp conversations. These use cases explain how users connect their WhatsApp account and how the system processes messages to identify and add events to their calendar.
 
 \input{parts/use-cases/connect-whatsapp}
-\include{parts/use-cases/extract-events-from-whatsapp}
+\input{parts/use-cases/extract-events-from-whatsapp}
 
 \subsection{Event Management and Conflict Resolution}
 Managing events and resolving scheduling conflicts are daily challenges for users. These use cases demonstrate how Jadwal handles event creation, conflict detection, and provides smart resolution options.
 
 \input{parts/use-cases/suggest-conflict-resolutions}
 \input{parts/use-cases/manage-scheduling-conflicts}
-\include{parts/use-cases/add-event-manually}
+\input{parts/use-cases/add-event-manually}
 
 \subsection{Prayer Time and Notification Management}
 Prayer time scheduling is a unique feature of Jadwal, and timely notifications ensure users never miss important events. These use cases detail how prayer times are scheduled and how the notification system keeps users informed.
 
 \input{parts/use-cases/schedule-prayer-times}
-\include{parts/use-cases/receive-event-notifications}
+\input{parts/use-cases/receive-event-notifications}
 
 % ==========
 
@@ -861,29 +861,29 @@ The relational database schema, shown in \textbf{Figure~\ref{fig:relational-sche
 
 % ==========
 
-\include{parts/ui-prototype}
+\include{parts/ui-prototype-and-conlusion}
 
-\section{Conclusion}
-
-Jadwal stands as a comprehensive and innovative solution for scheduling with great design. The use cases and database architecture are well described that helps in creating the application systematically. The use cases clearly define how users interact with the system, covering all the features like Continue with email, Resolve conflicts, WhatsApp integration, scheduling prayer time and many more. The database design is the backbone of Jadwal, which clearly shows how the system works and how the data is managed perfectly. In conclusion, Jadwal is well described which makes it easy to understand how everything is working and would be easy to track everything that is happening in the backend.
+% ==========
 
 \chapter*{Conclusion}
 \addcontentsline{toc}{chapter}{Conclusion}
 \markboth{Conclusion}{}
 
-In a fast paced and interconnected world everyone struggles to manage their time efficiently especially for someone who has multiple tasks every day. Jadwal addresses all these challenges by introducing features that helps to bridge all the gaps that other platforms are unable to offer. Jadwal ensures user friendly interface for the user to manage their schedule and avoid missing any event
+In a fast-paced and interconnected world, everyone struggles to manage their time efficiently, especially for someone who has multiple tasks every day. Jadwal addresses all these challenges by introducing features that help to bridge all the gaps that other platforms are unable to offer. Jadwal ensures a user-friendly interface for the user to manage their schedule and avoid missing any events.
 
-Jadwal integrates with CalDAV, a standardized protocol that facilitates seamless synchronization across various calendar platforms. This allows the users to effortlessly connect and manage their calendars from different devices and applications, such as Apple Calendar and Google Calendar, making everything in one ecosystem.
+Jadwal integrates with CalDAV, a standardized protocol that facilitates seamless synchronization across various calendar platforms. This allows users to effortlessly connect and manage their calendars from different devices and applications, such as Apple Calendar and Google Calendar, making everything in one ecosystem.
 
-Jadwal's feature state-of-the-art LLM WhatsApp event extraction enhances the application that extract events from WhatsApp which is informal communication channel and people most likely uses it for discussing events which creates a gap that could lead to missing or conflicting an event. Jadwal aims to solve this problem.
+Jadwal's state-of-the-art LLM WhatsApp event extraction feature enhances the application by extracting events from WhatsApp, which is an informal communication channel that people most likely use for discussing events. This creates a gap that could lead to missing or conflicting events, and Jadwal aims to solve this problem.
 
-The feature scheduling of prayer times highlights Jadwal as it is unique and Jadwal sees it important as it is a daily activity and clearing and holding place for this event would help the user to manage their day more efficiently.
+The feature of scheduling prayer times highlights Jadwal as unique, and Jadwal sees it as important since it is a daily activity. Clearing and holding a place for this event would help the user to manage their day more efficiently.
 
-The feature that makes Jadwal stand out is managing events effectively by offering features like suggesting conflict resolution and integrating other calendars. This would reduce the chances of the user missing any event.
+The feature that makes Jadwal stand out is managing events effectively by offering features like suggesting conflict resolution and integrating other calendars. This would reduce the chances of the user missing any events.
 
-Integration with CalDav allows Jadwal to connect all the calendars that the user has and bring it to one platform. Which helps a lot in managing the day. Why do we separate calendars to organize one day for one person.
+Integration with CalDAV allows Jadwal to connect all the calendars that the user has and bring them to one platform, which helps a lot in managing the day. Why do we separate calendars to organize one day for one person?
 
-In conclusion, Jadwal stands out from all the existing solutions and provides an innovative calendar application that bridges the gaps and helps the user to manage their day more efficiently.
+Throughout the project, a systematic approach was taken in developing Jadwal. The use cases clearly define how users interact with the system, covering all the features like Continue with Email, Resolve Conflicts, WhatsApp Integration, Scheduling Prayer Time, and many more. The database architecture and system design showcase the backbone of Jadwal, illustrating how the system works and how the data is managed perfectly. These technical aspects ensure that Jadwal is well-structured and easy to understand, making it simple to track everything happening in the backend.
+
+In conclusion, Jadwal stands out from all the existing solutions and provides an innovative calendar application that bridges the gaps and helps the user to manage their day more efficiently. With its comprehensive features, user-friendly interface, and robust technical foundation, Jadwal is poised to revolutionize the way individuals manage their time in today's fast-paced world.
 
 
 % Bibliography

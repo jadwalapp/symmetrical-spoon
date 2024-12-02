@@ -41,14 +41,7 @@
   \ucpostconditions{The system has access to the user's WhatsApp account.}
 \end{usecase}
 
-\begin{figure}[!h]
-  \centering
-  \includegraphics[width=\textwidth]{images/docs/diagrams/sequence-diagrams/all-sequence-diagrams/Connect WhatsApp.png}
-  \caption{Connect WhatsApp Sequence Diagram}
-  \label{fig:seq/connect-whatsapp}
-\end{figure}
-
-The "Connect WhatsApp Sequence Diagram", shown in \textbf{Figure~\ref{fig:seq/connect-whatsapp}}, illustrates the two-phase authentication process for connecting a user's WhatsApp account to Jadwal. The sequence begins with the InitiateWhatsApp gRPC call, where the user provides their phone number to the Backend.
+The ``Connect WhatsApp Sequence Diagram'', shown in \textbf{Figure~\ref{fig:seq/connect-whatsapp}}, illustrates the two-phase authentication process for connecting a user's WhatsApp account to Jadwal. The sequence begins with the InitiateWhatsApp gRPC call, where the user provides their phone number to the Backend.
 
 The Backend then communicates with the WhatsApp service to request a linking code. This interaction follows two possible paths:
 
@@ -65,5 +58,12 @@ The Backend then communicates with the WhatsApp service to request a linking cod
           \item The Backend immediately returns an InitiateWhatsApp failure response to the user
         \end{itemize}
 \end{itemize}
+
+\begin{figure}[!h]
+  \centering
+  \includegraphics[width=\textwidth]{images/docs/diagrams/sequence-diagrams/all-sequence-diagrams/Connect WhatsApp.png}
+  \caption{Connect WhatsApp Sequence Diagram}
+  \label{fig:seq/connect-whatsapp}
+\end{figure}
 
 During the completion phase, if the linking code validation fails, the Backend returns a CompleteWhatsApp failure response, requiring the user to restart the process. This secure two-phase authentication ensures that only legitimate WhatsApp account owners can connect their accounts to Jadwal while maintaining the integrity of the WhatsApp integration.

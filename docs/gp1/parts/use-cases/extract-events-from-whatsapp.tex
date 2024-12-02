@@ -56,14 +56,7 @@
   }
 \end{usecase}
 
-\begin{figure}[!h]
-  \centering
-  \includegraphics[width=\textwidth]{images/docs/diagrams/sequence-diagrams/all-sequence-diagrams/Extract Events from WhatsApp.png}
-  \caption{Extract Events from WhatsApp Sequence Diagram}
-  \label{fig:seq/extract-events-whatsapp}
-\end{figure}
-
-The "Extract Events from WhatsApp Sequence Diagram", shown in \textbf{Figure~\ref{fig:seq/extract-events-whatsapp}}, illustrates the automated event extraction process from WhatsApp conversations. The system operates in a continuous monitoring loop where the WhatsApp Service (implemented using whatsapp-web.js) listens for incoming messages. Upon receiving a message, the service implements a 30-second delay to gather conversation context, collecting the last 15 messages from the chat history to ensure comprehensive event detection.
+The ``Extract Events from WhatsApp Sequence Diagram'', shown in \textbf{Figure~\ref{fig:seq/extract-events-whatsapp}}, illustrates the automated event extraction process from WhatsApp conversations. The system operates in a continuous monitoring loop where the WhatsApp Service (implemented using whatsapp-web.js) listens for incoming messages. Upon receiving a message, the service implements a 30-second delay to gather conversation context, collecting the last 15 messages from the chat history to ensure comprehensive event detection.
 
 The gathered context is then forwarded to the Backend, which interfaces with the LLM Service using a specialized prompt engineered for event detection. This prompt is specifically designed to:
 \begin{itemize}
@@ -72,6 +65,13 @@ The gathered context is then forwarded to the Backend, which interfaces with the
   \item Process various date and time formats
   \item Generate structured JSON output for system processing
 \end{itemize}
+
+\begin{figure}[!h]
+  \centering
+  \includegraphics[width=\textwidth]{images/docs/diagrams/sequence-diagrams/all-sequence-diagrams/Extract Events from WhatsApp.png}
+  \caption{Extract Events from WhatsApp Sequence Diagram}
+  \label{fig:seq/extract-events-whatsapp}
+\end{figure}
 
 When the LLM Service detects an event, it returns a structured JSON response to the Backend. The Backend then:
 \begin{enumerate}

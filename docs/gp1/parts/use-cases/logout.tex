@@ -17,12 +17,12 @@
 
 \begin{figure}[!h]
   \centering
-  \includegraphics[width=0.5\textwidth]{images/docs/diagrams/sequence-diagrams/all-sequence-diagrams/Logout.png}
+  \includegraphics[width=0.3\textwidth]{images/docs/diagrams/sequence-diagrams/all-sequence-diagrams/Logout.png}
   \caption{Logout Sequence Diagram}
   \label{fig:seq/logout}
 \end{figure}
 
-The "Logout Sequence Diagram", shown in \textbf{Figure~\ref{fig:seq/logout}}, demonstrates the secure logout process in Jadwal. Unlike other operations that require server interaction, the logout process is handled entirely on the client side for efficiency and immediate security effect. When the user initiates logout, the application immediately removes the JWT (JSON Web Token) from the device's secure storage.
+The ``Logout Sequence Diagram'', shown in \textbf{Figure~\ref{fig:seq/logout}}, demonstrates the secure logout process in Jadwal. Unlike other operations that require server interaction, the logout process is handled entirely on the client side for efficiency and immediate security effect. When the user initiates logout, the application immediately removes the JWT (JSON Web Token) from the device's secure storage.
 
 This local-only operation ensures immediate session termination, as any subsequent requests would fail without the authentication token. This approach provides several benefits:
 \begin{itemize}

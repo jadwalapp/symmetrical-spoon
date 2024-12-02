@@ -47,7 +47,7 @@
   \label{fig:seq/connect-calendar}
 \end{figure}
 
-The "Connect Calendar Sequence Diagram", shown in \textbf{Figure~\ref{fig:seq/connect-calendar}}, illustrates the process of connecting an external calendar using CalDAV integration. The sequence begins when the user initiates a calendar connection request through the ConnectCalDAVCalendar gRPC call.
+The ``Connect Calendar Sequence Diagram'', shown in \textbf{Figure~\ref{fig:seq/connect-calendar}}, illustrates the process of connecting an external calendar using CalDAV integration. The sequence begins when the user initiates a calendar connection request through the ConnectCalDAVCalendar gRPC call.
 
 The Backend first authenticates the provided CalDAV credentials with the external calendar service. Upon successful authentication, the Backend securely stores the calendar connection details in the Database, ensuring encrypted storage of sensitive credentials. The Backend then initiates calendar data synchronization, retrieving calendar events and metadata from the CalDAV server.
 
