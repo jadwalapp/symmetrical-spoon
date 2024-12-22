@@ -125,7 +125,7 @@ func (s *service) CompleteEmail(ctx context.Context, r *connect.Request[authv1.C
 		return nil, internalError
 	}
 
-	token, err := s.tokens.NewToken(magicLink.CustomerID.String(), tokens.Audience_SymmetricalSpoon)
+	token, err := s.tokens.NewToken(magicLink.CustomerID, tokens.Audience_SymmetricalSpoon)
 	if err != nil {
 		log.Ctx(ctx).Err(err).Msg("failed running NewToken")
 		return nil, internalError
@@ -166,7 +166,7 @@ func (s *service) UseGoogle(ctx context.Context, r *connect.Request[authv1.UseGo
 		return nil, internalError
 	}
 
-	token, err := s.tokens.NewToken(customer.ID.String(), tokens.Audience_SymmetricalSpoon)
+	token, err := s.tokens.NewToken(customer.ID, tokens.Audience_SymmetricalSpoon)
 	if err != nil {
 		log.Ctx(ctx).Err(err).Msg("failed running NewToken")
 		return nil, internalError

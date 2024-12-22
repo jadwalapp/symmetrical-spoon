@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt"
+	"github.com/google/uuid"
 )
 
 var (
@@ -22,7 +23,7 @@ type tokens struct {
 	PrivateKey *rsa.PrivateKey
 }
 
-func (t tokens) NewToken(customerId string, aud Audience) (string, error) {
+func (t tokens) NewToken(customerId uuid.UUID, aud Audience) (string, error) {
 	expiresAt := time.Now().UTC().Add(tokenValidity)
 	claims := TokenClaims{
 		Payload{

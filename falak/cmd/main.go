@@ -7,14 +7,18 @@ import (
 	"os"
 
 	"connectrpc.com/connect"
+	"connectrpc.com/grpcreflect"
 	"github.com/bufbuild/protovalidate-go"
-	"github.com/golang-migrate/migrate"
-	"github.com/golang-migrate/migrate/database/postgres"
+	"github.com/golang-migrate/migrate/v4"
+	"github.com/golang-migrate/migrate/v4/database/postgres"
+	"github.com/golang-migrate/migrate/v4/source/iofs"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/api/auth"
+	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/api/profile"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/apimetadata"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/email/emailer"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/email/template"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/gen/proto/auth/v1/authv1connect"
+	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/gen/proto/profile/v1/profilev1connect"
 	googlesvc "github.com/jadwalapp/symmetrical-spoon/falak/pkg/google"
 	googleclient "github.com/jadwalapp/symmetrical-spoon/falak/pkg/google/client"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/httpclient"
@@ -28,7 +32,6 @@ import (
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 
-	_ "github.com/golang-migrate/migrate/source/file"
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
@@ -61,8 +64,14 @@ func main() {
 		log.Fatal().Msgf("cannot create postgres db driver: %v", err)
 	}
 
-	migStore, err := migrate.NewWithDatabaseInstance(
-		"file://pkg/store/migrations",
+	iofsMig, err := iofs.New(store.MigrationsFS, "migrations")
+	if err != nil {
+		log.Fatal().Msgf("cannot create iofs: %v", err)
+	}
+
+	migStore, err := migrate.NewWithInstance(
+		"iofs",
+		iofsMig,
 		dbDriverName,
 		dbDriver,
 	)
@@ -143,9 +152,18 @@ func main() {
 	// ======== SERVER ========
 	mux := http.NewServeMux()
 
+	reflector := grpcreflect.NewStaticReflector(
+		authv1connect.AuthServiceName,
+		profilev1connect.ProfileServiceName,
+	)
+	mux.Handle(grpcreflect.NewHandlerV1(reflector))
+	mux.Handle(grpcreflect.NewHandlerV1Alpha(reflector))
+
 	authServer := auth.NewService(*pv, *dbStore, tokens, emailerImpl, templates, apiMetadata, googleSvc)
-	authPath, authHandler := authv1connect.NewAuthServiceHandler(authServer, interceptorsForServer)
-	mux.Handle(authPath, authHandler)
+	mux.Handle(authv1connect.NewAuthServiceHandler(authServer, interceptorsForServer))
+
+	profileServer := profile.NewService(*pv, *dbStore, apiMetadata)
+	mux.Handle(profilev1connect.NewProfileServiceHandler(profileServer, interceptorsForServer))
 
 	addr := fmt.Sprintf("0.0.0.0:%s", config.Port)
 	log.Info().Msgf("listening on %s", addr)
