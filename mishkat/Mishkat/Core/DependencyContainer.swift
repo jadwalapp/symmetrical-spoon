@@ -16,20 +16,16 @@ class DependencyContainer {
     lazy var client = ProtocolClient(
         httpClient: URLSessionHTTPClient(),
         config: ProtocolClientConfig(
-            host: "https://falak.jadwal.app",
-//            host: "http://localhost:50064",
+//            host: "https://falak.jadwal.app",
+            host: "http://localhost:50064",
             networkProtocol: .connect,
             interceptors: [InterceptorFactory { AuthInterceptor(config: $0) }]
         )
     )
     
-    lazy var authClient: Auth_V1_AuthServiceClient = {
-        return Auth_V1_AuthServiceClient(
-            client: client
-        )
-    }()
+    lazy private var authClient: Auth_V1_AuthServiceClient = { return Auth_V1_AuthServiceClient(client: client) }()
+    lazy var authRepository: AuthRepository = { return AuthRepository(authClient: authClient) }()
     
-    lazy var authRepository: AuthRepository = {
-        return AuthRepository(authClient: authClient)
-    }()
+    lazy private var profileClient: Profile_V1_ProfileServiceClient = { return Profile_V1_ProfileServiceClient(client: client) }()
+    lazy var profileRepository: ProfileRepository = { return ProfileRepository(profileClient: profileClient) }()
 }

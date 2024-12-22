@@ -27,7 +27,6 @@ class AuthViewModel: ObservableObject {
     @Published var navigationPath: [AuthNavigationDestination] = []
     
     private let authRepository: AuthRepository
-    
     init(authRepository: AuthRepository) {
         self.authRepository = authRepository
         self.isAuthenticated = KeychainManager.shared.getToken() != nil

@@ -9,22 +9,15 @@ import SwiftUI
 
 struct SettingsView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
-        
+    @EnvironmentObject var settingsViewModel: SettingsViewModel
+    
     var body: some View {
         List {
             Section {
-                HStack {
-                    Circle()
-                        .frame(width: 60)
-                        .padding(.trailing, 16)
-                    VStack(alignment: .leading) {
-                        Text("Hello Yazeed!")
-                            .font(.headline)
-                        Text("yazeedfady@gmail.com")
-                            .font(.subheadline)
-                    }
-                    Spacer()
-                }
+                SettingsProfileTile(
+                    name: settingsViewModel.profileData?.name ?? "",
+                    email: settingsViewModel.profileData?.email ?? ""
+                )
             }
             Section {
                 Button {
@@ -61,9 +54,17 @@ struct SettingsView: View {
                 }
             }
         }
+        .task {
+            settingsViewModel.getProfile()
+        }
     }
 }
 
 #Preview {
     SettingsView()
+        .environmentObject(
+            SettingsViewModel(
+                profileRepository: DependencyContainer.shared.profileRepository
+            )
+        )
 }
