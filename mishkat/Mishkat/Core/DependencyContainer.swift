@@ -16,8 +16,8 @@ class DependencyContainer {
     lazy var client = ProtocolClient(
         httpClient: URLSessionHTTPClient(),
         config: ProtocolClientConfig(
-//            host: "https://falak.jadwal.app",
-            host: "http://localhost:50064",
+            host: "https://falak.jadwal.app",
+//            host: "http://localhost:50064",
             networkProtocol: .connect,
             interceptors: [InterceptorFactory { AuthInterceptor(config: $0) }]
         )
