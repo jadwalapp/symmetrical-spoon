@@ -11,10 +11,12 @@ import SwiftUI
 struct MishkatApp: App {
     @StateObject private var authViewModel: AuthViewModel
     @StateObject private var settingsViewModel: SettingsViewModel
+    @StateObject private var profileViewModel: ProfileViewModel
     
     init() {
         _authViewModel = StateObject(wrappedValue: AuthViewModel(authRepository: DependencyContainer.shared.authRepository))
-        _settingsViewModel = StateObject(wrappedValue: SettingsViewModel(profileRepository: DependencyContainer.shared.profileRepository))
+        _settingsViewModel = StateObject(wrappedValue: SettingsViewModel())
+        _profileViewModel = StateObject(wrappedValue: ProfileViewModel(profileRepository: DependencyContainer.shared.profileRepository))
         
     }
     
@@ -23,6 +25,7 @@ struct MishkatApp: App {
             ContentView()
                 .environmentObject(authViewModel)
                 .environmentObject(settingsViewModel)
+                .environmentObject(profileViewModel)
                 .onOpenURL { url in
                     handleDeepLink(url)
                 }

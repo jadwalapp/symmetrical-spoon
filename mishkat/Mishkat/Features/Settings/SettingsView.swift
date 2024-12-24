@@ -9,15 +9,19 @@ import SwiftUI
 
 struct SettingsView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
-    @EnvironmentObject var settingsViewModel: SettingsViewModel
+    @EnvironmentObject var profileViewModel: ProfileViewModel
     
     var body: some View {
         List {
             Section {
-                SettingsProfileTile(
-                    name: settingsViewModel.profileData?.name ?? "",
-                    email: settingsViewModel.profileData?.email ?? ""
-                )
+                AsyncView(
+                    response: profileViewModel.profileState
+                ) { profile in
+                    SettingsProfileTile(
+                        name: profile.name,
+                        email: profile.email
+                    )
+                }
             }
             Section {
                 Button {
@@ -55,7 +59,12 @@ struct SettingsView: View {
             }
         }
         .task {
-            settingsViewModel.getProfile()
+            await profileViewModel.getProfile()
+        }
+        .refreshable {
+            Task {
+                await profileViewModel.getProfile()
+            }
         }
     }
 }
@@ -63,7 +72,7 @@ struct SettingsView: View {
 #Preview {
     SettingsView()
         .environmentObject(
-            SettingsViewModel(
+            ProfileViewModel(
                 profileRepository: DependencyContainer.shared.profileRepository
             )
         )
