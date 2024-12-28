@@ -65,7 +65,6 @@ struct EmailInputView: View {
             
         }
         .padding(24)
-        .navigationBarBackButtonHidden(authViewModel.initiateEmailState == .loading)
     }
 }
 
