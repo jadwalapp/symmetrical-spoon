@@ -22,12 +22,6 @@ struct AuthView: View {
                     }
                 }
         }
-        .alert(item: Binding(
-            get: { authViewModel.error.map { AuthError(message: $0) } },
-            set: { _ in authViewModel.error = nil }
-        )) { error in
-            Alert(title: Text("Error"), message: Text(error.message))
-        }
     }
 }
 

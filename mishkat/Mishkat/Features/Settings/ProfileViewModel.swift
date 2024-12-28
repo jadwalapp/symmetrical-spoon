@@ -16,17 +16,24 @@ class ProfileViewModel: ObservableObject {
        self.profileRepository = profileRepository
    }
    
-   @MainActor
-   func getProfile() async {
-       if case .loading = profileState { return }
+   func getProfile() {
+       if case .loading = self.profileState { return }
        
-       profileState = .loading
-       
-       do {
-           let profile = try await profileRepository.getProfile()
-           profileState = .loaded(profile)
-       } catch {
-           profileState = .failed(error)
+       Task {
+           await MainActor.run {
+               self.profileState = .loading
+           }
+           
+           do {
+               let profile = try await profileRepository.getProfile()
+               await MainActor.run {
+                   self.profileState = .loaded(profile)
+               }
+           } catch {
+               await MainActor.run {
+                   self.profileState = .failed(error)
+               }
+           }
        }
    }
 }

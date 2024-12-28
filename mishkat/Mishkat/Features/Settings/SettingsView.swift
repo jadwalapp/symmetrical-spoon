@@ -58,13 +58,11 @@ struct SettingsView: View {
                 }
             }
         }
-        .task {
-            await profileViewModel.getProfile()
+        .onFirstAppear {
+            profileViewModel.getProfile()
         }
         .refreshable {
-            Task {
-                await profileViewModel.getProfile()
-            }
+            profileViewModel.getProfile()
         }
     }
 }

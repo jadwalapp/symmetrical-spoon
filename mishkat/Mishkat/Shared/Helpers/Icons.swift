@@ -7,9 +7,9 @@
 
 import Foundation
 
-typealias IconName = String
+public typealias IconName = String
 
-enum Icons: IconName {
+public enum Icons: IconName {
     case brandGoogle = "brandGoogle"
     case mail = "mail"
 }

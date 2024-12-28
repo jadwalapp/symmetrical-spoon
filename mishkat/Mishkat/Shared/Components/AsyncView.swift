@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-enum AsyncValue<Value> {
+enum AsyncValue<Value>: Equatable {
     case idle
     case loading
     case loaded(Value)
@@ -27,6 +27,13 @@ enum AsyncValue<Value> {
         case .loaded: return 2
         case .failed: return 3
         }
+    }
+    
+    static func == (
+        lhs: AsyncValue<Value>,
+        rhs: AsyncValue<Value>
+    ) -> Bool {
+        return lhs.stateIdentifier == rhs.stateIdentifier
     }
 }
 

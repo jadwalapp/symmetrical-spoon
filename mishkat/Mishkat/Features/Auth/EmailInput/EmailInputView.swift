@@ -10,31 +10,62 @@ import SwiftUI
 struct EmailInputView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
     @State private var email: String = ""
-
+    
+    @FocusState private var emailFieldFocused: Bool?
+    
     var body: some View {
-        VStack(spacing: 20) {
-            Text("Enter your email")
-                .font(.title)
-            
-            TextField("Email", text: $email)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .autocapitalization(.none)
-                .keyboardType(.emailAddress)
-                .disabled(authViewModel.isLoading)
-            
-            if authViewModel.isLoading {
-                ProgressView()
-            } else {
-                OButton(icon: .mail, label: "Continue") {
-                    authViewModel.submitEmail(email: email)
+        VStack(alignment: .leading, spacing: 24) {
+            VStack(alignment: .leading, spacing: 16) {
+                IconWithBackground(icon: .mail)
+                VStack(alignment: .leading) {
+                    Text("Continue with Email")
+                        .font(.title2)
+                        .bold()
+                    Text("Sign in or sign up with your email")
+                        .font(.subheadline)
+                        .foregroundStyle(.subheadline)
                 }
             }
+            
+            TextField("Email", text: $email)
+                .padding()
+                .background(.lightGray)
+                .font(.headline)
+                .cornerRadius(16)
+                .textFieldStyle(.plain)
+                .autocapitalization(.none)
+                .keyboardType(.emailAddress)
+                .disabled(authViewModel.initiateEmailState == .loading)
+                .focused($emailFieldFocused, equals: true)
+                .onAppear {
+                    emailFieldFocused = true
+                }
+            
+            
+            Spacer()
+            
+            OButton(
+                icon: .mail,
+                label: "Continue",
+                isLoading: authViewModel.initiateEmailState == .loading,
+                isDisabled: email.isEmpty
+            ) {
+                authViewModel.initiateEmail(
+                    email: email
+                )
+            }
+            
         }
-        .padding()
-        .navigationBarBackButtonHidden(authViewModel.isLoading)
+        .padding(24)
+        .navigationBarBackButtonHidden(authViewModel.initiateEmailState == .loading)
     }
 }
 
 #Preview {
-    EmailInputView()
+    NavigationStack {
+        EmailInputView()
+            .environmentObject(AuthViewModel(
+                authRepository: DependencyContainer.shared.authRepository
+            ))
+    }
 }

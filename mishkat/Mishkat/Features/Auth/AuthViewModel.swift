@@ -21,10 +21,14 @@ class AuthViewModel: ObservableObject {
     
     @Published var authState: AuthState = .onboarding
     @Published var isAuthenticated = false
-    @Published var email: String = ""
-    @Published var error: String?
-    @Published var isLoading = false
     @Published var navigationPath: [AuthNavigationDestination] = []
+    
+    @Published var email: String = ""
+    
+    @Published private(set) var initiateEmailState: AsyncValue<Auth_V1_InitiateEmailResponse> = .idle
+    @Published private(set) var completeEmailState: AsyncValue<Auth_V1_CompleteEmailResponse> = .idle
+    @Published private(set) var useGoogleState: AsyncValue<Auth_V1_UseGoogleResponse> = .idle
+    
     
     private let authRepository: AuthRepository
     init(authRepository: AuthRepository) {
@@ -32,21 +36,23 @@ class AuthViewModel: ObservableObject {
         self.isAuthenticated = KeychainManager.shared.getToken() != nil
     }
     
-    func continueWithGoogle() {
-        isLoading = true
+    func useGoogle() {
         Task {
+            await MainActor.run {
+                useGoogleState = .loading
+            }
+            
             do {
                 // TODO: Implement Google Sign-In
                 let response = try await authRepository.useGoogle(googleToken: "googleToken")
                 await MainActor.run {
                     KeychainManager.shared.saveToken(response.accessToken)
                     self.isAuthenticated = true
-                    self.isLoading = false
+                    useGoogleState = .loaded(response)
                 }
             } catch {
                 await MainActor.run {
-                    self.error = error.localizedDescription
-                    self.isLoading = false
+                    useGoogleState = .failed(error)
                 }
             }
         }
@@ -56,52 +62,59 @@ class AuthViewModel: ObservableObject {
         navigationPath.append(.emailInput)
     }
     
-    func submitEmail(email: String) {
-        self.email = email
-        isLoading = true
+    func initiateEmail(email: String) {
         Task {
+            self.email = email
+            
+            await MainActor.run {
+                self.initiateEmailState = .loading
+            }
+            
             do {
-                let _ = try await authRepository.initiateEmail(email: email)
+                let response = try await authRepository.initiateEmail(email: email)
                 await MainActor.run {
+                    self.initiateEmailState = .loaded(response)
                     self.navigationPath.append(.tokenSent)
-                    self.isLoading = false
                 }
             } catch {
                 await MainActor.run {
-                    self.error = error.localizedDescription
-                    self.isLoading = false
+                    self.initiateEmailState = .failed(error)
                 }
             }
         }
     }
     
     func resendVerificationEmail() {
-        submitEmail(email: email)
+        initiateEmail(email: email)
     }
     
-    func handleMagicLink(token: String) {
-        isLoading = true
+    func completeEmail(token: String) {
         Task {
+            await MainActor.run {
+                self.completeEmailState = .loading
+            }
+            
             do {
                 let response = try await authRepository.completeEmail(token: token)
                 await MainActor.run {
                     KeychainManager.shared.saveToken(response.accessToken)
-                    self.isAuthenticated = true
-                    self.isLoading = false
+                    self.completeEmailState = .loaded(response)
                 }
             } catch {
                 await MainActor.run {
-                    self.error = error.localizedDescription
-                    self.isLoading = false
+                    self.completeEmailState = .failed(error)
                 }
             }
         }
     }
-
+    
     func logout() {
         KeychainManager.shared.deleteToken()
         isAuthenticated = false
         navigationPath.removeAll()
         authState = .onboarding
+        self.initiateEmailState = .idle
+        self.completeEmailState = .idle
+        self.useGoogleState = .idle
     }
 }

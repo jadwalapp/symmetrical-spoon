@@ -40,6 +40,6 @@ struct MishkatApp: App {
             return
         }
         
-        authViewModel.handleMagicLink(token: token)
+        authViewModel.completeEmail(token: token)
     }
 }
