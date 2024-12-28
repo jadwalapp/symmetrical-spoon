@@ -64,9 +64,8 @@ class AuthViewModel: ObservableObject {
     
     func initiateEmail(email: String) {
         Task {
-            self.email = email
-            
             await MainActor.run {
+                self.email = email
                 self.initiateEmailState = .loading
             }
             
