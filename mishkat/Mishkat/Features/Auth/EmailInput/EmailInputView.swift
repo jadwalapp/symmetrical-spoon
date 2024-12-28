@@ -41,6 +41,14 @@ struct EmailInputView: View {
                     emailFieldFocused = true
                 }
             
+            if case .failed(let error) = authViewModel.initiateEmailState {
+                Text("\(error.localizedDescription)")
+                    .font(.callout)
+                    .foregroundStyle(.red)
+                    .bold()
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .multilineTextAlignment(.center)
+            }
             
             Spacer()
             
