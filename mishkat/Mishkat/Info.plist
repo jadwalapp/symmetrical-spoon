@@ -4,5 +4,12 @@
 <dict>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+	    <string>googlegmail</string>
+	    <string>ms-outlook</string>
+	    <string>ymail</string>
+	    <string>mailto</string>
+	</array>
 </dict>
 </plist>

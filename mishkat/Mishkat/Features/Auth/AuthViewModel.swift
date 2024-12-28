@@ -97,6 +97,7 @@ class AuthViewModel: ObservableObject {
                 let response = try await authRepository.completeEmail(token: token)
                 await MainActor.run {
                     KeychainManager.shared.saveToken(response.accessToken)
+                    self.isAuthenticated = true
                     self.completeEmailState = .loaded(response)
                 }
             } catch {

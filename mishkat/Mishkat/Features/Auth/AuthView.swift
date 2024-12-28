@@ -25,11 +25,6 @@ struct AuthView: View {
     }
 }
 
-struct AuthError: Identifiable {
-    let id = UUID()
-    let message: String
-}
-
 #Preview {
     AuthView()
 }

@@ -28,7 +28,7 @@ struct IconWithBackground: View {
             Image(icon)
                 .resizable()
                 .frame(width: size / 2, height: size / 2)
-                .foregroundStyle(iconColor ?? .gray)
+                .foregroundStyle(iconColor ?? .secondary)
         }
     }
 }

@@ -12,4 +12,6 @@ public typealias IconName = String
 public enum Icons: IconName {
     case brandGoogle = "brandGoogle"
     case mail = "mail"
+    case arrowRight = "arrowRight"
+    case rotate = "rotate"
 }

@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "Gmail_icon_(2020).svg.png",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
