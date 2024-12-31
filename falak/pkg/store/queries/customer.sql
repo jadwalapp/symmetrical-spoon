@@ -20,3 +20,16 @@ SELECT * FROM customer WHERE LOWER(email) = LOWER(sqlc.arg(email));
 
 -- name: DeleteCustomerById :exec
 DELETE FROM customer WHERE id = $1;
+
+-- name: IsCustomerFirstLogin :one
+SELECT 
+  (
+    SELECT COUNT(CASE WHEN used_at IS NULL THEN 1 END) = 
+           COUNT(CASE WHEN used_at IS NOT NULL THEN 1 END)
+    FROM magic_link ml
+    WHERE ml.customer_id = $1
+  ) != 
+  EXISTS (
+    SELECT 1 FROM auth_google ag
+    WHERE ag.customer_id = $1
+  ) as is_customer_first_login;

@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"time"
 
 	"connectrpc.com/connect"
@@ -114,6 +115,26 @@ func (s *service) CompleteEmail(ctx context.Context, r *connect.Request[authv1.C
 		// TODO: perhaps send a new email by calling InitiateEmail, or have a method ouside that both RPCs share :D
 		log.Ctx(ctx).Error().Msg("expired magic link")
 		return nil, connect.NewError(connect.CodeFailedPrecondition, errors.New("expired magic link"))
+	}
+
+	isNewCustomer, err := s.store.IsCustomerFirstLogin(ctx, magicLink.CustomerID)
+	if err != nil {
+		log.Ctx(ctx).Err(err).Msg("failed running IsCustomerFirstLogin")
+		return nil, internalError
+	}
+
+	if isNewCustomer {
+		customer, err := s.store.GetCustomerById(ctx, magicLink.CustomerID)
+		if err != nil {
+			log.Ctx(ctx).Err(err).Msg("failed running IsCustomerFirstLogin")
+			return nil, internalError
+		}
+
+		err = s.emailer.Send(ctx, emailer.FromEmail_HelloEmail, customer.Email, fmt.Sprintf("Hala Wallah %s", customer.Name), "We are happy to help you schedule your calendar")
+		if err != nil {
+			log.Ctx(ctx).Err(err).Msg("failed running SendFromTemplate for magic link template")
+			return nil, internalError
+		}
 	}
 
 	err = s.store.UpdateMagicLinkUsedAtByTokenHash(ctx, store.UpdateMagicLinkUsedAtByTokenHashParams{
