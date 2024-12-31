@@ -187,6 +187,20 @@ func (s *service) UseGoogle(ctx context.Context, r *connect.Request[authv1.UseGo
 		return nil, internalError
 	}
 
+	isNewCustomer, err := s.store.IsCustomerFirstLogin(ctx, customer.ID)
+	if err != nil {
+		log.Ctx(ctx).Err(err).Msg("failed running IsCustomerFirstLogin")
+		return nil, internalError
+	}
+
+	if isNewCustomer.Valid && isNewCustomer.Bool {
+		err = s.emailer.Send(ctx, emailer.FromEmail_HelloEmail, customer.Email, fmt.Sprintf("Hala Wallah %s", customer.Name), "We are happy to help you schedule your calendar")
+		if err != nil {
+			log.Ctx(ctx).Err(err).Msg("failed running SendFromTemplate for magic link template")
+			return nil, internalError
+		}
+	}
+
 	token, err := s.tokens.NewToken(customer.ID, tokens.Audience_SymmetricalSpoon)
 	if err != nil {
 		log.Ctx(ctx).Err(err).Msg("failed running NewToken")
