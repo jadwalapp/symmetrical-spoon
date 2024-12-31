@@ -123,7 +123,7 @@ func (s *service) CompleteEmail(ctx context.Context, r *connect.Request[authv1.C
 		return nil, internalError
 	}
 
-	if isNewCustomer {
+	if isNewCustomer.Valid && isNewCustomer.Bool {
 		customer, err := s.store.GetCustomerById(ctx, magicLink.CustomerID)
 		if err != nil {
 			log.Ctx(ctx).Err(err).Msg("failed running IsCustomerFirstLogin")
