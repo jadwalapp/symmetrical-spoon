@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"time"
 
 	"connectrpc.com/connect"
@@ -116,6 +117,26 @@ func (s *service) CompleteEmail(ctx context.Context, r *connect.Request[authv1.C
 		return nil, connect.NewError(connect.CodeFailedPrecondition, errors.New("expired magic link"))
 	}
 
+	isNewCustomer, err := s.store.IsCustomerFirstLogin(ctx, magicLink.CustomerID)
+	if err != nil {
+		log.Ctx(ctx).Err(err).Msg("failed running IsCustomerFirstLogin")
+		return nil, internalError
+	}
+
+	if isNewCustomer.Valid && isNewCustomer.Bool {
+		customer, err := s.store.GetCustomerById(ctx, magicLink.CustomerID)
+		if err != nil {
+			log.Ctx(ctx).Err(err).Msg("failed running IsCustomerFirstLogin")
+			return nil, internalError
+		}
+
+		err = s.emailer.Send(ctx, emailer.FromEmail_HelloEmail, customer.Email, fmt.Sprintf("Hala Wallah %s", customer.Name), "We are happy to help you schedule your calendar")
+		if err != nil {
+			log.Ctx(ctx).Err(err).Msg("failed running SendFromTemplate for magic link template")
+			return nil, internalError
+		}
+	}
+
 	err = s.store.UpdateMagicLinkUsedAtByTokenHash(ctx, store.UpdateMagicLinkUsedAtByTokenHashParams{
 		TokenHash: magicLink.TokenHash,
 		UsedAt:    sql.NullTime{Time: time.Now(), Valid: true},
@@ -158,12 +179,26 @@ func (s *service) UseGoogle(ctx context.Context, r *connect.Request[authv1.UseGo
 	}
 
 	customer, err := s.store.CreateCustomerIfNotExists(ctx, store.CreateCustomerIfNotExistsParams{
-		Name:  userInfo.GivenName + userInfo.FamilyName,
+		Name:  userInfo.GivenName + " " + userInfo.FamilyName,
 		Email: userInfo.Email,
 	})
 	if err != nil {
 		log.Ctx(ctx).Err(err).Msg("failed running CreateCustomerIfNotExists")
 		return nil, internalError
+	}
+
+	isNewCustomer, err := s.store.IsCustomerFirstLogin(ctx, customer.ID)
+	if err != nil {
+		log.Ctx(ctx).Err(err).Msg("failed running IsCustomerFirstLogin")
+		return nil, internalError
+	}
+
+	if isNewCustomer.Valid && isNewCustomer.Bool {
+		err = s.emailer.Send(ctx, emailer.FromEmail_HelloEmail, customer.Email, fmt.Sprintf("Hala Wallah %s", customer.Name), "We are happy to help you schedule your calendar")
+		if err != nil {
+			log.Ctx(ctx).Err(err).Msg("failed running SendFromTemplate for magic link template")
+			return nil, internalError
+		}
 	}
 
 	token, err := s.tokens.NewToken(customer.ID, tokens.Audience_SymmetricalSpoon)
