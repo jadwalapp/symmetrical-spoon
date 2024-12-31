@@ -158,7 +158,7 @@ func (s *service) UseGoogle(ctx context.Context, r *connect.Request[authv1.UseGo
 	}
 
 	customer, err := s.store.CreateCustomerIfNotExists(ctx, store.CreateCustomerIfNotExistsParams{
-		Name:  userInfo.GivenName + userInfo.FamilyName,
+		Name:  userInfo.GivenName + " " + userInfo.FamilyName,
 		Email: userInfo.Email,
 	})
 	if err != nil {
