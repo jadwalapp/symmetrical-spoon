@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+option go_package = "github.com/jadwalapp/symmetrical-spoon/falak/pkg/gen/proto/whatsapp/v1;whatsappv1";
+
+package whatsapp.v1;
+
+message InitiateConnectWhatsappAccountRequest {
+    string mobile = 1;
+}
+
+message InitiateConnectWhatsappAccountResponse {
+    string whatsapp_completion_token = 1;
+}
+
+message CompleteConnectWhatsappAccountRequest {
+    string whatsapp_completion_token = 1;
+    string whatsapp_provided_code = 2;
+}
+
+message CompleteConnectWhatsappAccountResponse {}
+
+message RemoveWhatsappAccountConnectionRequest {}
+
+message RemoveWhatsappAccountConnectionResponse {}
+
+message GetWhatsappAccountRequest {}
+
+message GetWhatsappAccountResponse {}
+
+service ProfileService {
+    rpc InitiateConnectWhatsappAccount(InitiateConnectWhatsappAccountRequest) returns (InitiateConnectWhatsappAccountResponse);
+    rpc CompleteConnectWhatsappAccount(CompleteConnectWhatsappAccountRequest) returns (CompleteConnectWhatsappAccountResponse);
+    // possible errors:
+    //   - not found
+    rpc RemoveWhatsappAccountConnection(RemoveWhatsappAccountConnectionRequest) returns (RemoveWhatsappAccountConnectionResponse);
+    // possible errors:
+    //   - not found
+    rpc GetWhatsappAccount(GetWhatsappAccountRequest) returns (GetWhatsappAccountResponse);
+}
