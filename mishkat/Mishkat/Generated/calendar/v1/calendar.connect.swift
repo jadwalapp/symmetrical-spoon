@@ -10,6 +10,12 @@ import SwiftProtobuf
 public protocol Calendar_V1_CalendarServiceClientInterface: Sendable {
 
     @discardableResult
+    func `getCalendarAccounts`(request: Calendar_V1_GetCalendarAccountsRequest, headers: Connect.Headers, completion: @escaping @Sendable (ResponseMessage<Calendar_V1_GetCalendarAccountsResponse>) -> Void) -> Connect.Cancelable
+
+    @available(iOS 13, *)
+    func `getCalendarAccounts`(request: Calendar_V1_GetCalendarAccountsRequest, headers: Connect.Headers) async -> ResponseMessage<Calendar_V1_GetCalendarAccountsResponse>
+
+    @discardableResult
     func `createCalendar`(request: Calendar_V1_CreateCalendarRequest, headers: Connect.Headers, completion: @escaping @Sendable (ResponseMessage<Calendar_V1_CreateCalendarResponse>) -> Void) -> Connect.Cancelable
 
     @available(iOS 13, *)
@@ -58,6 +64,16 @@ public final class Calendar_V1_CalendarServiceClient: Calendar_V1_CalendarServic
 
     public init(client: Connect.ProtocolClientInterface) {
         self.client = client
+    }
+
+    @discardableResult
+    public func `getCalendarAccounts`(request: Calendar_V1_GetCalendarAccountsRequest, headers: Connect.Headers = [:], completion: @escaping @Sendable (ResponseMessage<Calendar_V1_GetCalendarAccountsResponse>) -> Void) -> Connect.Cancelable {
+        return self.client.unary(path: "/calendar.v1.CalendarService/GetCalendarAccounts", idempotencyLevel: .unknown, request: request, headers: headers, completion: completion)
+    }
+
+    @available(iOS 13, *)
+    public func `getCalendarAccounts`(request: Calendar_V1_GetCalendarAccountsRequest, headers: Connect.Headers = [:]) async -> ResponseMessage<Calendar_V1_GetCalendarAccountsResponse> {
+        return await self.client.unary(path: "/calendar.v1.CalendarService/GetCalendarAccounts", idempotencyLevel: .unknown, request: request, headers: headers)
     }
 
     @discardableResult
@@ -132,6 +148,7 @@ public final class Calendar_V1_CalendarServiceClient: Calendar_V1_CalendarServic
 
     public enum Metadata {
         public enum Methods {
+            public static let getCalendarAccounts = Connect.MethodSpec(name: "GetCalendarAccounts", service: "calendar.v1.CalendarService", type: .unary)
             public static let createCalendar = Connect.MethodSpec(name: "CreateCalendar", service: "calendar.v1.CalendarService", type: .unary)
             public static let getCalendars = Connect.MethodSpec(name: "GetCalendars", service: "calendar.v1.CalendarService", type: .unary)
             public static let createEvent = Connect.MethodSpec(name: "CreateEvent", service: "calendar.v1.CalendarService", type: .unary)
