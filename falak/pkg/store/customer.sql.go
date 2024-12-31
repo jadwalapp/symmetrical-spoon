@@ -7,6 +7,7 @@ package store
 
 import (
 	"context"
+	"database/sql"
 	"time"
 
 	"github.com/google/uuid"
@@ -94,4 +95,29 @@ func (q *Queries) GetCustomerById(ctx context.Context, id uuid.UUID) (Customer, 
 		&i.UpdatedAt,
 	)
 	return i, err
+}
+
+const isCustomerFirstLogin = `-- name: IsCustomerFirstLogin :one
+SELECT 
+  (
+    NOT EXISTS (
+      SELECT 1 
+      FROM magic_link ml
+      WHERE ml.customer_id = $1
+        AND ml.used_at IS NOT NULL
+    )
+    OR 
+    NOT EXISTS (
+      SELECT 1 
+      FROM auth_google ag
+      WHERE ag.customer_id = $1
+    )
+  ) AS is_customer_first_login
+`
+
+func (q *Queries) IsCustomerFirstLogin(ctx context.Context, customerID uuid.UUID) (sql.NullBool, error) {
+	row := q.db.QueryRowContext(ctx, isCustomerFirstLogin, customerID)
+	var is_customer_first_login sql.NullBool
+	err := row.Scan(&is_customer_first_login)
+	return is_customer_first_login, err
 }
