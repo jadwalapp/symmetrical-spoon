@@ -55,7 +55,9 @@ message CreateCalendarResponse {
     Calendar calendar = 1;
 }
 
-message GetCalendarsRequest {}
+message GetCalendarsRequest {
+    optional string calendar_account_id = 1 [(buf.validate.field).string.uuid = true];
+}
 message GetCalendarsResponse {
     repeated Calendar calendars = 1;
 }

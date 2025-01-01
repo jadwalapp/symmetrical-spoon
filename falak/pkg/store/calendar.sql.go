@@ -121,3 +121,76 @@ func (q *Queries) GetCalendarsByCustomerId(ctx context.Context, customerID uuid.
 	}
 	return items, nil
 }
+
+const getCalendarsByCustomerIdAndAccountId = `-- name: GetCalendarsByCustomerIdAndAccountId :many
+SELECT id, customer_id, provider, ca.created_at, ca.updated_at, uid, account_id, prodid, version, calscale, display_name, description, color, timezone, sequence, v.created_at, v.updated_at
+FROM calendar_accounts ca
+JOIN vcalendar v ON ca.id = v.account_id
+WHERE ca.customer_id = $1 AND v.account_id = $2
+`
+
+type GetCalendarsByCustomerIdAndAccountIdParams struct {
+	CustomerID uuid.UUID
+	AccountID  uuid.UUID
+}
+
+type GetCalendarsByCustomerIdAndAccountIdRow struct {
+	ID          uuid.UUID
+	CustomerID  uuid.UUID
+	Provider    ProviderType
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	Uid         string
+	AccountID   uuid.UUID
+	Prodid      string
+	Version     string
+	Calscale    sql.NullString
+	DisplayName string
+	Description sql.NullString
+	Color       string
+	Timezone    sql.NullString
+	Sequence    sql.NullInt32
+	CreatedAt_2 time.Time
+	UpdatedAt_2 time.Time
+}
+
+func (q *Queries) GetCalendarsByCustomerIdAndAccountId(ctx context.Context, arg GetCalendarsByCustomerIdAndAccountIdParams) ([]GetCalendarsByCustomerIdAndAccountIdRow, error) {
+	rows, err := q.db.QueryContext(ctx, getCalendarsByCustomerIdAndAccountId, arg.CustomerID, arg.AccountID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetCalendarsByCustomerIdAndAccountIdRow
+	for rows.Next() {
+		var i GetCalendarsByCustomerIdAndAccountIdRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.CustomerID,
+			&i.Provider,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.Uid,
+			&i.AccountID,
+			&i.Prodid,
+			&i.Version,
+			&i.Calscale,
+			&i.DisplayName,
+			&i.Description,
+			&i.Color,
+			&i.Timezone,
+			&i.Sequence,
+			&i.CreatedAt_2,
+			&i.UpdatedAt_2,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}

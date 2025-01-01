@@ -35,3 +35,27 @@ func mapStoreVcalendarToPbCalendar(c *store.Vcalendar) *calendarv1.Calendar {
 		Color:             c.Color,
 	}
 }
+
+func mapStoreGetCalendarsByCustomerIdRowToPbCalendar(r *store.GetCalendarsByCustomerIdRow) *calendarv1.Calendar {
+	return &calendarv1.Calendar{
+		Id:                r.Uid,
+		CalendarAccountId: r.ID.String(),
+		Name:              r.DisplayName,
+		Description:       r.Description.String,
+		StartDate:         &timestamppb.Timestamp{},
+		EndDate:           &timestamppb.Timestamp{},
+		Color:             r.Color,
+	}
+}
+
+func mapStoreGetCalendarsByCustomerIdAndAccountIdRowToPbCalendar(r *store.GetCalendarsByCustomerIdAndAccountIdRow) *calendarv1.Calendar {
+	return &calendarv1.Calendar{
+		Id:                r.Uid,
+		CalendarAccountId: r.ID.String(),
+		Name:              r.DisplayName,
+		Description:       r.Description.String,
+		StartDate:         &timestamppb.Timestamp{},
+		EndDate:           &timestamppb.Timestamp{},
+		Color:             r.Color,
+	}
+}

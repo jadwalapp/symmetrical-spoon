@@ -123,6 +123,57 @@ func (s *service) CreateCalendar(ctx context.Context, r *connect.Request[calenda
 	}, nil
 }
 
+func (s *service) GetCalendars(ctx context.Context, r *connect.Request[calendarv1.GetCalendarsRequest]) (*connect.Response[calendarv1.GetCalendarsResponse], error) {
+	if err := s.pv.Validate(r.Msg); err != nil {
+		log.Ctx(ctx).Err(err).Msg("invalid request")
+		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+	}
+
+	tokenClaims, ok := s.apiMetadata.GetClaims(ctx)
+	if !ok {
+		log.Ctx(ctx).Error().Msg("failed running GetClaims")
+		return nil, internalError
+	}
+
+	pbCalendars := make([]*calendarv1.Calendar, 0)
+	if r.Msg.CalendarAccountId != nil {
+		calendarAccountID, err := uuid.Parse(*r.Msg.CalendarAccountId)
+		if err != nil {
+			log.Ctx(ctx).Err(err).Msg("failed running uuid.Parse for *r.Msg.CalendarAccountId")
+			return nil, internalError
+		}
+
+		calendars, err := s.store.GetCalendarsByCustomerIdAndAccountId(ctx, store.GetCalendarsByCustomerIdAndAccountIdParams{
+			CustomerID: tokenClaims.Payload.CustomerId,
+			AccountID:  calendarAccountID,
+		})
+		if err != nil {
+			log.Ctx(ctx).Err(err).Msg("failed running GetCalendarsByCustomerIdAndAccountId")
+			return nil, internalError
+		}
+
+		for _, c := range calendars {
+			pbCalendars = append(pbCalendars, mapStoreGetCalendarsByCustomerIdAndAccountIdRowToPbCalendar(&c))
+		}
+	} else {
+		calendars, err := s.store.GetCalendarsByCustomerId(ctx, tokenClaims.Payload.CustomerId)
+		if err != nil {
+			log.Ctx(ctx).Err(err).Msg("failed running GetCalendarsByCustomerId")
+			return nil, internalError
+		}
+
+		for _, c := range calendars {
+			pbCalendars = append(pbCalendars, mapStoreGetCalendarsByCustomerIdRowToPbCalendar(&c))
+		}
+	}
+
+	return &connect.Response[calendarv1.GetCalendarsResponse]{
+		Msg: &calendarv1.GetCalendarsResponse{
+			Calendars: pbCalendars,
+		},
+	}, nil
+}
+
 func NewService(pv protovalidate.Validator, store store.Queries, apiMetadata apimetadata.ApiMetadata) calendarv1connect.CalendarServiceHandler {
 	return &service{
 		pv:          pv,

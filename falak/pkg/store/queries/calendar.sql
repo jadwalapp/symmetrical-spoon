@@ -9,3 +9,9 @@ SELECT *
 FROM calendar_accounts ca
 JOIN vcalendar v ON ca.id = v.account_id
 WHERE ca.customer_id = $1;
+
+-- name: GetCalendarsByCustomerIdAndAccountId :many
+SELECT *
+FROM calendar_accounts ca
+JOIN vcalendar v ON ca.id = v.account_id
+WHERE ca.customer_id = $1 AND v.account_id = $2;
