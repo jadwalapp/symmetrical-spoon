@@ -6,11 +6,226 @@ package store
 
 import (
 	"database/sql"
+	"database/sql/driver"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/sqlc-dev/pqtype"
 )
+
+type AlarmAction string
+
+const (
+	AlarmActionAUDIO   AlarmAction = "AUDIO"
+	AlarmActionDISPLAY AlarmAction = "DISPLAY"
+	AlarmActionEMAIL   AlarmAction = "EMAIL"
+)
+
+func (e *AlarmAction) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = AlarmAction(s)
+	case string:
+		*e = AlarmAction(s)
+	default:
+		return fmt.Errorf("unsupported scan type for AlarmAction: %T", src)
+	}
+	return nil
+}
+
+type NullAlarmAction struct {
+	AlarmAction AlarmAction
+	Valid       bool // Valid is true if AlarmAction is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullAlarmAction) Scan(value interface{}) error {
+	if value == nil {
+		ns.AlarmAction, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.AlarmAction.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullAlarmAction) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.AlarmAction), nil
+}
+
+type EventClassification string
+
+const (
+	EventClassificationPUBLIC       EventClassification = "PUBLIC"
+	EventClassificationPRIVATE      EventClassification = "PRIVATE"
+	EventClassificationCONFIDENTIAL EventClassification = "CONFIDENTIAL"
+)
+
+func (e *EventClassification) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = EventClassification(s)
+	case string:
+		*e = EventClassification(s)
+	default:
+		return fmt.Errorf("unsupported scan type for EventClassification: %T", src)
+	}
+	return nil
+}
+
+type NullEventClassification struct {
+	EventClassification EventClassification
+	Valid               bool // Valid is true if EventClassification is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullEventClassification) Scan(value interface{}) error {
+	if value == nil {
+		ns.EventClassification, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.EventClassification.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullEventClassification) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.EventClassification), nil
+}
+
+type EventStatus string
+
+const (
+	EventStatusCONFIRMED EventStatus = "CONFIRMED"
+	EventStatusTENTATIVE EventStatus = "TENTATIVE"
+	EventStatusCANCELLED EventStatus = "CANCELLED"
+)
+
+func (e *EventStatus) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = EventStatus(s)
+	case string:
+		*e = EventStatus(s)
+	default:
+		return fmt.Errorf("unsupported scan type for EventStatus: %T", src)
+	}
+	return nil
+}
+
+type NullEventStatus struct {
+	EventStatus EventStatus
+	Valid       bool // Valid is true if EventStatus is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullEventStatus) Scan(value interface{}) error {
+	if value == nil {
+		ns.EventStatus, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.EventStatus.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullEventStatus) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.EventStatus), nil
+}
+
+type ProviderType string
+
+const (
+	ProviderTypeLocal  ProviderType = "local"
+	ProviderTypeCaldav ProviderType = "caldav"
+)
+
+func (e *ProviderType) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = ProviderType(s)
+	case string:
+		*e = ProviderType(s)
+	default:
+		return fmt.Errorf("unsupported scan type for ProviderType: %T", src)
+	}
+	return nil
+}
+
+type NullProviderType struct {
+	ProviderType ProviderType
+	Valid        bool // Valid is true if ProviderType is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullProviderType) Scan(value interface{}) error {
+	if value == nil {
+		ns.ProviderType, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.ProviderType.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullProviderType) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.ProviderType), nil
+}
+
+type Transparency string
+
+const (
+	TransparencyOPAQUE      Transparency = "OPAQUE"
+	TransparencyTRANSPARENT Transparency = "TRANSPARENT"
+)
+
+func (e *Transparency) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = Transparency(s)
+	case string:
+		*e = Transparency(s)
+	default:
+		return fmt.Errorf("unsupported scan type for Transparency: %T", src)
+	}
+	return nil
+}
+
+type NullTransparency struct {
+	Transparency Transparency
+	Valid        bool // Valid is true if Transparency is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullTransparency) Scan(value interface{}) error {
+	if value == nil {
+		ns.Transparency, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.Transparency.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullTransparency) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.Transparency), nil
+}
 
 type AuthGoogle struct {
 	ID         uuid.UUID
@@ -23,7 +238,7 @@ type AuthGoogle struct {
 type CalendarAccount struct {
 	ID         uuid.UUID
 	CustomerID uuid.UUID
-	Provider   string
+	Provider   ProviderType
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
 }
@@ -49,7 +264,7 @@ type MagicLink struct {
 type Valarm struct {
 	ID          uuid.UUID
 	EventUid    string
-	Action      string
+	Action      AlarmAction
 	Trigger     string
 	Description sql.NullString
 	Summary     sql.NullString
@@ -68,7 +283,7 @@ type Vcalendar struct {
 	Calscale    sql.NullString
 	DisplayName string
 	Description sql.NullString
-	Color       sql.NullString
+	Color       string
 	Timezone    sql.NullString
 	Sequence    sql.NullInt32
 	CreatedAt   time.Time
@@ -85,9 +300,9 @@ type Vevent struct {
 	Summary        string
 	Description    sql.NullString
 	Location       sql.NullString
-	Status         sql.NullString
-	Classification sql.NullString
-	Transp         sql.NullString
+	Status         NullEventStatus
+	Classification NullEventClassification
+	Transp         NullTransparency
 	Rrule          sql.NullString
 	Rdate          pqtype.NullRawMessage
 	Exdate         pqtype.NullRawMessage
@@ -105,7 +320,7 @@ type VeventException struct {
 	Location     sql.NullString
 	Dtstart      sql.NullTime
 	Dtend        sql.NullTime
-	Status       sql.NullString
+	Status       NullEventStatus
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
 }

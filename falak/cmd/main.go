@@ -13,11 +13,13 @@ import (
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	"github.com/golang-migrate/migrate/v4/source/iofs"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/api/auth"
+	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/api/calendar"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/api/profile"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/apimetadata"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/email/emailer"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/email/template"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/gen/proto/auth/v1/authv1connect"
+	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/gen/proto/calendar/v1/calendarv1connect"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/gen/proto/profile/v1/profilev1connect"
 	googlesvc "github.com/jadwalapp/symmetrical-spoon/falak/pkg/google"
 	googleclient "github.com/jadwalapp/symmetrical-spoon/falak/pkg/google/client"
@@ -155,6 +157,7 @@ func main() {
 	reflector := grpcreflect.NewStaticReflector(
 		authv1connect.AuthServiceName,
 		profilev1connect.ProfileServiceName,
+		calendarv1connect.CalendarServiceName,
 	)
 	mux.Handle(grpcreflect.NewHandlerV1(reflector))
 	mux.Handle(grpcreflect.NewHandlerV1Alpha(reflector))
@@ -164,6 +167,9 @@ func main() {
 
 	profileServer := profile.NewService(*pv, *dbStore, apiMetadata)
 	mux.Handle(profilev1connect.NewProfileServiceHandler(profileServer, interceptorsForServer))
+
+	calendarServer := calendar.NewService(*pv, *dbStore, apiMetadata)
+	mux.Handle(calendarv1connect.NewCalendarServiceHandler(calendarServer, interceptorsForServer))
 
 	addr := fmt.Sprintf("0.0.0.0:%s", config.Port)
 	log.Info().Msgf("listening on %s", addr)
