@@ -54,6 +54,29 @@ func (q *Queries) CreateCalendarUnderCalendarAccountById(ctx context.Context, ar
 	return i, err
 }
 
+const doesCustomerOwnCalendar = `-- name: DoesCustomerOwnCalendar :one
+SELECT (
+    EXISTS(
+        SELECT 1 FROM vcalendar v
+        JOIN calendar_accounts ca ON v.uid = $2
+        WHERE ca.customer_id = $1
+      													
+    )
+) AS does_customer_own_calendar
+`
+
+type DoesCustomerOwnCalendarParams struct {
+	CustomerID uuid.UUID
+	Uid        string
+}
+
+func (q *Queries) DoesCustomerOwnCalendar(ctx context.Context, arg DoesCustomerOwnCalendarParams) (bool, error) {
+	row := q.db.QueryRowContext(ctx, doesCustomerOwnCalendar, arg.CustomerID, arg.Uid)
+	var does_customer_own_calendar bool
+	err := row.Scan(&does_customer_own_calendar)
+	return does_customer_own_calendar, err
+}
+
 const getCalendarsByCustomerId = `-- name: GetCalendarsByCustomerId :many
 SELECT id, customer_id, provider, ca.created_at, ca.updated_at, uid, account_id, prodid, version, calscale, display_name, description, color, timezone, sequence, v.created_at, v.updated_at
 FROM calendar_accounts ca

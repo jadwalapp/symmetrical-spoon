@@ -72,7 +72,11 @@ message Event {
 }
 
 message CreateEventRequest {
-    string calendar_id = 1 [(buf.validate.field).string.uuid = true];
+    string calendar_id = 1 [(buf.validate.field) = {
+        string: {
+            pattern: "^[0-9a-fA-F-]{36}@cal\\.jadwal\\.app$"
+        }
+    }];
     string title = 2 [(buf.validate.field) = {
         string: {
             min_len: 1,
@@ -87,6 +91,11 @@ message CreateEventRequest {
     bool is_all_day = 4;
     google.protobuf.Timestamp start_date = 5 [(buf.validate.field).required = true];
     google.protobuf.Timestamp end_date = 6 [(buf.validate.field).required = true];
+    string description = 7 [(buf.validate.field) = {
+        string: {
+            max_len: 512
+        }
+    }];
 }
 message CreateEventResponse {
     Event event = 1;
@@ -101,7 +110,11 @@ message DeleteEventRequest {
 message DeleteEventResponse {}
 
 message GetEventsByCalendarRequest {
-    string calendar_id = 1 [(buf.validate.field).string.uuid = true];
+    string calendar_id = 1 [(buf.validate.field) = {
+        string: {
+            pattern: "^[0-9a-fA-F-]{36}@cal\\.jadwal\\.app$"
+        }
+    }];
     google.protobuf.Timestamp start_date = 2;
     google.protobuf.Timestamp end_date = 3;
 }

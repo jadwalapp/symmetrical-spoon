@@ -59,3 +59,14 @@ func mapStoreGetCalendarsByCustomerIdAndAccountIdRowToPbCalendar(r *store.GetCal
 		Color:             r.Color,
 	}
 }
+
+func mapStoreVeventToPbEvent(e *store.Vevent) *calendarv1.Event {
+	return &calendarv1.Event{
+		Id:        e.Uid,
+		Title:     e.Summary,
+		Location:  e.Location.String,
+		IsAllDay:  false,
+		StartDate: &timestamppb.Timestamp{},
+		EndDate:   &timestamppb.Timestamp{},
+	}
+}

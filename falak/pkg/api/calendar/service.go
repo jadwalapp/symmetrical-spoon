@@ -4,6 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
+	"time"
 
 	"connectrpc.com/connect"
 	"github.com/bufbuild/protovalidate-go"
@@ -76,12 +78,6 @@ func (s *service) CreateCalendar(ctx context.Context, r *connect.Request[calenda
 		return nil, internalError
 	}
 
-	customer, err := s.store.GetCustomerById(ctx, tokenClaims.Payload.CustomerId)
-	if err != nil {
-		log.Ctx(ctx).Err(err).Msg("failed running GetCustomerByEmail")
-		return nil, internalError
-	}
-
 	calendarAccountID, err := uuid.Parse(r.Msg.CalendarAccountId)
 	if err != nil {
 		log.Ctx(ctx).Err(err).Msg("failed running uuid.Parse for r.Msg.CalendarAccountId")
@@ -89,7 +85,7 @@ func (s *service) CreateCalendar(ctx context.Context, r *connect.Request[calenda
 	}
 
 	doesCustomerOwnCalendarAccount, err := s.store.DoesCustomerOwnCalendarAccount(ctx, store.DoesCustomerOwnCalendarAccountParams{
-		CustomerID: customer.ID,
+		CustomerID: tokenClaims.Payload.CustomerId,
 		ID:         calendarAccountID,
 	})
 	if err != nil {
@@ -170,6 +166,76 @@ func (s *service) GetCalendars(ctx context.Context, r *connect.Request[calendarv
 	return &connect.Response[calendarv1.GetCalendarsResponse]{
 		Msg: &calendarv1.GetCalendarsResponse{
 			Calendars: pbCalendars,
+		},
+	}, nil
+}
+
+func (s *service) CreateEvent(ctx context.Context, r *connect.Request[calendarv1.CreateEventRequest]) (*connect.Response[calendarv1.CreateEventResponse], error) {
+	if err := s.pv.Validate(r.Msg); err != nil {
+		log.Ctx(ctx).Err(err).Msg("invalid request")
+		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+	}
+
+	tokenClaims, ok := s.apiMetadata.GetClaims(ctx)
+	if !ok {
+		log.Ctx(ctx).Error().Msg("failed running GetClaims")
+		return nil, internalError
+	}
+
+	doesCustomerOwnCalendar, err := s.store.DoesCustomerOwnCalendar(ctx, store.DoesCustomerOwnCalendarParams{
+		CustomerID: tokenClaims.Payload.CustomerId,
+		Uid:        r.Msg.CalendarId,
+	})
+	if err != nil {
+		log.Ctx(ctx).Err(err).Msg("failed running DoesCustomerOwnCalendar")
+		return nil, internalError
+	}
+	if !doesCustomerOwnCalendar {
+		log.Ctx(ctx).Err(err).Msg("an idiot is trying to mess with our system :D")
+		return nil, internalError
+	}
+
+	dtstart := r.Msg.StartDate.AsTime()
+	dtend := r.Msg.EndDate.AsTime()
+
+	if r.Msg.IsAllDay {
+		dtstart = time.Date(dtstart.Year(), dtstart.Month(), dtstart.Day(), 0, 0, 0, 0, time.UTC)
+		dtend = time.Date(dtend.Year(), dtend.Month(), dtend.Day(), 0, 0, 0, 0, time.UTC).Add(24 * time.Hour)
+	}
+
+	if !dtend.After(dtstart) {
+		return nil, fmt.Errorf("invalid event: start date must be before end date")
+	}
+
+	event, err := s.store.CreateEventUnderCalendarByUid(ctx, store.CreateEventUnderCalendarByUidParams{
+		CalendarUid: r.Msg.CalendarId,
+		Dtstamp:     time.Now().UTC(),
+		Dtstart:     dtstart,
+		Dtend: sql.NullTime{
+			Time:  dtend,
+			Valid: true,
+		},
+		Summary: r.Msg.Title,
+		Description: sql.NullString{
+			String: r.Msg.Description,
+			Valid:  r.Msg.Description != "",
+		},
+		Location: sql.NullString{
+			String: r.Msg.Location,
+			Valid:  r.Msg.Location != "",
+		},
+		Status:         store.NullEventStatus{},         // Assuming default
+		Classification: store.NullEventClassification{}, // Assuming default
+		Transp:         store.NullTransparency{},        // Assuming default
+	})
+	if err != nil {
+		log.Ctx(ctx).Error().Msg("failed running CreateEventUnderCalendarByUid")
+		return nil, internalError
+	}
+
+	return &connect.Response[calendarv1.CreateEventResponse]{
+		Msg: &calendarv1.CreateEventResponse{
+			Event: mapStoreVeventToPbEvent(&event),
 		},
 	}, nil
 }

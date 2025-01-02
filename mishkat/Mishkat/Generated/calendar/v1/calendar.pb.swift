@@ -298,6 +298,8 @@ public struct Calendar_V1_CreateEventRequest: Sendable {
   /// Clears the value of `endDate`. Subsequent reads from it will return its default value.
   public mutating func clearEndDate() {self._endDate = nil}
 
+  public var description_p: String = String()
+
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   public init() {}
@@ -871,6 +873,7 @@ extension Calendar_V1_CreateEventRequest: SwiftProtobuf.Message, SwiftProtobuf._
     4: .standard(proto: "is_all_day"),
     5: .standard(proto: "start_date"),
     6: .standard(proto: "end_date"),
+    7: .same(proto: "description"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -885,6 +888,7 @@ extension Calendar_V1_CreateEventRequest: SwiftProtobuf.Message, SwiftProtobuf._
       case 4: try { try decoder.decodeSingularBoolField(value: &self.isAllDay) }()
       case 5: try { try decoder.decodeSingularMessageField(value: &self._startDate) }()
       case 6: try { try decoder.decodeSingularMessageField(value: &self._endDate) }()
+      case 7: try { try decoder.decodeSingularStringField(value: &self.description_p) }()
       default: break
       }
     }
@@ -913,6 +917,9 @@ extension Calendar_V1_CreateEventRequest: SwiftProtobuf.Message, SwiftProtobuf._
     try { if let v = self._endDate {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 6)
     } }()
+    if !self.description_p.isEmpty {
+      try visitor.visitSingularStringField(value: self.description_p, fieldNumber: 7)
+    }
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -923,6 +930,7 @@ extension Calendar_V1_CreateEventRequest: SwiftProtobuf.Message, SwiftProtobuf._
     if lhs.isAllDay != rhs.isAllDay {return false}
     if lhs._startDate != rhs._startDate {return false}
     if lhs._endDate != rhs._endDate {return false}
+    if lhs.description_p != rhs.description_p {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
