@@ -62,6 +62,16 @@ message GetCalendarsResponse {
     repeated Calendar calendars = 1;
 }
 
+message CalendarAccountWithCalendars {
+    CalendarAccount account = 1;
+    repeated Calendar calendars = 2;
+}
+
+message GetCalendarsWithCalendarAccountsRequest {}
+message GetCalendarsWithCalendarAccountsResponse {
+    repeated CalendarAccountWithCalendars calendar_account_with_calendars_list = 1;
+}
+
 message Event {
     string id = 1;
     string title = 2;
@@ -143,6 +153,8 @@ service CalendarService {
 
     rpc CreateCalendar(CreateCalendarRequest) returns (CreateCalendarResponse);
     rpc GetCalendars(GetCalendarsRequest) returns (GetCalendarsResponse);
+
+    rpc GetCalendarsWithCalendarAccounts(GetCalendarsWithCalendarAccountsRequest) returns (GetCalendarsWithCalendarAccountsResponse);
     
     rpc CreateEvent(CreateEventRequest) returns (CreateEventResponse);
     rpc UpdateEvent(UpdateEventRequest) returns (UpdateEventResponse);
