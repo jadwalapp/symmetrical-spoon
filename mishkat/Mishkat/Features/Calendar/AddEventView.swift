@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct AddEventView: View {
+    @EnvironmentObject var calendarViewModel: CalendarViewModel
+    
     @Binding var isPresented: Bool
     var selectedDate: DateComponents?
     
@@ -17,6 +19,10 @@ struct AddEventView: View {
     @State private var endDate = Date().addingTimeInterval(3600) // 1 hour later
     @State private var notes = ""
     @State private var isAllDay = false
+    
+    var isValid: Bool {
+        return eventTitle.count > 0 && startDate < endDate
+    }
     
     var body: some View {
         NavigationStack {
@@ -29,13 +35,22 @@ struct AddEventView: View {
                 }
                 
                 Section {
+                    AsyncView(response: calendarViewModel.calendarsWithCalendarAccountsState) { resp in
+                        Text("resp: \(resp)")
+                    }
+                    
+                }
+                
+                Section {
                     Toggle("All-day", isOn: $isAllDay)
-                    DatePicker("Starts",
-                             selection: $startDate,
-                             displayedComponents: isAllDay ? .date : [.date, .hourAndMinute])
-                    DatePicker("Ends",
-                             selection: $endDate,
-                             displayedComponents: isAllDay ? .date : [.date, .hourAndMinute])
+                    DatePicker(
+                        "Starts",
+                        selection: $startDate,
+                        displayedComponents: isAllDay ? .date : [.date, .hourAndMinute])
+                    DatePicker(
+                        "Ends",
+                        selection: $endDate,
+                        displayedComponents: isAllDay ? .date : [.date, .hourAndMinute])
                 }
                 
                 Section {
@@ -54,14 +69,28 @@ struct AddEventView: View {
                     }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Add") {
-                        // Here you would save the event
-                        isPresented = false
+                    if calendarViewModel.createEventState == .loading {
+                        ProgressView()
+                    } else {
+                        Button("Add") {
+                            calendarViewModel.createEvent(
+                                calendarId: "",
+                                title: eventTitle,
+                                location: eventLocation,
+                                isAllDay: isAllDay,
+                                startDate: startDate,
+                                endDate: endDate
+                            )
+                            isPresented = false
+                        }
+                        .disabled(!isValid || calendarViewModel.calendarsWithCalendarAccountsState == .loading)
                     }
                 }
             }
         }
         .onAppear {
+            calendarViewModel.getCalendarsWithCalendarAccounts()
+            
             if let selectedDate = selectedDate {
                 var components = DateComponents()
                 components.year = selectedDate.year
@@ -72,6 +101,11 @@ struct AddEventView: View {
                     startDate = date
                     endDate = date.addingTimeInterval(3600)
                 }
+            }
+        }
+        .onChange(of: calendarViewModel.createEventState) { newValue in
+            if  case .loaded = newValue {
+                isPresented = false
             }
         }
     }
@@ -87,4 +121,5 @@ struct AddEventView: View {
             day: 20
         )
     )
+    .environmentObject(CalendarViewModel(calendarRepository: DependencyContainer.shared.calendarRepository))
 }

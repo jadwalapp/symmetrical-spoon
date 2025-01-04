@@ -28,4 +28,7 @@ class DependencyContainer {
     
     lazy private var profileClient: Profile_V1_ProfileServiceClient = { return Profile_V1_ProfileServiceClient(client: client) }()
     lazy var profileRepository: ProfileRepository = { return ProfileRepository(profileClient: profileClient) }()
+    
+    lazy private var calendarClient: Calendar_V1_CalendarServiceClient = { return Calendar_V1_CalendarServiceClient(client: client) }()
+    lazy var calendarRepository: CalendarRepository = { return CalendarRepository(calendarClient: calendarClient) }()
 }
