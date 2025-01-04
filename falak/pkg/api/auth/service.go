@@ -179,6 +179,7 @@ func (s *service) CompleteEmail(ctx context.Context, r *connect.Request[authv1.C
 		},
 	}, nil
 }
+
 func (s *service) UseGoogle(ctx context.Context, r *connect.Request[authv1.UseGoogleRequest]) (*connect.Response[authv1.UseGoogleResponse], error) {
 	if err := s.pv.Validate(r.Msg); err != nil {
 		log.Ctx(ctx).Err(err).Msg("invalid request")

@@ -240,6 +240,56 @@ func (s *service) CreateEvent(ctx context.Context, r *connect.Request[calendarv1
 	}, nil
 }
 
+func (s *service) GetCalendarsWithCalendarAccounts(ctx context.Context, r *connect.Request[calendarv1.GetCalendarsWithCalendarAccountsRequest]) (*connect.Response[calendarv1.GetCalendarsWithCalendarAccountsResponse], error) {
+	if err := s.pv.Validate(r.Msg); err != nil {
+		log.Ctx(ctx).Err(err).Msg("invalid request")
+		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+	}
+
+	calendarAccountsResp, err := s.GetCalendarAccounts(ctx, &connect.Request[calendarv1.GetCalendarAccountsRequest]{
+		Msg: &calendarv1.GetCalendarAccountsRequest{},
+	})
+	if err != nil {
+		log.Ctx(ctx).Error().Msg("failed running GetCalendarAccounts")
+		return nil, internalError
+	}
+
+	calendarsResp, err := s.GetCalendars(ctx, &connect.Request[calendarv1.GetCalendarsRequest]{
+		Msg: &calendarv1.GetCalendarsRequest{
+			CalendarAccountId: nil,
+		},
+	})
+	if err != nil {
+		log.Ctx(ctx).Error().Msg("failed running GetCalendars")
+		return nil, internalError
+	}
+
+	accountWithCalendarsMap := make(map[string]*calendarv1.CalendarAccountWithCalendars, len(calendarAccountsResp.Msg.CalendarAccounts))
+	for _, calendarAccount := range calendarAccountsResp.Msg.CalendarAccounts {
+		accountWithCalendarsMap[calendarAccount.Id] = &calendarv1.CalendarAccountWithCalendars{
+			Account:   calendarAccount,
+			Calendars: []*calendarv1.Calendar{},
+		}
+	}
+
+	for _, calendar := range calendarsResp.Msg.Calendars {
+		if accountWithCalendars, exists := accountWithCalendarsMap[calendar.CalendarAccountId]; exists {
+			accountWithCalendars.Calendars = append(accountWithCalendars.Calendars, calendar)
+		}
+	}
+
+	accountWithCalendarsList := make([]*calendarv1.CalendarAccountWithCalendars, 0, len(calendarAccountsResp.Msg.CalendarAccounts))
+	for _, accountWithCalendars := range accountWithCalendarsMap {
+		accountWithCalendarsList = append(accountWithCalendarsList, accountWithCalendars)
+	}
+
+	return &connect.Response[calendarv1.GetCalendarsWithCalendarAccountsResponse]{
+		Msg: &calendarv1.GetCalendarsWithCalendarAccountsResponse{
+			CalendarAccountWithCalendarsList: accountWithCalendarsList,
+		},
+	}, nil
+}
+
 func NewService(pv protovalidate.Validator, store store.Queries, apiMetadata apimetadata.ApiMetadata) calendarv1connect.CalendarServiceHandler {
 	return &service{
 		pv:          pv,
