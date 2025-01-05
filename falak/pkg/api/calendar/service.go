@@ -229,7 +229,7 @@ func (s *service) CreateEvent(ctx context.Context, r *connect.Request[calendarv1
 		Transp:         store.NullTransparency{},        // Assuming default
 	})
 	if err != nil {
-		log.Ctx(ctx).Error().Msg("failed running CreateEventUnderCalendarByUid")
+		log.Ctx(ctx).Err(err).Msg("failed running CreateEventUnderCalendarByUid")
 		return nil, internalError
 	}
 
@@ -250,7 +250,7 @@ func (s *service) GetCalendarsWithCalendarAccounts(ctx context.Context, r *conne
 		Msg: &calendarv1.GetCalendarAccountsRequest{},
 	})
 	if err != nil {
-		log.Ctx(ctx).Error().Msg("failed running GetCalendarAccounts")
+		log.Ctx(ctx).Err(err).Msg("failed running GetCalendarAccounts")
 		return nil, internalError
 	}
 
@@ -260,7 +260,7 @@ func (s *service) GetCalendarsWithCalendarAccounts(ctx context.Context, r *conne
 		},
 	})
 	if err != nil {
-		log.Ctx(ctx).Error().Msg("failed running GetCalendars")
+		log.Ctx(ctx).Err(err).Msg("failed running GetCalendars")
 		return nil, internalError
 	}
 
