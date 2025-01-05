@@ -30,7 +30,7 @@ SELECT
       WHERE ml.customer_id = $1
         AND ml.used_at IS NOT NULL
     )
-    OR 
+    AND 
     NOT EXISTS (
       SELECT 1 
       FROM auth_google ag
