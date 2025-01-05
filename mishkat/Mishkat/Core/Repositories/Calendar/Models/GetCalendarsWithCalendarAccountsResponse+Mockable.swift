@@ -23,7 +23,6 @@ extension Calendar_V1_GetCalendarsWithCalendarAccountsResponse: Mockable {
         
         resp.calendarAccountWithCalendarsList = [
             fakeEntry,
-            fakeEntry,
         ]
         
         return resp

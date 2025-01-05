@@ -20,8 +20,33 @@ struct AddEventView: View {
     @State private var notes = ""
     @State private var isAllDay = false
     
+    @State private var selectedCalender: Calendar_V1_Calendar?
+    
     var isValid: Bool {
-        return eventTitle.count > 0 && startDate < endDate
+        return eventTitle.count > 0 && startDate < endDate && selectedCalender != nil
+    }
+    
+    var calendarPicker: some View {
+        AsyncView(response: calendarViewModel.calendarsWithCalendarAccountsState) { resp in
+            if selectedCalender != nil {
+                Picker("Calendar", selection: $selectedCalender) {
+                    ForEach(resp.calendarAccountWithCalendarsList) { accountWithCalendars in
+                        Section(header: Text("\(accountWithCalendars.account.provider.rawValue)")) {
+                            ForEach(accountWithCalendars.calendars) { calendar in
+                                Text(calendar.name).tag(calendar)
+                            }
+                        }
+                    }
+                }
+            } else {
+                HStack {
+                    Text("Calendar")
+                        .unredacted()
+                    Spacer()
+                    Text("THE CALENDAR :D")
+                }
+            }
+        }
     }
     
     var body: some View {
@@ -35,10 +60,8 @@ struct AddEventView: View {
                 }
                 
                 Section {
-                    AsyncView(response: calendarViewModel.calendarsWithCalendarAccountsState) { resp in
-                        Text("resp: \(resp)")
-                    }
-                    
+                    calendarPicker
+                        .frame(height: 40)
                 }
                 
                 Section {
@@ -73,15 +96,16 @@ struct AddEventView: View {
                         ProgressView()
                     } else {
                         Button("Add") {
-                            calendarViewModel.createEvent(
-                                calendarId: "",
-                                title: eventTitle,
-                                location: eventLocation,
-                                isAllDay: isAllDay,
-                                startDate: startDate,
-                                endDate: endDate
-                            )
-                            isPresented = false
+                            if let calendarId = selectedCalender?.id {
+                                calendarViewModel.createEvent(
+                                    calendarId: calendarId,
+                                    title: eventTitle,
+                                    location: eventLocation,
+                                    isAllDay: isAllDay,
+                                    startDate: startDate,
+                                    endDate: endDate
+                                )
+                            }
                         }
                         .disabled(!isValid || calendarViewModel.calendarsWithCalendarAccountsState == .loading)
                     }
@@ -106,6 +130,13 @@ struct AddEventView: View {
         .onChange(of: calendarViewModel.createEventState) { newValue in
             if  case .loaded = newValue {
                 isPresented = false
+            }
+        }
+        .onChange(of: calendarViewModel.calendarsWithCalendarAccountsState) { newValue in
+            if case .loaded(let calendars) = newValue, !calendars.calendarAccountWithCalendarsList.isEmpty {
+                if let firstCalendar = calendars.calendarAccountWithCalendarsList.first?.calendars.first {
+                    selectedCalender = firstCalendar
+                }
             }
         }
     }
