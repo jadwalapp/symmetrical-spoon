@@ -20,6 +20,80 @@ fileprivate struct _GeneratedWithProtocGenSwiftVersion: SwiftProtobuf.ProtobufAP
   typealias Version = _2
 }
 
+public enum Calendar_V1_CalendarAccountProvider: SwiftProtobuf.Enum, Swift.CaseIterable {
+  public typealias RawValue = Int
+  case unspecified // = 0
+  case local // = 1
+  case caldav // = 2
+  case UNRECOGNIZED(Int)
+
+  public init() {
+    self = .unspecified
+  }
+
+  public init?(rawValue: Int) {
+    switch rawValue {
+    case 0: self = .unspecified
+    case 1: self = .local
+    case 2: self = .caldav
+    default: self = .UNRECOGNIZED(rawValue)
+    }
+  }
+
+  public var rawValue: Int {
+    switch self {
+    case .unspecified: return 0
+    case .local: return 1
+    case .caldav: return 2
+    case .UNRECOGNIZED(let i): return i
+    }
+  }
+
+  // The compiler won't synthesize support with the UNRECOGNIZED case.
+  public static let allCases: [Calendar_V1_CalendarAccountProvider] = [
+    .unspecified,
+    .local,
+    .caldav,
+  ]
+
+}
+
+public struct Calendar_V1_CalendarAccount: Sendable {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  public var id: String = String()
+
+  public var provider: Calendar_V1_CalendarAccountProvider = .unspecified
+
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  public init() {}
+}
+
+public struct Calendar_V1_GetCalendarAccountsRequest: Sendable {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  public init() {}
+}
+
+public struct Calendar_V1_GetCalendarAccountsResponse: Sendable {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  public var calendarAccounts: [Calendar_V1_CalendarAccount] = []
+
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  public init() {}
+}
+
 public struct Calendar_V1_Calendar: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
@@ -27,7 +101,11 @@ public struct Calendar_V1_Calendar: Sendable {
 
   public var id: String = String()
 
+  public var calendarAccountID: String = String()
+
   public var name: String = String()
+
+  public var description_p: String = String()
 
   public var startDate: SwiftProtobuf.Google_Protobuf_Timestamp {
     get {return _startDate ?? SwiftProtobuf.Google_Protobuf_Timestamp()}
@@ -62,7 +140,11 @@ public struct Calendar_V1_CreateCalendarRequest: Sendable {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
+  public var calendarAccountID: String = String()
+
   public var name: String = String()
+
+  public var description_p: String = String()
 
   public var startDate: SwiftProtobuf.Google_Protobuf_Timestamp {
     get {return _startDate ?? SwiftProtobuf.Google_Protobuf_Timestamp()}
@@ -118,9 +200,20 @@ public struct Calendar_V1_GetCalendarsRequest: Sendable {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
+  public var calendarAccountID: String {
+    get {return _calendarAccountID ?? String()}
+    set {_calendarAccountID = newValue}
+  }
+  /// Returns true if `calendarAccountID` has been explicitly set.
+  public var hasCalendarAccountID: Bool {return self._calendarAccountID != nil}
+  /// Clears the value of `calendarAccountID`. Subsequent reads from it will return its default value.
+  public mutating func clearCalendarAccountID() {self._calendarAccountID = nil}
+
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   public init() {}
+
+  fileprivate var _calendarAccountID: String? = nil
 }
 
 public struct Calendar_V1_GetCalendarsResponse: Sendable {
@@ -129,6 +222,51 @@ public struct Calendar_V1_GetCalendarsResponse: Sendable {
   // methods supported on all messages.
 
   public var calendars: [Calendar_V1_Calendar] = []
+
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  public init() {}
+}
+
+public struct Calendar_V1_CalendarAccountWithCalendars: Sendable {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  public var account: Calendar_V1_CalendarAccount {
+    get {return _account ?? Calendar_V1_CalendarAccount()}
+    set {_account = newValue}
+  }
+  /// Returns true if `account` has been explicitly set.
+  public var hasAccount: Bool {return self._account != nil}
+  /// Clears the value of `account`. Subsequent reads from it will return its default value.
+  public mutating func clearAccount() {self._account = nil}
+
+  public var calendars: [Calendar_V1_Calendar] = []
+
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  public init() {}
+
+  fileprivate var _account: Calendar_V1_CalendarAccount? = nil
+}
+
+public struct Calendar_V1_GetCalendarsWithCalendarAccountsRequest: Sendable {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  public init() {}
+}
+
+public struct Calendar_V1_GetCalendarsWithCalendarAccountsResponse: Sendable {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  public var calendarAccountWithCalendarsList: [Calendar_V1_CalendarAccountWithCalendars] = []
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -204,6 +342,8 @@ public struct Calendar_V1_CreateEventRequest: Sendable {
   public var hasEndDate: Bool {return self._endDate != nil}
   /// Clears the value of `endDate`. Subsequent reads from it will return its default value.
   public mutating func clearEndDate() {self._endDate = nil}
+
+  public var description_p: String = String()
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -364,14 +504,19 @@ public struct Calendar_V1_ConnectCalDAVCalendarResponse: Sendable {
 
 fileprivate let _protobuf_package = "calendar.v1"
 
-extension Calendar_V1_Calendar: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  public static let protoMessageName: String = _protobuf_package + ".Calendar"
+extension Calendar_V1_CalendarAccountProvider: SwiftProtobuf._ProtoNameProviding {
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    0: .same(proto: "CALENDAR_ACCOUNT_PROVIDER_UNSPECIFIED"),
+    1: .same(proto: "CALENDAR_ACCOUNT_PROVIDER_LOCAL"),
+    2: .same(proto: "CALENDAR_ACCOUNT_PROVIDER_CALDAV"),
+  ]
+}
+
+extension Calendar_V1_CalendarAccount: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".CalendarAccount"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "id"),
-    2: .same(proto: "name"),
-    3: .standard(proto: "start_date"),
-    4: .standard(proto: "end_date"),
-    5: .same(proto: "color"),
+    2: .same(proto: "provider"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -381,10 +526,106 @@ extension Calendar_V1_Calendar: SwiftProtobuf.Message, SwiftProtobuf._MessageImp
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
       case 1: try { try decoder.decodeSingularStringField(value: &self.id) }()
-      case 2: try { try decoder.decodeSingularStringField(value: &self.name) }()
-      case 3: try { try decoder.decodeSingularMessageField(value: &self._startDate) }()
-      case 4: try { try decoder.decodeSingularMessageField(value: &self._endDate) }()
-      case 5: try { try decoder.decodeSingularStringField(value: &self.color) }()
+      case 2: try { try decoder.decodeSingularEnumField(value: &self.provider) }()
+      default: break
+      }
+    }
+  }
+
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if !self.id.isEmpty {
+      try visitor.visitSingularStringField(value: self.id, fieldNumber: 1)
+    }
+    if self.provider != .unspecified {
+      try visitor.visitSingularEnumField(value: self.provider, fieldNumber: 2)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  public static func ==(lhs: Calendar_V1_CalendarAccount, rhs: Calendar_V1_CalendarAccount) -> Bool {
+    if lhs.id != rhs.id {return false}
+    if lhs.provider != rhs.provider {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Calendar_V1_GetCalendarAccountsRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".GetCalendarAccountsRequest"
+  public static let _protobuf_nameMap = SwiftProtobuf._NameMap()
+
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    // Load everything into unknown fields
+    while try decoder.nextFieldNumber() != nil {}
+  }
+
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  public static func ==(lhs: Calendar_V1_GetCalendarAccountsRequest, rhs: Calendar_V1_GetCalendarAccountsRequest) -> Bool {
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Calendar_V1_GetCalendarAccountsResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".GetCalendarAccountsResponse"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "calendar_accounts"),
+  ]
+
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeRepeatedMessageField(value: &self.calendarAccounts) }()
+      default: break
+      }
+    }
+  }
+
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if !self.calendarAccounts.isEmpty {
+      try visitor.visitRepeatedMessageField(value: self.calendarAccounts, fieldNumber: 1)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  public static func ==(lhs: Calendar_V1_GetCalendarAccountsResponse, rhs: Calendar_V1_GetCalendarAccountsResponse) -> Bool {
+    if lhs.calendarAccounts != rhs.calendarAccounts {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Calendar_V1_Calendar: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".Calendar"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "id"),
+    2: .standard(proto: "calendar_account_id"),
+    3: .same(proto: "name"),
+    4: .same(proto: "description"),
+    5: .standard(proto: "start_date"),
+    6: .standard(proto: "end_date"),
+    7: .same(proto: "color"),
+  ]
+
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularStringField(value: &self.id) }()
+      case 2: try { try decoder.decodeSingularStringField(value: &self.calendarAccountID) }()
+      case 3: try { try decoder.decodeSingularStringField(value: &self.name) }()
+      case 4: try { try decoder.decodeSingularStringField(value: &self.description_p) }()
+      case 5: try { try decoder.decodeSingularMessageField(value: &self._startDate) }()
+      case 6: try { try decoder.decodeSingularMessageField(value: &self._endDate) }()
+      case 7: try { try decoder.decodeSingularStringField(value: &self.color) }()
       default: break
       }
     }
@@ -398,24 +639,32 @@ extension Calendar_V1_Calendar: SwiftProtobuf.Message, SwiftProtobuf._MessageImp
     if !self.id.isEmpty {
       try visitor.visitSingularStringField(value: self.id, fieldNumber: 1)
     }
+    if !self.calendarAccountID.isEmpty {
+      try visitor.visitSingularStringField(value: self.calendarAccountID, fieldNumber: 2)
+    }
     if !self.name.isEmpty {
-      try visitor.visitSingularStringField(value: self.name, fieldNumber: 2)
+      try visitor.visitSingularStringField(value: self.name, fieldNumber: 3)
+    }
+    if !self.description_p.isEmpty {
+      try visitor.visitSingularStringField(value: self.description_p, fieldNumber: 4)
     }
     try { if let v = self._startDate {
-      try visitor.visitSingularMessageField(value: v, fieldNumber: 3)
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 5)
     } }()
     try { if let v = self._endDate {
-      try visitor.visitSingularMessageField(value: v, fieldNumber: 4)
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 6)
     } }()
     if !self.color.isEmpty {
-      try visitor.visitSingularStringField(value: self.color, fieldNumber: 5)
+      try visitor.visitSingularStringField(value: self.color, fieldNumber: 7)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
 
   public static func ==(lhs: Calendar_V1_Calendar, rhs: Calendar_V1_Calendar) -> Bool {
     if lhs.id != rhs.id {return false}
+    if lhs.calendarAccountID != rhs.calendarAccountID {return false}
     if lhs.name != rhs.name {return false}
+    if lhs.description_p != rhs.description_p {return false}
     if lhs._startDate != rhs._startDate {return false}
     if lhs._endDate != rhs._endDate {return false}
     if lhs.color != rhs.color {return false}
@@ -427,10 +676,12 @@ extension Calendar_V1_Calendar: SwiftProtobuf.Message, SwiftProtobuf._MessageImp
 extension Calendar_V1_CreateCalendarRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".CreateCalendarRequest"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .same(proto: "name"),
-    2: .standard(proto: "start_date"),
-    3: .standard(proto: "end_date"),
-    4: .same(proto: "color"),
+    1: .standard(proto: "calendar_account_id"),
+    2: .same(proto: "name"),
+    3: .same(proto: "description"),
+    4: .standard(proto: "start_date"),
+    5: .standard(proto: "end_date"),
+    6: .same(proto: "color"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -439,10 +690,12 @@ extension Calendar_V1_CreateCalendarRequest: SwiftProtobuf.Message, SwiftProtobu
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeSingularStringField(value: &self.name) }()
-      case 2: try { try decoder.decodeSingularMessageField(value: &self._startDate) }()
-      case 3: try { try decoder.decodeSingularMessageField(value: &self._endDate) }()
-      case 4: try { try decoder.decodeSingularStringField(value: &self.color) }()
+      case 1: try { try decoder.decodeSingularStringField(value: &self.calendarAccountID) }()
+      case 2: try { try decoder.decodeSingularStringField(value: &self.name) }()
+      case 3: try { try decoder.decodeSingularStringField(value: &self.description_p) }()
+      case 4: try { try decoder.decodeSingularMessageField(value: &self._startDate) }()
+      case 5: try { try decoder.decodeSingularMessageField(value: &self._endDate) }()
+      case 6: try { try decoder.decodeSingularStringField(value: &self.color) }()
       default: break
       }
     }
@@ -453,23 +706,31 @@ extension Calendar_V1_CreateCalendarRequest: SwiftProtobuf.Message, SwiftProtobu
     // allocates stack space for every if/case branch local when no optimizations
     // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
     // https://github.com/apple/swift-protobuf/issues/1182
+    if !self.calendarAccountID.isEmpty {
+      try visitor.visitSingularStringField(value: self.calendarAccountID, fieldNumber: 1)
+    }
     if !self.name.isEmpty {
-      try visitor.visitSingularStringField(value: self.name, fieldNumber: 1)
+      try visitor.visitSingularStringField(value: self.name, fieldNumber: 2)
+    }
+    if !self.description_p.isEmpty {
+      try visitor.visitSingularStringField(value: self.description_p, fieldNumber: 3)
     }
     try { if let v = self._startDate {
-      try visitor.visitSingularMessageField(value: v, fieldNumber: 2)
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 4)
     } }()
     try { if let v = self._endDate {
-      try visitor.visitSingularMessageField(value: v, fieldNumber: 3)
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 5)
     } }()
     if !self.color.isEmpty {
-      try visitor.visitSingularStringField(value: self.color, fieldNumber: 4)
+      try visitor.visitSingularStringField(value: self.color, fieldNumber: 6)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
 
   public static func ==(lhs: Calendar_V1_CreateCalendarRequest, rhs: Calendar_V1_CreateCalendarRequest) -> Bool {
+    if lhs.calendarAccountID != rhs.calendarAccountID {return false}
     if lhs.name != rhs.name {return false}
+    if lhs.description_p != rhs.description_p {return false}
     if lhs._startDate != rhs._startDate {return false}
     if lhs._endDate != rhs._endDate {return false}
     if lhs.color != rhs.color {return false}
@@ -516,18 +777,35 @@ extension Calendar_V1_CreateCalendarResponse: SwiftProtobuf.Message, SwiftProtob
 
 extension Calendar_V1_GetCalendarsRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GetCalendarsRequest"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap()
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "calendar_account_id"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
-    // Load everything into unknown fields
-    while try decoder.nextFieldNumber() != nil {}
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularStringField(value: &self._calendarAccountID) }()
+      default: break
+      }
+    }
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._calendarAccountID {
+      try visitor.visitSingularStringField(value: v, fieldNumber: 1)
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
   public static func ==(lhs: Calendar_V1_GetCalendarsRequest, rhs: Calendar_V1_GetCalendarsRequest) -> Bool {
+    if lhs._calendarAccountID != rhs._calendarAccountID {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
@@ -560,6 +838,99 @@ extension Calendar_V1_GetCalendarsResponse: SwiftProtobuf.Message, SwiftProtobuf
 
   public static func ==(lhs: Calendar_V1_GetCalendarsResponse, rhs: Calendar_V1_GetCalendarsResponse) -> Bool {
     if lhs.calendars != rhs.calendars {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Calendar_V1_CalendarAccountWithCalendars: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".CalendarAccountWithCalendars"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "account"),
+    2: .same(proto: "calendars"),
+  ]
+
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularMessageField(value: &self._account) }()
+      case 2: try { try decoder.decodeRepeatedMessageField(value: &self.calendars) }()
+      default: break
+      }
+    }
+  }
+
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._account {
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
+    } }()
+    if !self.calendars.isEmpty {
+      try visitor.visitRepeatedMessageField(value: self.calendars, fieldNumber: 2)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  public static func ==(lhs: Calendar_V1_CalendarAccountWithCalendars, rhs: Calendar_V1_CalendarAccountWithCalendars) -> Bool {
+    if lhs._account != rhs._account {return false}
+    if lhs.calendars != rhs.calendars {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Calendar_V1_GetCalendarsWithCalendarAccountsRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".GetCalendarsWithCalendarAccountsRequest"
+  public static let _protobuf_nameMap = SwiftProtobuf._NameMap()
+
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    // Load everything into unknown fields
+    while try decoder.nextFieldNumber() != nil {}
+  }
+
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  public static func ==(lhs: Calendar_V1_GetCalendarsWithCalendarAccountsRequest, rhs: Calendar_V1_GetCalendarsWithCalendarAccountsRequest) -> Bool {
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Calendar_V1_GetCalendarsWithCalendarAccountsResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".GetCalendarsWithCalendarAccountsResponse"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "calendar_account_with_calendars_list"),
+  ]
+
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeRepeatedMessageField(value: &self.calendarAccountWithCalendarsList) }()
+      default: break
+      }
+    }
+  }
+
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if !self.calendarAccountWithCalendarsList.isEmpty {
+      try visitor.visitRepeatedMessageField(value: self.calendarAccountWithCalendarsList, fieldNumber: 1)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  public static func ==(lhs: Calendar_V1_GetCalendarsWithCalendarAccountsResponse, rhs: Calendar_V1_GetCalendarsWithCalendarAccountsResponse) -> Bool {
+    if lhs.calendarAccountWithCalendarsList != rhs.calendarAccountWithCalendarsList {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
@@ -640,6 +1011,7 @@ extension Calendar_V1_CreateEventRequest: SwiftProtobuf.Message, SwiftProtobuf._
     4: .standard(proto: "is_all_day"),
     5: .standard(proto: "start_date"),
     6: .standard(proto: "end_date"),
+    7: .same(proto: "description"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -654,6 +1026,7 @@ extension Calendar_V1_CreateEventRequest: SwiftProtobuf.Message, SwiftProtobuf._
       case 4: try { try decoder.decodeSingularBoolField(value: &self.isAllDay) }()
       case 5: try { try decoder.decodeSingularMessageField(value: &self._startDate) }()
       case 6: try { try decoder.decodeSingularMessageField(value: &self._endDate) }()
+      case 7: try { try decoder.decodeSingularStringField(value: &self.description_p) }()
       default: break
       }
     }
@@ -682,6 +1055,9 @@ extension Calendar_V1_CreateEventRequest: SwiftProtobuf.Message, SwiftProtobuf._
     try { if let v = self._endDate {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 6)
     } }()
+    if !self.description_p.isEmpty {
+      try visitor.visitSingularStringField(value: self.description_p, fieldNumber: 7)
+    }
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -692,6 +1068,7 @@ extension Calendar_V1_CreateEventRequest: SwiftProtobuf.Message, SwiftProtobuf._
     if lhs.isAllDay != rhs.isAllDay {return false}
     if lhs._startDate != rhs._startDate {return false}
     if lhs._endDate != rhs._endDate {return false}
+    if lhs.description_p != rhs.description_p {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }

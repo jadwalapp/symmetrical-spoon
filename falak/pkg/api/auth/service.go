@@ -130,6 +130,27 @@ func (s *service) CompleteEmail(ctx context.Context, r *connect.Request[authv1.C
 			return nil, internalError
 		}
 
+		calendarAccount, err := s.store.CreateCalendarAccount(ctx, store.CreateCalendarAccountParams{
+			CustomerID: customer.ID,
+			Provider:   store.ProviderTypeLocal,
+		})
+		if err != nil {
+			log.Ctx(ctx).Err(err).Msg("failed running CreateCalendarAccount")
+			return nil, internalError
+		}
+
+		_, err = s.store.CreateCalendarUnderCalendarAccountById(ctx, store.CreateCalendarUnderCalendarAccountByIdParams{
+			AccountID:   calendarAccount.ID,
+			Prodid:      util.ProdID,
+			DisplayName: fmt.Sprintf("%s's Calendar", customer.Name),
+			Description: sql.NullString{String: "", Valid: false},
+			Color:       "#C35831", // pearl orange
+		})
+		if err != nil {
+			log.Ctx(ctx).Err(err).Msg("failed running CreateCalendarUnderCalendarAccountById")
+			return nil, internalError
+		}
+
 		err = s.emailer.Send(ctx, emailer.FromEmail_HelloEmail, customer.Email, fmt.Sprintf("Hala Wallah %s", customer.Name), "We are happy to help you schedule your calendar")
 		if err != nil {
 			log.Ctx(ctx).Err(err).Msg("failed running SendFromTemplate for magic link template")
@@ -158,6 +179,7 @@ func (s *service) CompleteEmail(ctx context.Context, r *connect.Request[authv1.C
 		},
 	}, nil
 }
+
 func (s *service) UseGoogle(ctx context.Context, r *connect.Request[authv1.UseGoogleRequest]) (*connect.Response[authv1.UseGoogleResponse], error) {
 	if err := s.pv.Validate(r.Msg); err != nil {
 		log.Ctx(ctx).Err(err).Msg("invalid request")
@@ -167,7 +189,8 @@ func (s *service) UseGoogle(ctx context.Context, r *connect.Request[authv1.UseGo
 	userInfo, err := s.googleSvc.GetUserInfoByToken(ctx, r.Msg.GoogleToken)
 	if err != nil {
 		if err == googlesvc.ErrInvalidToken {
-
+			log.Ctx(ctx).Err(err).Msg("got invalid token error running GetUserInfoByToken")
+			return nil, connect.NewError(connect.CodeInvalidArgument, nil)
 		}
 
 		log.Ctx(ctx).Err(err).Msg("failed running GetUserInfoByToken")
@@ -194,6 +217,27 @@ func (s *service) UseGoogle(ctx context.Context, r *connect.Request[authv1.UseGo
 	}
 
 	if isNewCustomer.Valid && isNewCustomer.Bool {
+		calendarAccount, err := s.store.CreateCalendarAccount(ctx, store.CreateCalendarAccountParams{
+			CustomerID: customer.ID,
+			Provider:   store.ProviderTypeLocal,
+		})
+		if err != nil {
+			log.Ctx(ctx).Err(err).Msg("failed running CreateCalendarAccount")
+			return nil, internalError
+		}
+
+		_, err = s.store.CreateCalendarUnderCalendarAccountById(ctx, store.CreateCalendarUnderCalendarAccountByIdParams{
+			AccountID:   calendarAccount.ID,
+			Prodid:      util.ProdID,
+			DisplayName: fmt.Sprintf("%s's Calendar", customer.Name),
+			Description: sql.NullString{String: "", Valid: false},
+			Color:       "#C35831", // pearl orange
+		})
+		if err != nil {
+			log.Ctx(ctx).Err(err).Msg("failed running CreateCalendarUnderCalendarAccountById")
+			return nil, internalError
+		}
+
 		err = s.emailer.Send(ctx, emailer.FromEmail_HelloEmail, customer.Email, fmt.Sprintf("Hala Wallah %s", customer.Name), "We are happy to help you schedule your calendar")
 		if err != nil {
 			log.Ctx(ctx).Err(err).Msg("failed running SendFromTemplate for magic link template")

@@ -7,32 +7,69 @@ option go_package = "github.com/jadwalapp/symmetrical-spoon/falak/pkg/gen/proto/
 
 package calendar.v1;
 
+enum CalendarAccountProvider {
+    CALENDAR_ACCOUNT_PROVIDER_UNSPECIFIED = 0;
+    CALENDAR_ACCOUNT_PROVIDER_LOCAL = 1;
+    CALENDAR_ACCOUNT_PROVIDER_CALDAV = 2;
+}
+
+message CalendarAccount {
+    string id = 1;
+    CalendarAccountProvider provider = 2;
+}
+
+message GetCalendarAccountsRequest {}
+
+message GetCalendarAccountsResponse {
+    repeated CalendarAccount calendar_accounts = 1;
+}
+
 message Calendar {
     string id = 1;
-    string name = 2;
-    google.protobuf.Timestamp start_date = 3;
-    google.protobuf.Timestamp end_date = 4;
-    string color = 5;
+    string calendar_account_id = 2;
+    string name = 3;
+    string description = 4;
+    google.protobuf.Timestamp start_date = 5;
+    google.protobuf.Timestamp end_date = 6;
+    string color = 7;
 }
 
 message CreateCalendarRequest {
-    string name = 1 [(buf.validate.field) = {
+    string calendar_account_id  = 1 [(buf.validate.field).string.uuid = true];
+    string name = 2 [(buf.validate.field) = {
         string: {
             min_len: 1,
             max_len: 64,
         }
     }];
-    google.protobuf.Timestamp start_date = 2;
-    google.protobuf.Timestamp end_date = 3;
-    string color = 4 [(buf.validate.field).string.len = 7];
+    string description = 3 [(buf.validate.field) = {
+        string: {
+            max_len: 128,
+        }
+    }];
+    google.protobuf.Timestamp start_date = 4;
+    google.protobuf.Timestamp end_date = 5;
+    string color = 6 [(buf.validate.field).string.len = 7];
 }
 message CreateCalendarResponse {
     Calendar calendar = 1;
 }
 
-message GetCalendarsRequest {}
+message GetCalendarsRequest {
+    optional string calendar_account_id = 1 [(buf.validate.field).string.uuid = true];
+}
 message GetCalendarsResponse {
     repeated Calendar calendars = 1;
+}
+
+message CalendarAccountWithCalendars {
+    CalendarAccount account = 1;
+    repeated Calendar calendars = 2;
+}
+
+message GetCalendarsWithCalendarAccountsRequest {}
+message GetCalendarsWithCalendarAccountsResponse {
+    repeated CalendarAccountWithCalendars calendar_account_with_calendars_list = 1;
 }
 
 message Event {
@@ -45,7 +82,11 @@ message Event {
 }
 
 message CreateEventRequest {
-    string calendar_id = 1 [(buf.validate.field).string.uuid = true];
+    string calendar_id = 1 [(buf.validate.field) = {
+        string: {
+            pattern: "^[0-9a-fA-F-]{36}@cal\\.jadwal\\.app$"
+        }
+    }];
     string title = 2 [(buf.validate.field) = {
         string: {
             min_len: 1,
@@ -60,6 +101,11 @@ message CreateEventRequest {
     bool is_all_day = 4;
     google.protobuf.Timestamp start_date = 5 [(buf.validate.field).required = true];
     google.protobuf.Timestamp end_date = 6 [(buf.validate.field).required = true];
+    string description = 7 [(buf.validate.field) = {
+        string: {
+            max_len: 512
+        }
+    }];
 }
 message CreateEventResponse {
     Event event = 1;
@@ -74,7 +120,11 @@ message DeleteEventRequest {
 message DeleteEventResponse {}
 
 message GetEventsByCalendarRequest {
-    string calendar_id = 1 [(buf.validate.field).string.uuid = true];
+    string calendar_id = 1 [(buf.validate.field) = {
+        string: {
+            pattern: "^[0-9a-fA-F-]{36}@cal\\.jadwal\\.app$"
+        }
+    }];
     google.protobuf.Timestamp start_date = 2;
     google.protobuf.Timestamp end_date = 3;
 }
@@ -99,12 +149,17 @@ message ConnectCalDAVCalendarResponse {
 }
 
 service CalendarService {
+    rpc GetCalendarAccounts(GetCalendarAccountsRequest) returns (GetCalendarAccountsResponse);
+
     rpc CreateCalendar(CreateCalendarRequest) returns (CreateCalendarResponse);
     rpc GetCalendars(GetCalendarsRequest) returns (GetCalendarsResponse);
+
+    rpc GetCalendarsWithCalendarAccounts(GetCalendarsWithCalendarAccountsRequest) returns (GetCalendarsWithCalendarAccountsResponse);
     
     rpc CreateEvent(CreateEventRequest) returns (CreateEventResponse);
     rpc UpdateEvent(UpdateEventRequest) returns (UpdateEventResponse);
     rpc DeleteEvent(DeleteEventRequest) returns (DeleteEventResponse);
     rpc GetEventsByCalendar(GetEventsByCalendarRequest) returns (GetEventsByCalendarResponse);
+
     rpc ConnectCalDAVCalendar(ConnectCalDAVCalendarRequest) returns (ConnectCalDAVCalendarResponse);
 }

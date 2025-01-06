@@ -39,9 +39,13 @@ struct CalendarView: View {
                 }
             }
             .sheet(isPresented: $showingAddEventSheet) {
-                AddEventView(isPresented: $showingAddEventSheet, selectedDate: selectedDate)
+                AddEventView(
+                    isPresented: $showingAddEventSheet,
+                    selectedDate: selectedDate
+                )
             }
         }
+        
     }
 }
 

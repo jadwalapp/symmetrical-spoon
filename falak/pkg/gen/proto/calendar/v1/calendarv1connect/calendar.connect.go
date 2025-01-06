@@ -33,12 +33,18 @@ const (
 // reflection-formatted method names, remove the leading slash and convert the remaining slash to a
 // period.
 const (
+	// CalendarServiceGetCalendarAccountsProcedure is the fully-qualified name of the CalendarService's
+	// GetCalendarAccounts RPC.
+	CalendarServiceGetCalendarAccountsProcedure = "/calendar.v1.CalendarService/GetCalendarAccounts"
 	// CalendarServiceCreateCalendarProcedure is the fully-qualified name of the CalendarService's
 	// CreateCalendar RPC.
 	CalendarServiceCreateCalendarProcedure = "/calendar.v1.CalendarService/CreateCalendar"
 	// CalendarServiceGetCalendarsProcedure is the fully-qualified name of the CalendarService's
 	// GetCalendars RPC.
 	CalendarServiceGetCalendarsProcedure = "/calendar.v1.CalendarService/GetCalendars"
+	// CalendarServiceGetCalendarsWithCalendarAccountsProcedure is the fully-qualified name of the
+	// CalendarService's GetCalendarsWithCalendarAccounts RPC.
+	CalendarServiceGetCalendarsWithCalendarAccountsProcedure = "/calendar.v1.CalendarService/GetCalendarsWithCalendarAccounts"
 	// CalendarServiceCreateEventProcedure is the fully-qualified name of the CalendarService's
 	// CreateEvent RPC.
 	CalendarServiceCreateEventProcedure = "/calendar.v1.CalendarService/CreateEvent"
@@ -58,20 +64,24 @@ const (
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
 var (
-	calendarServiceServiceDescriptor                     = v1.File_calendar_v1_calendar_proto.Services().ByName("CalendarService")
-	calendarServiceCreateCalendarMethodDescriptor        = calendarServiceServiceDescriptor.Methods().ByName("CreateCalendar")
-	calendarServiceGetCalendarsMethodDescriptor          = calendarServiceServiceDescriptor.Methods().ByName("GetCalendars")
-	calendarServiceCreateEventMethodDescriptor           = calendarServiceServiceDescriptor.Methods().ByName("CreateEvent")
-	calendarServiceUpdateEventMethodDescriptor           = calendarServiceServiceDescriptor.Methods().ByName("UpdateEvent")
-	calendarServiceDeleteEventMethodDescriptor           = calendarServiceServiceDescriptor.Methods().ByName("DeleteEvent")
-	calendarServiceGetEventsByCalendarMethodDescriptor   = calendarServiceServiceDescriptor.Methods().ByName("GetEventsByCalendar")
-	calendarServiceConnectCalDAVCalendarMethodDescriptor = calendarServiceServiceDescriptor.Methods().ByName("ConnectCalDAVCalendar")
+	calendarServiceServiceDescriptor                                = v1.File_calendar_v1_calendar_proto.Services().ByName("CalendarService")
+	calendarServiceGetCalendarAccountsMethodDescriptor              = calendarServiceServiceDescriptor.Methods().ByName("GetCalendarAccounts")
+	calendarServiceCreateCalendarMethodDescriptor                   = calendarServiceServiceDescriptor.Methods().ByName("CreateCalendar")
+	calendarServiceGetCalendarsMethodDescriptor                     = calendarServiceServiceDescriptor.Methods().ByName("GetCalendars")
+	calendarServiceGetCalendarsWithCalendarAccountsMethodDescriptor = calendarServiceServiceDescriptor.Methods().ByName("GetCalendarsWithCalendarAccounts")
+	calendarServiceCreateEventMethodDescriptor                      = calendarServiceServiceDescriptor.Methods().ByName("CreateEvent")
+	calendarServiceUpdateEventMethodDescriptor                      = calendarServiceServiceDescriptor.Methods().ByName("UpdateEvent")
+	calendarServiceDeleteEventMethodDescriptor                      = calendarServiceServiceDescriptor.Methods().ByName("DeleteEvent")
+	calendarServiceGetEventsByCalendarMethodDescriptor              = calendarServiceServiceDescriptor.Methods().ByName("GetEventsByCalendar")
+	calendarServiceConnectCalDAVCalendarMethodDescriptor            = calendarServiceServiceDescriptor.Methods().ByName("ConnectCalDAVCalendar")
 )
 
 // CalendarServiceClient is a client for the calendar.v1.CalendarService service.
 type CalendarServiceClient interface {
+	GetCalendarAccounts(context.Context, *connect.Request[v1.GetCalendarAccountsRequest]) (*connect.Response[v1.GetCalendarAccountsResponse], error)
 	CreateCalendar(context.Context, *connect.Request[v1.CreateCalendarRequest]) (*connect.Response[v1.CreateCalendarResponse], error)
 	GetCalendars(context.Context, *connect.Request[v1.GetCalendarsRequest]) (*connect.Response[v1.GetCalendarsResponse], error)
+	GetCalendarsWithCalendarAccounts(context.Context, *connect.Request[v1.GetCalendarsWithCalendarAccountsRequest]) (*connect.Response[v1.GetCalendarsWithCalendarAccountsResponse], error)
 	CreateEvent(context.Context, *connect.Request[v1.CreateEventRequest]) (*connect.Response[v1.CreateEventResponse], error)
 	UpdateEvent(context.Context, *connect.Request[v1.UpdateEventRequest]) (*connect.Response[v1.UpdateEventResponse], error)
 	DeleteEvent(context.Context, *connect.Request[v1.DeleteEventRequest]) (*connect.Response[v1.DeleteEventResponse], error)
@@ -89,6 +99,12 @@ type CalendarServiceClient interface {
 func NewCalendarServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) CalendarServiceClient {
 	baseURL = strings.TrimRight(baseURL, "/")
 	return &calendarServiceClient{
+		getCalendarAccounts: connect.NewClient[v1.GetCalendarAccountsRequest, v1.GetCalendarAccountsResponse](
+			httpClient,
+			baseURL+CalendarServiceGetCalendarAccountsProcedure,
+			connect.WithSchema(calendarServiceGetCalendarAccountsMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
 		createCalendar: connect.NewClient[v1.CreateCalendarRequest, v1.CreateCalendarResponse](
 			httpClient,
 			baseURL+CalendarServiceCreateCalendarProcedure,
@@ -99,6 +115,12 @@ func NewCalendarServiceClient(httpClient connect.HTTPClient, baseURL string, opt
 			httpClient,
 			baseURL+CalendarServiceGetCalendarsProcedure,
 			connect.WithSchema(calendarServiceGetCalendarsMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		getCalendarsWithCalendarAccounts: connect.NewClient[v1.GetCalendarsWithCalendarAccountsRequest, v1.GetCalendarsWithCalendarAccountsResponse](
+			httpClient,
+			baseURL+CalendarServiceGetCalendarsWithCalendarAccountsProcedure,
+			connect.WithSchema(calendarServiceGetCalendarsWithCalendarAccountsMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
 		createEvent: connect.NewClient[v1.CreateEventRequest, v1.CreateEventResponse](
@@ -136,13 +158,20 @@ func NewCalendarServiceClient(httpClient connect.HTTPClient, baseURL string, opt
 
 // calendarServiceClient implements CalendarServiceClient.
 type calendarServiceClient struct {
-	createCalendar        *connect.Client[v1.CreateCalendarRequest, v1.CreateCalendarResponse]
-	getCalendars          *connect.Client[v1.GetCalendarsRequest, v1.GetCalendarsResponse]
-	createEvent           *connect.Client[v1.CreateEventRequest, v1.CreateEventResponse]
-	updateEvent           *connect.Client[v1.UpdateEventRequest, v1.UpdateEventResponse]
-	deleteEvent           *connect.Client[v1.DeleteEventRequest, v1.DeleteEventResponse]
-	getEventsByCalendar   *connect.Client[v1.GetEventsByCalendarRequest, v1.GetEventsByCalendarResponse]
-	connectCalDAVCalendar *connect.Client[v1.ConnectCalDAVCalendarRequest, v1.ConnectCalDAVCalendarResponse]
+	getCalendarAccounts              *connect.Client[v1.GetCalendarAccountsRequest, v1.GetCalendarAccountsResponse]
+	createCalendar                   *connect.Client[v1.CreateCalendarRequest, v1.CreateCalendarResponse]
+	getCalendars                     *connect.Client[v1.GetCalendarsRequest, v1.GetCalendarsResponse]
+	getCalendarsWithCalendarAccounts *connect.Client[v1.GetCalendarsWithCalendarAccountsRequest, v1.GetCalendarsWithCalendarAccountsResponse]
+	createEvent                      *connect.Client[v1.CreateEventRequest, v1.CreateEventResponse]
+	updateEvent                      *connect.Client[v1.UpdateEventRequest, v1.UpdateEventResponse]
+	deleteEvent                      *connect.Client[v1.DeleteEventRequest, v1.DeleteEventResponse]
+	getEventsByCalendar              *connect.Client[v1.GetEventsByCalendarRequest, v1.GetEventsByCalendarResponse]
+	connectCalDAVCalendar            *connect.Client[v1.ConnectCalDAVCalendarRequest, v1.ConnectCalDAVCalendarResponse]
+}
+
+// GetCalendarAccounts calls calendar.v1.CalendarService.GetCalendarAccounts.
+func (c *calendarServiceClient) GetCalendarAccounts(ctx context.Context, req *connect.Request[v1.GetCalendarAccountsRequest]) (*connect.Response[v1.GetCalendarAccountsResponse], error) {
+	return c.getCalendarAccounts.CallUnary(ctx, req)
 }
 
 // CreateCalendar calls calendar.v1.CalendarService.CreateCalendar.
@@ -153,6 +182,12 @@ func (c *calendarServiceClient) CreateCalendar(ctx context.Context, req *connect
 // GetCalendars calls calendar.v1.CalendarService.GetCalendars.
 func (c *calendarServiceClient) GetCalendars(ctx context.Context, req *connect.Request[v1.GetCalendarsRequest]) (*connect.Response[v1.GetCalendarsResponse], error) {
 	return c.getCalendars.CallUnary(ctx, req)
+}
+
+// GetCalendarsWithCalendarAccounts calls
+// calendar.v1.CalendarService.GetCalendarsWithCalendarAccounts.
+func (c *calendarServiceClient) GetCalendarsWithCalendarAccounts(ctx context.Context, req *connect.Request[v1.GetCalendarsWithCalendarAccountsRequest]) (*connect.Response[v1.GetCalendarsWithCalendarAccountsResponse], error) {
+	return c.getCalendarsWithCalendarAccounts.CallUnary(ctx, req)
 }
 
 // CreateEvent calls calendar.v1.CalendarService.CreateEvent.
@@ -182,8 +217,10 @@ func (c *calendarServiceClient) ConnectCalDAVCalendar(ctx context.Context, req *
 
 // CalendarServiceHandler is an implementation of the calendar.v1.CalendarService service.
 type CalendarServiceHandler interface {
+	GetCalendarAccounts(context.Context, *connect.Request[v1.GetCalendarAccountsRequest]) (*connect.Response[v1.GetCalendarAccountsResponse], error)
 	CreateCalendar(context.Context, *connect.Request[v1.CreateCalendarRequest]) (*connect.Response[v1.CreateCalendarResponse], error)
 	GetCalendars(context.Context, *connect.Request[v1.GetCalendarsRequest]) (*connect.Response[v1.GetCalendarsResponse], error)
+	GetCalendarsWithCalendarAccounts(context.Context, *connect.Request[v1.GetCalendarsWithCalendarAccountsRequest]) (*connect.Response[v1.GetCalendarsWithCalendarAccountsResponse], error)
 	CreateEvent(context.Context, *connect.Request[v1.CreateEventRequest]) (*connect.Response[v1.CreateEventResponse], error)
 	UpdateEvent(context.Context, *connect.Request[v1.UpdateEventRequest]) (*connect.Response[v1.UpdateEventResponse], error)
 	DeleteEvent(context.Context, *connect.Request[v1.DeleteEventRequest]) (*connect.Response[v1.DeleteEventResponse], error)
@@ -197,6 +234,12 @@ type CalendarServiceHandler interface {
 // By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
 // and JSON codecs. They also support gzip compression.
 func NewCalendarServiceHandler(svc CalendarServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
+	calendarServiceGetCalendarAccountsHandler := connect.NewUnaryHandler(
+		CalendarServiceGetCalendarAccountsProcedure,
+		svc.GetCalendarAccounts,
+		connect.WithSchema(calendarServiceGetCalendarAccountsMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
 	calendarServiceCreateCalendarHandler := connect.NewUnaryHandler(
 		CalendarServiceCreateCalendarProcedure,
 		svc.CreateCalendar,
@@ -207,6 +250,12 @@ func NewCalendarServiceHandler(svc CalendarServiceHandler, opts ...connect.Handl
 		CalendarServiceGetCalendarsProcedure,
 		svc.GetCalendars,
 		connect.WithSchema(calendarServiceGetCalendarsMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	calendarServiceGetCalendarsWithCalendarAccountsHandler := connect.NewUnaryHandler(
+		CalendarServiceGetCalendarsWithCalendarAccountsProcedure,
+		svc.GetCalendarsWithCalendarAccounts,
+		connect.WithSchema(calendarServiceGetCalendarsWithCalendarAccountsMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
 	calendarServiceCreateEventHandler := connect.NewUnaryHandler(
@@ -241,10 +290,14 @@ func NewCalendarServiceHandler(svc CalendarServiceHandler, opts ...connect.Handl
 	)
 	return "/calendar.v1.CalendarService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
+		case CalendarServiceGetCalendarAccountsProcedure:
+			calendarServiceGetCalendarAccountsHandler.ServeHTTP(w, r)
 		case CalendarServiceCreateCalendarProcedure:
 			calendarServiceCreateCalendarHandler.ServeHTTP(w, r)
 		case CalendarServiceGetCalendarsProcedure:
 			calendarServiceGetCalendarsHandler.ServeHTTP(w, r)
+		case CalendarServiceGetCalendarsWithCalendarAccountsProcedure:
+			calendarServiceGetCalendarsWithCalendarAccountsHandler.ServeHTTP(w, r)
 		case CalendarServiceCreateEventProcedure:
 			calendarServiceCreateEventHandler.ServeHTTP(w, r)
 		case CalendarServiceUpdateEventProcedure:
@@ -264,12 +317,20 @@ func NewCalendarServiceHandler(svc CalendarServiceHandler, opts ...connect.Handl
 // UnimplementedCalendarServiceHandler returns CodeUnimplemented from all methods.
 type UnimplementedCalendarServiceHandler struct{}
 
+func (UnimplementedCalendarServiceHandler) GetCalendarAccounts(context.Context, *connect.Request[v1.GetCalendarAccountsRequest]) (*connect.Response[v1.GetCalendarAccountsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("calendar.v1.CalendarService.GetCalendarAccounts is not implemented"))
+}
+
 func (UnimplementedCalendarServiceHandler) CreateCalendar(context.Context, *connect.Request[v1.CreateCalendarRequest]) (*connect.Response[v1.CreateCalendarResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("calendar.v1.CalendarService.CreateCalendar is not implemented"))
 }
 
 func (UnimplementedCalendarServiceHandler) GetCalendars(context.Context, *connect.Request[v1.GetCalendarsRequest]) (*connect.Response[v1.GetCalendarsResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("calendar.v1.CalendarService.GetCalendars is not implemented"))
+}
+
+func (UnimplementedCalendarServiceHandler) GetCalendarsWithCalendarAccounts(context.Context, *connect.Request[v1.GetCalendarsWithCalendarAccountsRequest]) (*connect.Response[v1.GetCalendarsWithCalendarAccountsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("calendar.v1.CalendarService.GetCalendarsWithCalendarAccounts is not implemented"))
 }
 
 func (UnimplementedCalendarServiceHandler) CreateEvent(context.Context, *connect.Request[v1.CreateEventRequest]) (*connect.Response[v1.CreateEventResponse], error) {
