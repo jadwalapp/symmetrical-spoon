@@ -37,7 +37,7 @@ func (a *client) GetPrayertimeInfo(ctx context.Context, r *GetPrayertimeInfoRequ
 
 	var response GetPrayertimeInfoResponse
 	if err := json.Unmarshal(body, &response); err != nil {
-		return nil, fmt.Errorf("Error unmarshalling JSON: %v", err)
+		return nil, fmt.Errorf("error unmarshalling JSON: %v", err)
 	}
 
 	return &response, nil
