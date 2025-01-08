@@ -2,7 +2,7 @@ package client
 
 import "context"
 
-type GeoLocationClinet interface {
+type GeoLocationClient interface {
 	GetGeoLocationInfo(context.Context, *GetGeoLocationInfoRequest) (*GetGeoLocationInfoResponse, error)
 }
 
@@ -11,6 +11,6 @@ type GetGeoLocationInfoRequest struct {
 }
 
 type GetGeoLocationInfoResponse struct {
-	City    string `json:"city"`
-	Country string `json:"country"`
+	City    string `json:"cityName"`
+	Country string `json:"countryName"`
 }

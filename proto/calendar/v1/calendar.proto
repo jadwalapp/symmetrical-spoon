@@ -148,6 +148,14 @@ message ConnectCalDAVCalendarResponse {
     Calendar calendar = 1;
 }
 
+message SchedulePrayerTimesRequest{
+    
+}
+message SchedulePrayerTimesResponse{
+    
+}
+
+
 service CalendarService {
     rpc GetCalendarAccounts(GetCalendarAccountsRequest) returns (GetCalendarAccountsResponse);
 
@@ -162,4 +170,6 @@ service CalendarService {
     rpc GetEventsByCalendar(GetEventsByCalendarRequest) returns (GetEventsByCalendarResponse);
 
     rpc ConnectCalDAVCalendar(ConnectCalDAVCalendarRequest) returns (ConnectCalDAVCalendarResponse);
+    rpc SchedulePrayerTimes (SchedulePrayerTimesRequest) returns (SchedulePrayerTimesResponse);
+    
 }

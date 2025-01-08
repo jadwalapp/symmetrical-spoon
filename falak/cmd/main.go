@@ -21,10 +21,12 @@ import (
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/gen/proto/auth/v1/authv1connect"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/gen/proto/calendar/v1/calendarv1connect"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/gen/proto/profile/v1/profilev1connect"
+	geolocationclient "github.com/jadwalapp/symmetrical-spoon/falak/pkg/geolocation/client"
 	googlesvc "github.com/jadwalapp/symmetrical-spoon/falak/pkg/google"
 	googleclient "github.com/jadwalapp/symmetrical-spoon/falak/pkg/google/client"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/httpclient"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/interceptors"
+	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/prayer/client"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/store"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/tokens"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/util"
@@ -143,6 +145,16 @@ func main() {
 	}
 	// ======== PROTOVALIDATE ========
 
+	// ======== GEO LOCATION CLIENT ========
+	geoLocClientHttpCli := httpclient.NewClient(&http.Client{})
+	geoLocClient := geolocationclient.NewClient(geoLocClientHttpCli)
+	// ======== GEO LOCATION CLIENT ========
+
+	// ======== Prayer Client ========
+	prayerClinetHttpCli := httpclient.NewClient(&http.Client{})
+	prayerTime := client.NewClient(prayerClinetHttpCli)
+	// ======== Prayer Client ========
+
 	// ======== INTERCEPTORS ========
 	interceptorsForServer := connect.WithInterceptors(
 		interceptors.LoggingInterceptor(),
@@ -168,7 +180,7 @@ func main() {
 	profileServer := profile.NewService(*pv, *dbStore, apiMetadata)
 	mux.Handle(profilev1connect.NewProfileServiceHandler(profileServer, interceptorsForServer))
 
-	calendarServer := calendar.NewService(*pv, *dbStore, apiMetadata)
+	calendarServer := calendar.NewService(*pv, *dbStore, apiMetadata, geoLocClient, prayerTime)
 	mux.Handle(calendarv1connect.NewCalendarServiceHandler(calendarServer, interceptorsForServer))
 
 	addr := fmt.Sprintf("0.0.0.0:%s", config.Port)
