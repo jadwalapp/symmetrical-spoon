@@ -7,12 +7,13 @@ import (
 
 	"connectrpc.com/connect"
 	"github.com/google/uuid"
+	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/lokilogger"
 	"github.com/rs/zerolog"
 )
 
 type traceIDKey struct{}
 
-func LoggingInterceptor() connect.UnaryInterceptorFunc {
+func LoggingInterceptor(lokiClient *lokilogger.LokiClient) connect.UnaryInterceptorFunc {
 	return func(next connect.UnaryFunc) connect.UnaryFunc {
 		return func(ctx context.Context, req connect.AnyRequest) (connect.AnyResponse, error) {
 			traceID, ok := ctx.Value(traceIDKey{}).(string)
@@ -21,7 +22,8 @@ func LoggingInterceptor() connect.UnaryInterceptorFunc {
 				ctx = context.WithValue(ctx, traceIDKey{}, traceID)
 			}
 
-			logger := zerolog.New(os.Stderr).With().
+			multiLevelWriters := zerolog.MultiLevelWriter(os.Stdout, lokiClient)
+			logger := zerolog.New(multiLevelWriters).With().
 				Timestamp().
 				Str("method", req.Spec().Procedure).
 				Str("trace_id", traceID).

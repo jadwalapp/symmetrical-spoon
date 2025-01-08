@@ -50,6 +50,8 @@ services:
     depends_on:
       postgresdb:
         condition: service_healthy
+      loki:
+        condition: service_started
     networks:
       - web
       - internal
@@ -63,15 +65,46 @@ services:
 
   grafana:
     image: grafana/grafana:latest
+    entrypoint:
+      - sh
+      - -euc
+      - |
+        mkdir -p /etc/grafana/provisioning/datasources
+        cat <<EOF > /etc/grafana/provisioning/datasources/ds.yaml
+        apiVersion: 1
+        datasources:
+        - name: Loki
+          type: loki
+          access: proxy 
+          orgId: 1
+          url: http://loki:3100
+          basicAuth: false
+          isDefault: true
+          version: 1
+          editable: false
+        EOF
+        /run.sh
     networks:
       - web
       - internal
     volumes:
       - grafana-storage:/var/lib/grafana
+    depends_on:
+      loki:
+        condition: service_started
+
+  loki:
+    image: grafana/loki:3.3.2
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - internal
+    volumes:
+      - loki-storage:/loki
 
 volumes:
   postgres_data:
   grafana-storage:
+  loki-storage:
 
 networks:
   web:
