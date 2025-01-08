@@ -25,6 +25,8 @@ services:
       - "traefik.http.routers.falak.entrypoints=web"
       - "traefik.http.services.falak.loadbalancer.server.port=${FALAK_PORT}"
       - "traefik.http.services.falak.loadbalancer.server.scheme=h2c"
+    ports:
+      - "9090:50064"
 
   website:
     labels:
@@ -41,13 +43,17 @@ services:
       - "traefik.http.routers.grafana.entrypoints=web"
       - "traefik.http.services.grafana.loadbalancer.server.port=3000"
 
+  loki:
+    ports:
+      - "3100:3100"
+
   plantuml:
     image: plantuml/plantuml-server:jetty
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=symmetrical-spoon_web"
-      - "traefik.http.routers.grafana.rule=Host(`plantuml.localhost`)"
-      - "traefik.http.routers.grafana.entrypoints=web"
-      - "traefik.http.services.grafana.loadbalancer.server.port=8080"
+      - "traefik.http.routers.plantuml.rule=Host(`plantuml.localhost`)"
+      - "traefik.http.routers.plantuml.entrypoints=web"
+      - "traefik.http.services.plantuml.loadbalancer.server.port=8080"
     networks:
       - web

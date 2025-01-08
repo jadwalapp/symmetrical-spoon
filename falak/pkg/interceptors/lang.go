@@ -20,7 +20,7 @@ func LangInterceptor(apim apimetadata.ApiMetadata) connect.UnaryInterceptorFunc 
 			case string(apimetadata.Lang_English):
 				language = apimetadata.Lang_English
 			default:
-				log.Info().Msg("x-lang header was empty :D")
+				log.Ctx(ctx).Info().Msg("x-lang header was empty :D")
 			}
 
 			ctxWithLang := apim.ContextWithLang(ctx, language)

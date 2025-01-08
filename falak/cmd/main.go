@@ -26,6 +26,7 @@ import (
 	googleclient "github.com/jadwalapp/symmetrical-spoon/falak/pkg/google/client"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/httpclient"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/interceptors"
+	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/lokilogger"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/prayer/client"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/store"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/tokens"
@@ -42,12 +43,25 @@ import (
 const dbDriverName = "pgx"
 
 func main() {
-	log.Logger = zerolog.New(os.Stderr).With().Timestamp().Logger()
-
 	config, err := util.LoadFalakConfig(".")
 	if err != nil {
 		log.Fatal().Msgf("cannot load config: %v", err)
 	}
+
+	// ======== LOKI CLIENT ========
+	lokiHookConfig := lokilogger.LokiConfig{
+		PushIntervalSeconds: int64(config.LokiPushIntervalSeconds),
+		MaxBatchSize:        config.LokiMaxBatchSize,
+		LokiEndpoint:        config.LokiEndpoint,
+		ServiceName:         "falak",
+	}
+	lokiClient := lokilogger.NewLokiClient(&lokiHookConfig)
+	// ======== LOKI CLIENT ========
+
+	// ======== LOGGER ========
+	multiLevelWriters := zerolog.MultiLevelWriter(os.Stdout, lokiClient)
+	log.Logger = zerolog.New(multiLevelWriters).With().Timestamp().Logger()
+	// ======== LOGGER ========
 
 	// ======== DATABASE ========
 	dbSource := util.CreateDbSource(
@@ -157,7 +171,7 @@ func main() {
 
 	// ======== INTERCEPTORS ========
 	interceptorsForServer := connect.WithInterceptors(
-		interceptors.LoggingInterceptor(),
+		interceptors.LoggingInterceptor(lokiClient),
 		interceptors.EnsureValidTokenInterceptor(tokens, apiMetadata),
 		interceptors.LangInterceptor(apiMetadata),
 	)
