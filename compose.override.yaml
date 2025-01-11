@@ -4,14 +4,17 @@ services:
       - "--api.insecure=true"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
-      - "--entryPoints.web.address=:80"
       - "--log.level=DEBUG"
+      - "--entryPoints.web.address=:80"
     ports:
       - "8080:8080"
     labels:
       - "traefik.http.routers.dashboard.rule=Host(`traefik.localhost`)"
       - "traefik.http.routers.dashboard.service=api@internal"
       - "traefik.http.routers.dashboard.entrypoints=web"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./traefik/certs:/certs:ro"
 
   postgresdb:
     ports:
@@ -46,6 +49,14 @@ services:
   loki:
     ports:
       - "3100:3100"
+
+  baikal:
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=symmetrical-spoon_web"
+      - "traefik.http.routers.baikal.rule=Host(`${BAIKAL_HOST}`)"
+      - "traefik.http.routers.baikal.entrypoints=web"
+      - "traefik.http.services.baikal.loadbalancer.server.port=80"
 
   plantuml:
     image: plantuml/plantuml-server:jetty

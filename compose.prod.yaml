@@ -11,7 +11,6 @@ services:
       - "--entryPoints.web.http.redirections.entryPoint.to=websecure"
       - "--entryPoints.web.http.redirections.entryPoint.scheme=https"
     ports:
-      - "80:80"
       - "443:443"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
@@ -57,6 +56,16 @@ services:
       - "traefik.http.routers.grafana.entrypoints=websecure"
       - "traefik.http.routers.grafana.tls.certresolver=myresolver"
       - "traefik.http.services.grafana.loadbalancer.server.port=3000"
+
+  baikal:
+    restart: always
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=symmetrical-spoon_web"
+      - "traefik.http.routers.baikal.rule=Host(`${BAIKAL_HOST}`)"
+      - "traefik.http.routers.baikal.entrypoints=websecure"
+      - "traefik.http.routers.baikal.tls.certresolver=myresolver"
+      - "traefik.http.services.baikal.loadbalancer.server.port=80"
 
 volumes:
   traefik-certificates:
