@@ -10,58 +10,10 @@ import SwiftProtobuf
 public protocol Calendar_V1_CalendarServiceClientInterface: Sendable {
 
     @discardableResult
-    func `getCalendarAccounts`(request: Calendar_V1_GetCalendarAccountsRequest, headers: Connect.Headers, completion: @escaping @Sendable (ResponseMessage<Calendar_V1_GetCalendarAccountsResponse>) -> Void) -> Connect.Cancelable
+    func `getCalDavaccount`(request: Calendar_V1_GetCalDAVAccountRequest, headers: Connect.Headers, completion: @escaping @Sendable (ResponseMessage<Calendar_V1_GetCalDAVAccountResponse>) -> Void) -> Connect.Cancelable
 
     @available(iOS 13, *)
-    func `getCalendarAccounts`(request: Calendar_V1_GetCalendarAccountsRequest, headers: Connect.Headers) async -> ResponseMessage<Calendar_V1_GetCalendarAccountsResponse>
-
-    @discardableResult
-    func `createCalendar`(request: Calendar_V1_CreateCalendarRequest, headers: Connect.Headers, completion: @escaping @Sendable (ResponseMessage<Calendar_V1_CreateCalendarResponse>) -> Void) -> Connect.Cancelable
-
-    @available(iOS 13, *)
-    func `createCalendar`(request: Calendar_V1_CreateCalendarRequest, headers: Connect.Headers) async -> ResponseMessage<Calendar_V1_CreateCalendarResponse>
-
-    @discardableResult
-    func `getCalendars`(request: Calendar_V1_GetCalendarsRequest, headers: Connect.Headers, completion: @escaping @Sendable (ResponseMessage<Calendar_V1_GetCalendarsResponse>) -> Void) -> Connect.Cancelable
-
-    @available(iOS 13, *)
-    func `getCalendars`(request: Calendar_V1_GetCalendarsRequest, headers: Connect.Headers) async -> ResponseMessage<Calendar_V1_GetCalendarsResponse>
-
-    @discardableResult
-    func `getCalendarsWithCalendarAccounts`(request: Calendar_V1_GetCalendarsWithCalendarAccountsRequest, headers: Connect.Headers, completion: @escaping @Sendable (ResponseMessage<Calendar_V1_GetCalendarsWithCalendarAccountsResponse>) -> Void) -> Connect.Cancelable
-
-    @available(iOS 13, *)
-    func `getCalendarsWithCalendarAccounts`(request: Calendar_V1_GetCalendarsWithCalendarAccountsRequest, headers: Connect.Headers) async -> ResponseMessage<Calendar_V1_GetCalendarsWithCalendarAccountsResponse>
-
-    @discardableResult
-    func `createEvent`(request: Calendar_V1_CreateEventRequest, headers: Connect.Headers, completion: @escaping @Sendable (ResponseMessage<Calendar_V1_CreateEventResponse>) -> Void) -> Connect.Cancelable
-
-    @available(iOS 13, *)
-    func `createEvent`(request: Calendar_V1_CreateEventRequest, headers: Connect.Headers) async -> ResponseMessage<Calendar_V1_CreateEventResponse>
-
-    @discardableResult
-    func `updateEvent`(request: Calendar_V1_UpdateEventRequest, headers: Connect.Headers, completion: @escaping @Sendable (ResponseMessage<Calendar_V1_UpdateEventResponse>) -> Void) -> Connect.Cancelable
-
-    @available(iOS 13, *)
-    func `updateEvent`(request: Calendar_V1_UpdateEventRequest, headers: Connect.Headers) async -> ResponseMessage<Calendar_V1_UpdateEventResponse>
-
-    @discardableResult
-    func `deleteEvent`(request: Calendar_V1_DeleteEventRequest, headers: Connect.Headers, completion: @escaping @Sendable (ResponseMessage<Calendar_V1_DeleteEventResponse>) -> Void) -> Connect.Cancelable
-
-    @available(iOS 13, *)
-    func `deleteEvent`(request: Calendar_V1_DeleteEventRequest, headers: Connect.Headers) async -> ResponseMessage<Calendar_V1_DeleteEventResponse>
-
-    @discardableResult
-    func `getEventsByCalendar`(request: Calendar_V1_GetEventsByCalendarRequest, headers: Connect.Headers, completion: @escaping @Sendable (ResponseMessage<Calendar_V1_GetEventsByCalendarResponse>) -> Void) -> Connect.Cancelable
-
-    @available(iOS 13, *)
-    func `getEventsByCalendar`(request: Calendar_V1_GetEventsByCalendarRequest, headers: Connect.Headers) async -> ResponseMessage<Calendar_V1_GetEventsByCalendarResponse>
-
-    @discardableResult
-    func `connectCalDavcalendar`(request: Calendar_V1_ConnectCalDAVCalendarRequest, headers: Connect.Headers, completion: @escaping @Sendable (ResponseMessage<Calendar_V1_ConnectCalDAVCalendarResponse>) -> Void) -> Connect.Cancelable
-
-    @available(iOS 13, *)
-    func `connectCalDavcalendar`(request: Calendar_V1_ConnectCalDAVCalendarRequest, headers: Connect.Headers) async -> ResponseMessage<Calendar_V1_ConnectCalDAVCalendarResponse>
+    func `getCalDavaccount`(request: Calendar_V1_GetCalDAVAccountRequest, headers: Connect.Headers) async -> ResponseMessage<Calendar_V1_GetCalDAVAccountResponse>
 }
 
 /// Concrete implementation of `Calendar_V1_CalendarServiceClientInterface`.
@@ -73,106 +25,18 @@ public final class Calendar_V1_CalendarServiceClient: Calendar_V1_CalendarServic
     }
 
     @discardableResult
-    public func `getCalendarAccounts`(request: Calendar_V1_GetCalendarAccountsRequest, headers: Connect.Headers = [:], completion: @escaping @Sendable (ResponseMessage<Calendar_V1_GetCalendarAccountsResponse>) -> Void) -> Connect.Cancelable {
-        return self.client.unary(path: "/calendar.v1.CalendarService/GetCalendarAccounts", idempotencyLevel: .unknown, request: request, headers: headers, completion: completion)
+    public func `getCalDavaccount`(request: Calendar_V1_GetCalDAVAccountRequest, headers: Connect.Headers = [:], completion: @escaping @Sendable (ResponseMessage<Calendar_V1_GetCalDAVAccountResponse>) -> Void) -> Connect.Cancelable {
+        return self.client.unary(path: "/calendar.v1.CalendarService/GetCalDAVAccount", idempotencyLevel: .unknown, request: request, headers: headers, completion: completion)
     }
 
     @available(iOS 13, *)
-    public func `getCalendarAccounts`(request: Calendar_V1_GetCalendarAccountsRequest, headers: Connect.Headers = [:]) async -> ResponseMessage<Calendar_V1_GetCalendarAccountsResponse> {
-        return await self.client.unary(path: "/calendar.v1.CalendarService/GetCalendarAccounts", idempotencyLevel: .unknown, request: request, headers: headers)
-    }
-
-    @discardableResult
-    public func `createCalendar`(request: Calendar_V1_CreateCalendarRequest, headers: Connect.Headers = [:], completion: @escaping @Sendable (ResponseMessage<Calendar_V1_CreateCalendarResponse>) -> Void) -> Connect.Cancelable {
-        return self.client.unary(path: "/calendar.v1.CalendarService/CreateCalendar", idempotencyLevel: .unknown, request: request, headers: headers, completion: completion)
-    }
-
-    @available(iOS 13, *)
-    public func `createCalendar`(request: Calendar_V1_CreateCalendarRequest, headers: Connect.Headers = [:]) async -> ResponseMessage<Calendar_V1_CreateCalendarResponse> {
-        return await self.client.unary(path: "/calendar.v1.CalendarService/CreateCalendar", idempotencyLevel: .unknown, request: request, headers: headers)
-    }
-
-    @discardableResult
-    public func `getCalendars`(request: Calendar_V1_GetCalendarsRequest, headers: Connect.Headers = [:], completion: @escaping @Sendable (ResponseMessage<Calendar_V1_GetCalendarsResponse>) -> Void) -> Connect.Cancelable {
-        return self.client.unary(path: "/calendar.v1.CalendarService/GetCalendars", idempotencyLevel: .unknown, request: request, headers: headers, completion: completion)
-    }
-
-    @available(iOS 13, *)
-    public func `getCalendars`(request: Calendar_V1_GetCalendarsRequest, headers: Connect.Headers = [:]) async -> ResponseMessage<Calendar_V1_GetCalendarsResponse> {
-        return await self.client.unary(path: "/calendar.v1.CalendarService/GetCalendars", idempotencyLevel: .unknown, request: request, headers: headers)
-    }
-
-    @discardableResult
-    public func `getCalendarsWithCalendarAccounts`(request: Calendar_V1_GetCalendarsWithCalendarAccountsRequest, headers: Connect.Headers = [:], completion: @escaping @Sendable (ResponseMessage<Calendar_V1_GetCalendarsWithCalendarAccountsResponse>) -> Void) -> Connect.Cancelable {
-        return self.client.unary(path: "/calendar.v1.CalendarService/GetCalendarsWithCalendarAccounts", idempotencyLevel: .unknown, request: request, headers: headers, completion: completion)
-    }
-
-    @available(iOS 13, *)
-    public func `getCalendarsWithCalendarAccounts`(request: Calendar_V1_GetCalendarsWithCalendarAccountsRequest, headers: Connect.Headers = [:]) async -> ResponseMessage<Calendar_V1_GetCalendarsWithCalendarAccountsResponse> {
-        return await self.client.unary(path: "/calendar.v1.CalendarService/GetCalendarsWithCalendarAccounts", idempotencyLevel: .unknown, request: request, headers: headers)
-    }
-
-    @discardableResult
-    public func `createEvent`(request: Calendar_V1_CreateEventRequest, headers: Connect.Headers = [:], completion: @escaping @Sendable (ResponseMessage<Calendar_V1_CreateEventResponse>) -> Void) -> Connect.Cancelable {
-        return self.client.unary(path: "/calendar.v1.CalendarService/CreateEvent", idempotencyLevel: .unknown, request: request, headers: headers, completion: completion)
-    }
-
-    @available(iOS 13, *)
-    public func `createEvent`(request: Calendar_V1_CreateEventRequest, headers: Connect.Headers = [:]) async -> ResponseMessage<Calendar_V1_CreateEventResponse> {
-        return await self.client.unary(path: "/calendar.v1.CalendarService/CreateEvent", idempotencyLevel: .unknown, request: request, headers: headers)
-    }
-
-    @discardableResult
-    public func `updateEvent`(request: Calendar_V1_UpdateEventRequest, headers: Connect.Headers = [:], completion: @escaping @Sendable (ResponseMessage<Calendar_V1_UpdateEventResponse>) -> Void) -> Connect.Cancelable {
-        return self.client.unary(path: "/calendar.v1.CalendarService/UpdateEvent", idempotencyLevel: .unknown, request: request, headers: headers, completion: completion)
-    }
-
-    @available(iOS 13, *)
-    public func `updateEvent`(request: Calendar_V1_UpdateEventRequest, headers: Connect.Headers = [:]) async -> ResponseMessage<Calendar_V1_UpdateEventResponse> {
-        return await self.client.unary(path: "/calendar.v1.CalendarService/UpdateEvent", idempotencyLevel: .unknown, request: request, headers: headers)
-    }
-
-    @discardableResult
-    public func `deleteEvent`(request: Calendar_V1_DeleteEventRequest, headers: Connect.Headers = [:], completion: @escaping @Sendable (ResponseMessage<Calendar_V1_DeleteEventResponse>) -> Void) -> Connect.Cancelable {
-        return self.client.unary(path: "/calendar.v1.CalendarService/DeleteEvent", idempotencyLevel: .unknown, request: request, headers: headers, completion: completion)
-    }
-
-    @available(iOS 13, *)
-    public func `deleteEvent`(request: Calendar_V1_DeleteEventRequest, headers: Connect.Headers = [:]) async -> ResponseMessage<Calendar_V1_DeleteEventResponse> {
-        return await self.client.unary(path: "/calendar.v1.CalendarService/DeleteEvent", idempotencyLevel: .unknown, request: request, headers: headers)
-    }
-
-    @discardableResult
-    public func `getEventsByCalendar`(request: Calendar_V1_GetEventsByCalendarRequest, headers: Connect.Headers = [:], completion: @escaping @Sendable (ResponseMessage<Calendar_V1_GetEventsByCalendarResponse>) -> Void) -> Connect.Cancelable {
-        return self.client.unary(path: "/calendar.v1.CalendarService/GetEventsByCalendar", idempotencyLevel: .unknown, request: request, headers: headers, completion: completion)
-    }
-
-    @available(iOS 13, *)
-    public func `getEventsByCalendar`(request: Calendar_V1_GetEventsByCalendarRequest, headers: Connect.Headers = [:]) async -> ResponseMessage<Calendar_V1_GetEventsByCalendarResponse> {
-        return await self.client.unary(path: "/calendar.v1.CalendarService/GetEventsByCalendar", idempotencyLevel: .unknown, request: request, headers: headers)
-    }
-
-    @discardableResult
-    public func `connectCalDavcalendar`(request: Calendar_V1_ConnectCalDAVCalendarRequest, headers: Connect.Headers = [:], completion: @escaping @Sendable (ResponseMessage<Calendar_V1_ConnectCalDAVCalendarResponse>) -> Void) -> Connect.Cancelable {
-        return self.client.unary(path: "/calendar.v1.CalendarService/ConnectCalDAVCalendar", idempotencyLevel: .unknown, request: request, headers: headers, completion: completion)
-    }
-
-    @available(iOS 13, *)
-    public func `connectCalDavcalendar`(request: Calendar_V1_ConnectCalDAVCalendarRequest, headers: Connect.Headers = [:]) async -> ResponseMessage<Calendar_V1_ConnectCalDAVCalendarResponse> {
-        return await self.client.unary(path: "/calendar.v1.CalendarService/ConnectCalDAVCalendar", idempotencyLevel: .unknown, request: request, headers: headers)
+    public func `getCalDavaccount`(request: Calendar_V1_GetCalDAVAccountRequest, headers: Connect.Headers = [:]) async -> ResponseMessage<Calendar_V1_GetCalDAVAccountResponse> {
+        return await self.client.unary(path: "/calendar.v1.CalendarService/GetCalDAVAccount", idempotencyLevel: .unknown, request: request, headers: headers)
     }
 
     public enum Metadata {
         public enum Methods {
-            public static let getCalendarAccounts = Connect.MethodSpec(name: "GetCalendarAccounts", service: "calendar.v1.CalendarService", type: .unary)
-            public static let createCalendar = Connect.MethodSpec(name: "CreateCalendar", service: "calendar.v1.CalendarService", type: .unary)
-            public static let getCalendars = Connect.MethodSpec(name: "GetCalendars", service: "calendar.v1.CalendarService", type: .unary)
-            public static let getCalendarsWithCalendarAccounts = Connect.MethodSpec(name: "GetCalendarsWithCalendarAccounts", service: "calendar.v1.CalendarService", type: .unary)
-            public static let createEvent = Connect.MethodSpec(name: "CreateEvent", service: "calendar.v1.CalendarService", type: .unary)
-            public static let updateEvent = Connect.MethodSpec(name: "UpdateEvent", service: "calendar.v1.CalendarService", type: .unary)
-            public static let deleteEvent = Connect.MethodSpec(name: "DeleteEvent", service: "calendar.v1.CalendarService", type: .unary)
-            public static let getEventsByCalendar = Connect.MethodSpec(name: "GetEventsByCalendar", service: "calendar.v1.CalendarService", type: .unary)
-            public static let connectCalDavcalendar = Connect.MethodSpec(name: "ConnectCalDAVCalendar", service: "calendar.v1.CalendarService", type: .unary)
+            public static let getCalDavaccount = Connect.MethodSpec(name: "GetCalDAVAccount", service: "calendar.v1.CalendarService", type: .unary)
         }
     }
 }

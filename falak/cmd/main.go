@@ -16,6 +16,7 @@ import (
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/api/calendar"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/api/profile"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/apimetadata"
+	baikalclient "github.com/jadwalapp/symmetrical-spoon/falak/pkg/baikal/client"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/email/emailer"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/email/template"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/gen/proto/auth/v1/authv1connect"
@@ -150,6 +151,11 @@ func main() {
 	googleSvc := googlesvc.NewService(config.GoogleOAuthClientId, googleCli)
 	// ======== GOOGLE SVC ========
 
+	// ======== BAIKAL CLIENT ========
+	baikalHttpCli := httpclient.NewClient(&http.Client{})
+	baikalCli := baikalclient.NewClient(baikalHttpCli, config.BaikalHost)
+	// ======== BAIKAL CLIENT ========
+
 	// ======== PROTOVALIDATE ========
 	pv, err := protovalidate.New()
 	if err != nil {
@@ -176,13 +182,13 @@ func main() {
 	mux.Handle(grpcreflect.NewHandlerV1(reflector))
 	mux.Handle(grpcreflect.NewHandlerV1Alpha(reflector))
 
-	authServer := auth.NewService(*pv, *dbStore, tokens, emailerImpl, templates, apiMetadata, googleSvc)
+	authServer := auth.NewService(*pv, *dbStore, tokens, emailerImpl, templates, apiMetadata, googleSvc, baikalCli, config.CalDAVPasswordEncryptionKey)
 	mux.Handle(authv1connect.NewAuthServiceHandler(authServer, interceptorsForServer))
 
 	profileServer := profile.NewService(*pv, *dbStore, apiMetadata)
 	mux.Handle(profilev1connect.NewProfileServiceHandler(profileServer, interceptorsForServer))
 
-	calendarServer := calendar.NewService(*pv, *dbStore, apiMetadata)
+	calendarServer := calendar.NewService(*pv, *dbStore, apiMetadata, config.CalDAVPasswordEncryptionKey)
 	mux.Handle(calendarv1connect.NewCalendarServiceHandler(calendarServer, interceptorsForServer))
 
 	addr := fmt.Sprintf("0.0.0.0:%s", config.Port)

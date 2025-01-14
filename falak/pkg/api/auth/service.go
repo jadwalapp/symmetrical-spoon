@@ -9,7 +9,9 @@ import (
 
 	"connectrpc.com/connect"
 	"github.com/bufbuild/protovalidate-go"
+	"github.com/google/uuid"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/apimetadata"
+	baikalclient "github.com/jadwalapp/symmetrical-spoon/falak/pkg/baikal/client"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/email/emailer"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/email/template"
 	authv1 "github.com/jadwalapp/symmetrical-spoon/falak/pkg/gen/proto/auth/v1"
@@ -30,13 +32,15 @@ var (
 )
 
 type service struct {
-	pv          protovalidate.Validator
-	store       store.Queries
-	tokens      tokens.Tokens
-	emailer     emailer.Emailer
-	templates   template.Templates
-	apiMetadata apimetadata.ApiMetadata
-	googleSvc   googlesvc.GoogleSvc
+	pv                          protovalidate.Validator
+	store                       store.Queries
+	tokens                      tokens.Tokens
+	emailer                     emailer.Emailer
+	templates                   template.Templates
+	apiMetadata                 apimetadata.ApiMetadata
+	googleSvc                   googlesvc.GoogleSvc
+	baikalCli                   baikalclient.Client
+	calDAVPasswordEncryptionKey string
 }
 
 func (s *service) InitiateEmail(ctx context.Context, r *connect.Request[authv1.InitiateEmailRequest]) (*connect.Response[authv1.InitiateEmailResponse], error) {
@@ -130,24 +134,27 @@ func (s *service) CompleteEmail(ctx context.Context, r *connect.Request[authv1.C
 			return nil, internalError
 		}
 
-		calendarAccount, err := s.store.CreateCalendarAccount(ctx, store.CreateCalendarAccountParams{
-			CustomerID: customer.ID,
-			Provider:   store.ProviderTypeLocal,
+		randomPassword := uuid.New().String()
+
+		_, err = s.baikalCli.CreateUser(ctx, &baikalclient.CreateUserRequest{
+			Username: customer.Email,
+			Email:    customer.Email,
+			Password: randomPassword,
 		})
 		if err != nil {
-			log.Ctx(ctx).Err(err).Msg("failed running CreateCalendarAccount")
+			log.Ctx(ctx).Err(err).Msg("failed running baikalCli.CreateUser")
 			return nil, internalError
 		}
 
-		_, err = s.store.CreateCalendarUnderCalendarAccountById(ctx, store.CreateCalendarUnderCalendarAccountByIdParams{
-			AccountID:   calendarAccount.ID,
-			Prodid:      util.ProdID,
-			DisplayName: fmt.Sprintf("%s's Calendar", customer.Name),
-			Description: sql.NullString{String: "", Valid: false},
-			Color:       "#C35831", // pearl orange
+		_, err = s.store.CreateCalDAVAccount(ctx, store.CreateCalDAVAccountParams{
+			CustomerID:    customer.ID,
+			Email:         customer.Email,
+			Username:      customer.Email,
+			Password:      randomPassword,
+			EncryptionKey: s.calDAVPasswordEncryptionKey,
 		})
 		if err != nil {
-			log.Ctx(ctx).Err(err).Msg("failed running CreateCalendarUnderCalendarAccountById")
+			log.Ctx(ctx).Err(err).Msg("failed running store.CreateCalDAVAccount")
 			return nil, internalError
 		}
 
@@ -217,24 +224,27 @@ func (s *service) UseGoogle(ctx context.Context, r *connect.Request[authv1.UseGo
 	}
 
 	if isNewCustomer.Valid && isNewCustomer.Bool {
-		calendarAccount, err := s.store.CreateCalendarAccount(ctx, store.CreateCalendarAccountParams{
-			CustomerID: customer.ID,
-			Provider:   store.ProviderTypeLocal,
+		randomPassword := uuid.New().String()
+
+		_, err = s.baikalCli.CreateUser(ctx, &baikalclient.CreateUserRequest{
+			Username: customer.Email,
+			Email:    customer.Email,
+			Password: randomPassword,
 		})
 		if err != nil {
-			log.Ctx(ctx).Err(err).Msg("failed running CreateCalendarAccount")
+			log.Ctx(ctx).Err(err).Msg("failed running baikalCli.CreateUser")
 			return nil, internalError
 		}
 
-		_, err = s.store.CreateCalendarUnderCalendarAccountById(ctx, store.CreateCalendarUnderCalendarAccountByIdParams{
-			AccountID:   calendarAccount.ID,
-			Prodid:      util.ProdID,
-			DisplayName: fmt.Sprintf("%s's Calendar", customer.Name),
-			Description: sql.NullString{String: "", Valid: false},
-			Color:       "#C35831", // pearl orange
+		_, err = s.store.CreateCalDAVAccount(ctx, store.CreateCalDAVAccountParams{
+			CustomerID:    customer.ID,
+			Email:         customer.Email,
+			Username:      customer.Email,
+			Password:      randomPassword,
+			EncryptionKey: s.calDAVPasswordEncryptionKey,
 		})
 		if err != nil {
-			log.Ctx(ctx).Err(err).Msg("failed running CreateCalendarUnderCalendarAccountById")
+			log.Ctx(ctx).Err(err).Msg("failed running store.CreateCalDAVAccount")
 			return nil, internalError
 		}
 
@@ -258,14 +268,16 @@ func (s *service) UseGoogle(ctx context.Context, r *connect.Request[authv1.UseGo
 	}, nil
 }
 
-func NewService(pv protovalidate.Validator, store store.Queries, tokens tokens.Tokens, emailer emailer.Emailer, templates template.Templates, apiMetadata apimetadata.ApiMetadata, googleSvc googlesvc.GoogleSvc) authv1connect.AuthServiceHandler {
+func NewService(pv protovalidate.Validator, store store.Queries, tokens tokens.Tokens, emailer emailer.Emailer, templates template.Templates, apiMetadata apimetadata.ApiMetadata, googleSvc googlesvc.GoogleSvc, baikalCli baikalclient.Client, calDAVPasswordEncryptionKey string) authv1connect.AuthServiceHandler {
 	return &service{
-		pv:          pv,
-		store:       store,
-		tokens:      tokens,
-		emailer:     emailer,
-		templates:   templates,
-		apiMetadata: apiMetadata,
-		googleSvc:   googleSvc,
+		pv:                          pv,
+		store:                       store,
+		tokens:                      tokens,
+		emailer:                     emailer,
+		templates:                   templates,
+		apiMetadata:                 apiMetadata,
+		googleSvc:                   googleSvc,
+		baikalCli:                   baikalCli,
+		calDAVPasswordEncryptionKey: calDAVPasswordEncryptionKey,
 	}
 }

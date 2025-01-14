@@ -19,6 +19,16 @@ type AuthGoogle struct {
 	UpdatedAt  time.Time
 }
 
+type CaldavAccount struct {
+	ID         uuid.UUID
+	CustomerID uuid.UUID
+	Email      string
+	Username   string
+	Password   string
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
+}
+
 type Customer struct {
 	ID        uuid.UUID
 	Name      string
