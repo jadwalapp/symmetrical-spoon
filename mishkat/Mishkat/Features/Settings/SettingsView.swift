@@ -24,55 +24,9 @@ struct SettingsView: View {
                 }
             }
             Section {
-                AsyncView(
-                    response: profileViewModel.calDavAccountState
-                ) { calDavAccount in
-                    VStack(spacing: 16) {
-                        HStack {
-                            Image(systemName: "calendar")
-                                .foregroundColor(.accentColor)
-                                .font(.title2)
-                            Text("CalDAV Credentials")
-                                .font(.headline)
-                        }
-                        
-                        VStack(spacing: 12) {
-                            credentialRow(
-                                title: "Username",
-                                value: calDavAccount.username,
-                                icon: "person.fill"
-                            )
-                            
-                            credentialRow(
-                                title: "Password",
-                                value: calDavAccount.password,
-                                icon: "lock.fill",
-                                isSecure: true
-                            )
-                        }
-                        .padding()
-                        .background(
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(Color.gray.opacity(0.1))
-                        )
-                        
-                        Button(action: {
-                            UIPasteboard.general.string = """
-                            Username: \(calDavAccount.username)
-                            Password: \(calDavAccount.password)
-                            """
-                        }) {
-                            Label("Copy Credentials", systemImage: "doc.on.doc")
-                        }
-                        .buttonStyle(.bordered)
-                        .tint(.accentColor)
-                    }
-                    .padding()
-                    .background(
-                        RoundedRectangle(cornerRadius: 16)
-                            .fill(Color.accentColor.opacity(0.05))
-                    )
-                }
+                CalDAVCredentialsView()
+                    .listRowInsets(EdgeInsets())
+                    .listRowBackground(Color.clear)
             }
             Section {
                 Button {
@@ -116,24 +70,6 @@ struct SettingsView: View {
         .refreshable {
             profileViewModel.getProfile()
             profileViewModel.getCalDavAccount()
-        }
-    }
-    
-    func credentialRow(title: String, value: String, icon: String, isSecure: Bool = false) -> some View {
-        HStack {
-            Label(title, systemImage: icon)
-                .foregroundColor(.secondary)
-            Spacer()
-            if isSecure {
-                SecureField("", text: .constant(value))
-                    .disabled(true)
-                    .textFieldStyle(PlainTextFieldStyle())
-                    .frame(width: 120)
-            } else {
-                Text(value)
-                    .foregroundColor(.primary)
-                    .font(.subheadline)
-            }
         }
     }
 }
