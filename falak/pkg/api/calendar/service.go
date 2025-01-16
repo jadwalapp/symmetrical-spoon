@@ -26,7 +26,7 @@ type service struct {
 	calendarv1connect.UnimplementedCalendarServiceHandler
 }
 
-func (s *service) GetCalDAVAccount(ctx context.Context, r *connect.Request[calendarv1.GetCalDAVAccountRequest]) (*connect.Response[calendarv1.GetCalDAVAccountResponse], error) {
+func (s *service) GetCalDAVAccount(ctx context.Context, r *connect.Request[calendarv1.GetCalDavAccountRequest]) (*connect.Response[calendarv1.GetCalDavAccountResponse], error) {
 	if err := s.pv.Validate(r.Msg); err != nil {
 		log.Ctx(ctx).Err(err).Msg("invalid request")
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
@@ -53,8 +53,8 @@ func (s *service) GetCalDAVAccount(ctx context.Context, r *connect.Request[calen
 		return nil, internalError
 	}
 
-	return &connect.Response[calendarv1.GetCalDAVAccountResponse]{
-		Msg: &calendarv1.GetCalDAVAccountResponse{
+	return &connect.Response[calendarv1.GetCalDavAccountResponse]{
+		Msg: &calendarv1.GetCalDavAccountResponse{
 			Username: calDAVAccount.Username,
 			Password: calDAVAccount.DecryptedPassword,
 		},
