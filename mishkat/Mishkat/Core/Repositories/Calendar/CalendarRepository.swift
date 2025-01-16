@@ -15,11 +15,11 @@ class CalendarRepository {
         self.calendarClient = calendarClient
     }
     
-    func getCalDavaccount() async throws -> Calendar_V1_GetCalDAVAccountResponse {
+    func getCalDavAccount() async throws -> Calendar_V1_GetCalDavAccountResponse {
         do {
-            let req = Calendar_V1_GetCalDAVAccountRequest()
+            let req = Calendar_V1_GetCalDavAccountRequest()
             
-            let resp = await calendarClient.getCalDavaccount(request: req, headers: [:])
+            let resp = await calendarClient.getCalDavAccount(request: req, headers: [:])
             return try resp.result.get()
         } catch {
             debugPrint("things went south running getCalDavaccount: \(error)")

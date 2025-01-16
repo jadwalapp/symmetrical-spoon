@@ -10,10 +10,10 @@ import SwiftProtobuf
 public protocol Calendar_V1_CalendarServiceClientInterface: Sendable {
 
     @discardableResult
-    func `getCalDavaccount`(request: Calendar_V1_GetCalDAVAccountRequest, headers: Connect.Headers, completion: @escaping @Sendable (ResponseMessage<Calendar_V1_GetCalDAVAccountResponse>) -> Void) -> Connect.Cancelable
+    func `getCalDavAccount`(request: Calendar_V1_GetCalDavAccountRequest, headers: Connect.Headers, completion: @escaping @Sendable (ResponseMessage<Calendar_V1_GetCalDavAccountResponse>) -> Void) -> Connect.Cancelable
 
     @available(iOS 13, *)
-    func `getCalDavaccount`(request: Calendar_V1_GetCalDAVAccountRequest, headers: Connect.Headers) async -> ResponseMessage<Calendar_V1_GetCalDAVAccountResponse>
+    func `getCalDavAccount`(request: Calendar_V1_GetCalDavAccountRequest, headers: Connect.Headers) async -> ResponseMessage<Calendar_V1_GetCalDavAccountResponse>
 }
 
 /// Concrete implementation of `Calendar_V1_CalendarServiceClientInterface`.
@@ -25,18 +25,18 @@ public final class Calendar_V1_CalendarServiceClient: Calendar_V1_CalendarServic
     }
 
     @discardableResult
-    public func `getCalDavaccount`(request: Calendar_V1_GetCalDAVAccountRequest, headers: Connect.Headers = [:], completion: @escaping @Sendable (ResponseMessage<Calendar_V1_GetCalDAVAccountResponse>) -> Void) -> Connect.Cancelable {
-        return self.client.unary(path: "/calendar.v1.CalendarService/GetCalDAVAccount", idempotencyLevel: .unknown, request: request, headers: headers, completion: completion)
+    public func `getCalDavAccount`(request: Calendar_V1_GetCalDavAccountRequest, headers: Connect.Headers = [:], completion: @escaping @Sendable (ResponseMessage<Calendar_V1_GetCalDavAccountResponse>) -> Void) -> Connect.Cancelable {
+        return self.client.unary(path: "/calendar.v1.CalendarService/GetCalDavAccount", idempotencyLevel: .unknown, request: request, headers: headers, completion: completion)
     }
 
     @available(iOS 13, *)
-    public func `getCalDavaccount`(request: Calendar_V1_GetCalDAVAccountRequest, headers: Connect.Headers = [:]) async -> ResponseMessage<Calendar_V1_GetCalDAVAccountResponse> {
-        return await self.client.unary(path: "/calendar.v1.CalendarService/GetCalDAVAccount", idempotencyLevel: .unknown, request: request, headers: headers)
+    public func `getCalDavAccount`(request: Calendar_V1_GetCalDavAccountRequest, headers: Connect.Headers = [:]) async -> ResponseMessage<Calendar_V1_GetCalDavAccountResponse> {
+        return await self.client.unary(path: "/calendar.v1.CalendarService/GetCalDavAccount", idempotencyLevel: .unknown, request: request, headers: headers)
     }
 
     public enum Metadata {
         public enum Methods {
-            public static let getCalDavaccount = Connect.MethodSpec(name: "GetCalDAVAccount", service: "calendar.v1.CalendarService", type: .unary)
+            public static let getCalDavAccount = Connect.MethodSpec(name: "GetCalDavAccount", service: "calendar.v1.CalendarService", type: .unary)
         }
     }
 }

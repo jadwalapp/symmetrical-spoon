@@ -33,20 +33,20 @@ const (
 // reflection-formatted method names, remove the leading slash and convert the remaining slash to a
 // period.
 const (
-	// CalendarServiceGetCalDAVAccountProcedure is the fully-qualified name of the CalendarService's
-	// GetCalDAVAccount RPC.
-	CalendarServiceGetCalDAVAccountProcedure = "/calendar.v1.CalendarService/GetCalDAVAccount"
+	// CalendarServiceGetCalDavAccountProcedure is the fully-qualified name of the CalendarService's
+	// GetCalDavAccount RPC.
+	CalendarServiceGetCalDavAccountProcedure = "/calendar.v1.CalendarService/GetCalDavAccount"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
 var (
 	calendarServiceServiceDescriptor                = v1.File_calendar_v1_calendar_proto.Services().ByName("CalendarService")
-	calendarServiceGetCalDAVAccountMethodDescriptor = calendarServiceServiceDescriptor.Methods().ByName("GetCalDAVAccount")
+	calendarServiceGetCalDavAccountMethodDescriptor = calendarServiceServiceDescriptor.Methods().ByName("GetCalDavAccount")
 )
 
 // CalendarServiceClient is a client for the calendar.v1.CalendarService service.
 type CalendarServiceClient interface {
-	GetCalDAVAccount(context.Context, *connect.Request[v1.GetCalDAVAccountRequest]) (*connect.Response[v1.GetCalDAVAccountResponse], error)
+	GetCalDavAccount(context.Context, *connect.Request[v1.GetCalDavAccountRequest]) (*connect.Response[v1.GetCalDavAccountResponse], error)
 }
 
 // NewCalendarServiceClient constructs a client for the calendar.v1.CalendarService service. By
@@ -59,10 +59,10 @@ type CalendarServiceClient interface {
 func NewCalendarServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) CalendarServiceClient {
 	baseURL = strings.TrimRight(baseURL, "/")
 	return &calendarServiceClient{
-		getCalDAVAccount: connect.NewClient[v1.GetCalDAVAccountRequest, v1.GetCalDAVAccountResponse](
+		getCalDavAccount: connect.NewClient[v1.GetCalDavAccountRequest, v1.GetCalDavAccountResponse](
 			httpClient,
-			baseURL+CalendarServiceGetCalDAVAccountProcedure,
-			connect.WithSchema(calendarServiceGetCalDAVAccountMethodDescriptor),
+			baseURL+CalendarServiceGetCalDavAccountProcedure,
+			connect.WithSchema(calendarServiceGetCalDavAccountMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
 	}
@@ -70,17 +70,17 @@ func NewCalendarServiceClient(httpClient connect.HTTPClient, baseURL string, opt
 
 // calendarServiceClient implements CalendarServiceClient.
 type calendarServiceClient struct {
-	getCalDAVAccount *connect.Client[v1.GetCalDAVAccountRequest, v1.GetCalDAVAccountResponse]
+	getCalDavAccount *connect.Client[v1.GetCalDavAccountRequest, v1.GetCalDavAccountResponse]
 }
 
-// GetCalDAVAccount calls calendar.v1.CalendarService.GetCalDAVAccount.
-func (c *calendarServiceClient) GetCalDAVAccount(ctx context.Context, req *connect.Request[v1.GetCalDAVAccountRequest]) (*connect.Response[v1.GetCalDAVAccountResponse], error) {
-	return c.getCalDAVAccount.CallUnary(ctx, req)
+// GetCalDavAccount calls calendar.v1.CalendarService.GetCalDavAccount.
+func (c *calendarServiceClient) GetCalDavAccount(ctx context.Context, req *connect.Request[v1.GetCalDavAccountRequest]) (*connect.Response[v1.GetCalDavAccountResponse], error) {
+	return c.getCalDavAccount.CallUnary(ctx, req)
 }
 
 // CalendarServiceHandler is an implementation of the calendar.v1.CalendarService service.
 type CalendarServiceHandler interface {
-	GetCalDAVAccount(context.Context, *connect.Request[v1.GetCalDAVAccountRequest]) (*connect.Response[v1.GetCalDAVAccountResponse], error)
+	GetCalDavAccount(context.Context, *connect.Request[v1.GetCalDavAccountRequest]) (*connect.Response[v1.GetCalDavAccountResponse], error)
 }
 
 // NewCalendarServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -89,16 +89,16 @@ type CalendarServiceHandler interface {
 // By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
 // and JSON codecs. They also support gzip compression.
 func NewCalendarServiceHandler(svc CalendarServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
-	calendarServiceGetCalDAVAccountHandler := connect.NewUnaryHandler(
-		CalendarServiceGetCalDAVAccountProcedure,
-		svc.GetCalDAVAccount,
-		connect.WithSchema(calendarServiceGetCalDAVAccountMethodDescriptor),
+	calendarServiceGetCalDavAccountHandler := connect.NewUnaryHandler(
+		CalendarServiceGetCalDavAccountProcedure,
+		svc.GetCalDavAccount,
+		connect.WithSchema(calendarServiceGetCalDavAccountMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
 	return "/calendar.v1.CalendarService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
-		case CalendarServiceGetCalDAVAccountProcedure:
-			calendarServiceGetCalDAVAccountHandler.ServeHTTP(w, r)
+		case CalendarServiceGetCalDavAccountProcedure:
+			calendarServiceGetCalDavAccountHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -108,6 +108,6 @@ func NewCalendarServiceHandler(svc CalendarServiceHandler, opts ...connect.Handl
 // UnimplementedCalendarServiceHandler returns CodeUnimplemented from all methods.
 type UnimplementedCalendarServiceHandler struct{}
 
-func (UnimplementedCalendarServiceHandler) GetCalDAVAccount(context.Context, *connect.Request[v1.GetCalDAVAccountRequest]) (*connect.Response[v1.GetCalDAVAccountResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("calendar.v1.CalendarService.GetCalDAVAccount is not implemented"))
+func (UnimplementedCalendarServiceHandler) GetCalDavAccount(context.Context, *connect.Request[v1.GetCalDavAccountRequest]) (*connect.Response[v1.GetCalDavAccountResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("calendar.v1.CalendarService.GetCalDavAccount is not implemented"))
 }

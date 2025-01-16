@@ -20,7 +20,7 @@ fileprivate struct _GeneratedWithProtocGenSwiftVersion: SwiftProtobuf.ProtobufAP
   typealias Version = _2
 }
 
-public struct Calendar_V1_GetCalDAVAccountRequest: Sendable {
+public struct Calendar_V1_GetCalDavAccountRequest: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -30,7 +30,7 @@ public struct Calendar_V1_GetCalDAVAccountRequest: Sendable {
   public init() {}
 }
 
-public struct Calendar_V1_GetCalDAVAccountResponse: Sendable {
+public struct Calendar_V1_GetCalDavAccountResponse: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -48,8 +48,8 @@ public struct Calendar_V1_GetCalDAVAccountResponse: Sendable {
 
 fileprivate let _protobuf_package = "calendar.v1"
 
-extension Calendar_V1_GetCalDAVAccountRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  public static let protoMessageName: String = _protobuf_package + ".GetCalDAVAccountRequest"
+extension Calendar_V1_GetCalDavAccountRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".GetCalDavAccountRequest"
   public static let _protobuf_nameMap = SwiftProtobuf._NameMap()
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -61,14 +61,14 @@ extension Calendar_V1_GetCalDAVAccountRequest: SwiftProtobuf.Message, SwiftProto
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Calendar_V1_GetCalDAVAccountRequest, rhs: Calendar_V1_GetCalDAVAccountRequest) -> Bool {
+  public static func ==(lhs: Calendar_V1_GetCalDavAccountRequest, rhs: Calendar_V1_GetCalDavAccountRequest) -> Bool {
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension Calendar_V1_GetCalDAVAccountResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  public static let protoMessageName: String = _protobuf_package + ".GetCalDAVAccountResponse"
+extension Calendar_V1_GetCalDavAccountResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".GetCalDavAccountResponse"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "username"),
     2: .same(proto: "password"),
@@ -97,7 +97,7 @@ extension Calendar_V1_GetCalDAVAccountResponse: SwiftProtobuf.Message, SwiftProt
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Calendar_V1_GetCalDAVAccountResponse, rhs: Calendar_V1_GetCalDAVAccountResponse) -> Bool {
+  public static func ==(lhs: Calendar_V1_GetCalDavAccountResponse, rhs: Calendar_V1_GetCalDavAccountResponse) -> Bool {
     if lhs.username != rhs.username {return false}
     if lhs.password != rhs.password {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
