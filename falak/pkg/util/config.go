@@ -27,6 +27,7 @@ type FalakConfig struct {
 	LokiPushIntervalSeconds     int    `mapstructure:"LOKI_PUSH_INTERVAL_SECONDS"`
 	LokiMaxBatchSize            int    `mapstructure:"LOKI_MAX_BATCH_SIZE"`
 	BaikalHost                  string `mapstructure:"BAIKAL_HOST"`
+	BaikalPhpSessionID          string `mapstructure:"BAIKAL_PHPSESSID"`
 	CalDAVPasswordEncryptionKey string `mapstructure:"CALDAV_PASSWORD_ENCRYPTION_KEY"`
 }
 

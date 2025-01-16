@@ -9,15 +9,15 @@ import (
 )
 
 type client struct {
-	cli     httpclient.HTTPClient
-	baseUrl string
+	cli          httpclient.HTTPClient
+	baseUrl      string
+	phpSessionID string
 }
 
 func (c *client) CreateUser(ctx context.Context, r *CreateUserRequest) (*CreateUserResponse, error) {
 	url := fmt.Sprintf("%s/admin/?/users/new/1/", c.baseUrl)
 	headers := map[string]string{
-		// TODO: make this set in the struct after calling a login function perhaps :D
-		"Cookie": "PHPSESSID=a7a156e35ea701b98313949ccee926cc",
+		"Cookie": fmt.Sprintf("PHPSESSID=%s", c.phpSessionID),
 	}
 
 	getResp, err := c.cli.Get(url, headers, nil)
@@ -59,9 +59,10 @@ func (c *client) CreateUser(ctx context.Context, r *CreateUserRequest) (*CreateU
 	return &CreateUserResponse{}, nil
 }
 
-func NewClient(cli httpclient.HTTPClient, baseUrl string) Client {
+func NewClient(cli httpclient.HTTPClient, baseUrl string, phpSessionID string) Client {
 	return &client{
-		cli:     cli,
-		baseUrl: baseUrl,
+		cli:          cli,
+		baseUrl:      baseUrl,
+		phpSessionID: phpSessionID,
 	}
 }

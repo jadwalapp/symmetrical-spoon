@@ -153,7 +153,7 @@ func main() {
 
 	// ======== BAIKAL CLIENT ========
 	baikalHttpCli := httpclient.NewClient(&http.Client{})
-	baikalCli := baikalclient.NewClient(baikalHttpCli, config.BaikalHost)
+	baikalCli := baikalclient.NewClient(baikalHttpCli, config.BaikalHost, config.BaikalPhpSessionID)
 	// ======== BAIKAL CLIENT ========
 
 	// ======== PROTOVALIDATE ========

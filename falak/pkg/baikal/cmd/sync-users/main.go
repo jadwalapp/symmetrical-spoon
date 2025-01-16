@@ -71,7 +71,7 @@ func main() {
 
 	// ======== BAIKAL CLIENT ========
 	cli := httpclient.NewClient(&http.Client{})
-	baikalCli := baikalclient.NewClient(cli, config.BaikalHost)
+	baikalCli := baikalclient.NewClient(cli, config.BaikalHost, config.BaikalPhpSessionID)
 	// ======== BAIKAL CLIENT ========
 
 	// query you need to make the list
