@@ -21,12 +21,12 @@ type service struct {
 	pv                          protovalidate.Validator
 	store                       store.Queries
 	apiMetadata                 apimetadata.ApiMetadata
-	calDAVPasswordEncryptionKey string
+	calDavPasswordEncryptionKey string
 
 	calendarv1connect.UnimplementedCalendarServiceHandler
 }
 
-func (s *service) GetCalDAVAccount(ctx context.Context, r *connect.Request[calendarv1.GetCalDavAccountRequest]) (*connect.Response[calendarv1.GetCalDavAccountResponse], error) {
+func (s *service) GetCalDavAccount(ctx context.Context, r *connect.Request[calendarv1.GetCalDavAccountRequest]) (*connect.Response[calendarv1.GetCalDavAccountResponse], error) {
 	if err := s.pv.Validate(r.Msg); err != nil {
 		log.Ctx(ctx).Err(err).Msg("invalid request")
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
@@ -44,9 +44,9 @@ func (s *service) GetCalDAVAccount(ctx context.Context, r *connect.Request[calen
 		return nil, internalError
 	}
 
-	calDAVAccount, err := s.store.GetCalDAVAccountByCustomerId(ctx, store.GetCalDAVAccountByCustomerIdParams{
+	calDavAccount, err := s.store.GetCalDAVAccountByCustomerId(ctx, store.GetCalDAVAccountByCustomerIdParams{
 		CustomerID:    customer.ID,
-		EncryptionKey: s.calDAVPasswordEncryptionKey,
+		EncryptionKey: s.calDavPasswordEncryptionKey,
 	})
 	if err != nil {
 		log.Ctx(ctx).Err(err).Msg("failed running GetCalDAVAccountByCustomerId")
@@ -55,8 +55,8 @@ func (s *service) GetCalDAVAccount(ctx context.Context, r *connect.Request[calen
 
 	return &connect.Response[calendarv1.GetCalDavAccountResponse]{
 		Msg: &calendarv1.GetCalDavAccountResponse{
-			Username: calDAVAccount.Username,
-			Password: calDAVAccount.DecryptedPassword,
+			Username: calDavAccount.Username,
+			Password: calDavAccount.DecryptedPassword,
 		},
 	}, nil
 }
@@ -66,6 +66,6 @@ func NewService(pv protovalidate.Validator, store store.Queries, apiMetadata api
 		pv:                          pv,
 		store:                       store,
 		apiMetadata:                 apiMetadata,
-		calDAVPasswordEncryptionKey: calDAVPasswordEncryptionKey,
+		calDavPasswordEncryptionKey: calDAVPasswordEncryptionKey,
 	}
 }
