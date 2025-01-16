@@ -74,7 +74,6 @@ func main() {
 	baikalCli := baikalclient.NewClient(cli, config.BaikalHost, config.BaikalPhpSessionID)
 	// ======== BAIKAL CLIENT ========
 
-	// query you need to make the list
 	customers, err := dbStore.ListCustomerWithoutCaldavAccount(context.Background())
 	if err != nil {
 		log.Fatal().Msgf("failed to run ListCustomerWithoutCaldavAccount: %v", err)
