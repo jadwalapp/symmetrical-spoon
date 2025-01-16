@@ -40,3 +40,9 @@ SELECT
       WHERE ag.customer_id = $1
     )
   ) AS is_customer_first_login;
+
+-- name: ListCustomerWithoutCaldavAccount :many
+SELECT c.*
+FROM customer c
+LEFT OUTER JOIN caldav_account ca ON c.id = ca.customer_id
+WHERE ca.customer_id IS NULL;
