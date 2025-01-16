@@ -21,9 +21,11 @@ SELECT * FROM customer WHERE LOWER(email) = LOWER(sqlc.arg(email));
 -- name: DeleteCustomerById :exec
 DELETE FROM customer WHERE id = $1;
 
+
 -- name: IsCustomerFirstLogin :one
 SELECT 
   (
+    -- not ((has magic link entry where used_at is not null) -> has account)
     NOT EXISTS (
       SELECT 1 
       FROM magic_link ml
@@ -31,6 +33,7 @@ SELECT
         AND ml.used_at IS NOT NULL
     )
     AND 
+    -- not ((has google entry) -> has account)
     NOT EXISTS (
       SELECT 1 
       FROM auth_google ag

@@ -66,7 +66,7 @@ type GetCalDAVAccountByCustomerIdRow struct {
 	Password      string
 	CreatedAt     time.Time
 	UpdatedAt     time.Time
-	PgpSymDecrypt interface{}
+	PgpSymDecrypt string
 }
 
 func (q *Queries) GetCalDAVAccountByCustomerId(ctx context.Context, arg GetCalDAVAccountByCustomerIdParams) (GetCalDAVAccountByCustomerIdRow, error) {
