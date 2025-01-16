@@ -51,6 +51,8 @@ services:
       - "3100:3100"
 
   baikal:
+    ports:
+      - 3322:80
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=symmetrical-spoon_web"

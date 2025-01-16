@@ -37,7 +37,7 @@ func (s *service) GetProfile(ctx context.Context, r *connect.Request[profilev1.G
 
 	customer, err := s.store.GetCustomerById(ctx, tokenClaims.Payload.CustomerId)
 	if err != nil {
-		log.Ctx(ctx).Err(err).Msg("failed running GetCustomerByEmail")
+		log.Ctx(ctx).Err(err).Msg("failed running GetCustomerById")
 		return nil, internalError
 	}
 
