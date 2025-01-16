@@ -49,12 +49,10 @@ func (c *client) CreateUser(ctx context.Context, r *CreateUserRequest) (*CreateU
 		"witness[passwordconfirm]":     "1",
 	}
 
-	resp, err := c.cli.PostFormData(url, form, headers)
+	_, err = c.cli.PostFormData(url, form, headers)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create user: %v", err)
 	}
-
-	fmt.Printf("resp of post: %v", resp)
 
 	return &CreateUserResponse{}, nil
 }
