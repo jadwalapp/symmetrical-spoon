@@ -56,7 +56,7 @@ func (s *service) GetCalDAVAccount(ctx context.Context, r *connect.Request[calen
 	return &connect.Response[calendarv1.GetCalDAVAccountResponse]{
 		Msg: &calendarv1.GetCalDAVAccountResponse{
 			Username: calDAVAccount.Username,
-			Password: calDAVAccount.Password,
+			Password: calDAVAccount.DecryptedPassword,
 		},
 	}, nil
 }

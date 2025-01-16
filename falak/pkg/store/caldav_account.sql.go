@@ -48,7 +48,7 @@ func (q *Queries) CreateCalDAVAccount(ctx context.Context, arg CreateCalDAVAccou
 }
 
 const getCalDAVAccountByCustomerId = `-- name: GetCalDAVAccountByCustomerId :one
-SELECT id, customer_id, email, username, password, created_at, updated_at, pgp_sym_decrypt(ca.password, $2::text)
+SELECT id, customer_id, email, username, password, created_at, updated_at, pgp_sym_decrypt(ca.password::bytea, $2::text) AS decrypted_password
 FROM caldav_account ca
 WHERE ca.customer_id = $1
 `
@@ -59,14 +59,14 @@ type GetCalDAVAccountByCustomerIdParams struct {
 }
 
 type GetCalDAVAccountByCustomerIdRow struct {
-	ID            uuid.UUID
-	CustomerID    uuid.UUID
-	Email         string
-	Username      string
-	Password      string
-	CreatedAt     time.Time
-	UpdatedAt     time.Time
-	PgpSymDecrypt string
+	ID                uuid.UUID
+	CustomerID        uuid.UUID
+	Email             string
+	Username          string
+	Password          string
+	CreatedAt         time.Time
+	UpdatedAt         time.Time
+	DecryptedPassword string
 }
 
 func (q *Queries) GetCalDAVAccountByCustomerId(ctx context.Context, arg GetCalDAVAccountByCustomerIdParams) (GetCalDAVAccountByCustomerIdRow, error) {
@@ -80,7 +80,7 @@ func (q *Queries) GetCalDAVAccountByCustomerId(ctx context.Context, arg GetCalDA
 		&i.Password,
 		&i.CreatedAt,
 		&i.UpdatedAt,
-		&i.PgpSymDecrypt,
+		&i.DecryptedPassword,
 	)
 	return i, err
 }
