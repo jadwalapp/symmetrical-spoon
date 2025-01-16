@@ -15,10 +15,8 @@ struct EmailInputView: View {
     
     var body: some View {
         ZStack {
-            // Main content in ScrollView
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
-                    // Header section
                     VStack(alignment: .leading, spacing: 16) {
                         IconWithBackground(icon: .mail)
                             .pulsingAnimation()
@@ -36,9 +34,7 @@ struct EmailInputView: View {
                         }
                     }
                     
-                    // Form section
                     VStack(spacing: 20) {
-                        // Email input field
                         VStack(alignment: .leading, spacing: 8) {
                             HStack(spacing: 12) {
                                 Image(systemName: "envelope.fill")
@@ -76,7 +72,6 @@ struct EmailInputView: View {
                         }
                         .entranceAnimation(delay: 0.3)
                         
-                        // Benefits section
                         VStack(spacing: 16) {
                             HStack(spacing: 12) {
                                 Image(systemName: "lock.shield.fill")
@@ -117,18 +112,15 @@ struct EmailInputView: View {
                         .entranceAnimation()
                     }
                     
-                    // Add some padding at the bottom to ensure content doesn't get hidden behind the button
                     Spacer()
                         .frame(height: 80)
                 }
                 .padding(24)
             }
             
-            // Fixed button at bottom
             VStack {
                 Spacer()
                 VStack(spacing: 0) {
-                    // Optional divider for visual separation
                     Divider()
                     
                     OButton(
