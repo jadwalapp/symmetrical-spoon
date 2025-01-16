@@ -57,6 +57,7 @@ struct CalDAVCredentialsView: View {
         VStack(spacing: 20) {
             AsyncView(response: profileViewModel.calDavAccountState) { account in
                 VStack(spacing: 16) {
+                    credentialRow(title: "Server URL", value: "https://baikal.jadwal.app/dav.php", systemImage: "globe")
                     credentialRow(title: "Username", value: account.username, systemImage: "person.fill")
                     credentialRow(title: "Password", value: account.password, systemImage: "lock.fill", isSecure: true)
                 }
