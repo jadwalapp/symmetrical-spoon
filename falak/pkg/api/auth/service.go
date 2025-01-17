@@ -146,7 +146,7 @@ func (s *service) CompleteEmail(ctx context.Context, r *connect.Request[authv1.C
 			return nil, internalError
 		}
 
-		_, err = s.store.CreateCalDAVAccount(ctx, store.CreateCalDAVAccountParams{
+		_, err = s.store.CreateCalDavAccount(ctx, store.CreateCalDavAccountParams{
 			CustomerID:    customer.ID,
 			Email:         customer.Email,
 			Username:      customer.Email,
@@ -154,7 +154,7 @@ func (s *service) CompleteEmail(ctx context.Context, r *connect.Request[authv1.C
 			EncryptionKey: s.calDAVPasswordEncryptionKey,
 		})
 		if err != nil {
-			log.Ctx(ctx).Err(err).Msg("failed running store.CreateCalDAVAccount")
+			log.Ctx(ctx).Err(err).Msg("failed running store.CreateCalDavAccount")
 			return nil, internalError
 		}
 
@@ -236,7 +236,7 @@ func (s *service) UseGoogle(ctx context.Context, r *connect.Request[authv1.UseGo
 			return nil, internalError
 		}
 
-		_, err = s.store.CreateCalDAVAccount(ctx, store.CreateCalDAVAccountParams{
+		_, err = s.store.CreateCalDavAccount(ctx, store.CreateCalDavAccountParams{
 			CustomerID:    customer.ID,
 			Email:         customer.Email,
 			Username:      customer.Email,
@@ -244,7 +244,7 @@ func (s *service) UseGoogle(ctx context.Context, r *connect.Request[authv1.UseGo
 			EncryptionKey: s.calDAVPasswordEncryptionKey,
 		})
 		if err != nil {
-			log.Ctx(ctx).Err(err).Msg("failed running store.CreateCalDAVAccount")
+			log.Ctx(ctx).Err(err).Msg("failed running store.CreateCalDavAccount")
 			return nil, internalError
 		}
 

@@ -83,14 +83,14 @@ func main() {
 	for _, customer := range customers {
 		_, err := baikalCli.CreateUser(context.Background(), &baikalclient.CreateUserRequest{})
 		if err != nil {
-			log.Error().Msgf("❌ failed to run CreateCalDAVAccount: %v", err)
+			log.Error().Msgf("❌ failed to run CreateUser: %v", err)
 			failedRequestsCustomersId = append(failedRequestsCustomersId, customer.ID.String())
 			continue
 		}
 
 		randomPassword := uuid.New().String()
 
-		_, err = dbStore.CreateCalDAVAccount(context.Background(), store.CreateCalDAVAccountParams{
+		_, err = dbStore.CreateCalDavAccount(context.Background(), store.CreateCalDavAccountParams{
 			CustomerID:    customer.ID,
 			Email:         customer.Email,
 			Username:      customer.Email,
@@ -98,7 +98,7 @@ func main() {
 			EncryptionKey: config.CalDAVPasswordEncryptionKey,
 		})
 		if err != nil {
-			log.Error().Msgf("❌ failed to run CreateCalDAVAccount: %v", err)
+			log.Error().Msgf("❌ failed to run CreateCalDavAccount: %v", err)
 			failedRequestsCustomersId = append(failedRequestsCustomersId, customer.ID.String())
 			continue
 		}

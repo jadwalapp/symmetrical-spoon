@@ -12,13 +12,13 @@ import (
 	"github.com/google/uuid"
 )
 
-const createCalDAVAccount = `-- name: CreateCalDAVAccount :one
+const createCalDavAccount = `-- name: CreateCalDavAccount :one
 INSERT INTO caldav_account (customer_id, email, username, password)
 VALUES ($1, $2, $3, pgp_sym_encrypt($4::text, $5::text))
 RETURNING id, customer_id, email, username, password, created_at, updated_at
 `
 
-type CreateCalDAVAccountParams struct {
+type CreateCalDavAccountParams struct {
 	CustomerID    uuid.UUID
 	Email         string
 	Username      string
@@ -26,8 +26,8 @@ type CreateCalDAVAccountParams struct {
 	EncryptionKey string
 }
 
-func (q *Queries) CreateCalDAVAccount(ctx context.Context, arg CreateCalDAVAccountParams) (CaldavAccount, error) {
-	row := q.db.QueryRowContext(ctx, createCalDAVAccount,
+func (q *Queries) CreateCalDavAccount(ctx context.Context, arg CreateCalDavAccountParams) (CaldavAccount, error) {
+	row := q.db.QueryRowContext(ctx, createCalDavAccount,
 		arg.CustomerID,
 		arg.Email,
 		arg.Username,
@@ -47,18 +47,18 @@ func (q *Queries) CreateCalDAVAccount(ctx context.Context, arg CreateCalDAVAccou
 	return i, err
 }
 
-const getCalDAVAccountByCustomerId = `-- name: GetCalDAVAccountByCustomerId :one
+const getCalDavAccountByCustomerId = `-- name: GetCalDavAccountByCustomerId :one
 SELECT id, customer_id, email, username, password, created_at, updated_at, pgp_sym_decrypt(ca.password::bytea, $2::text) AS decrypted_password
 FROM caldav_account ca
 WHERE ca.customer_id = $1
 `
 
-type GetCalDAVAccountByCustomerIdParams struct {
+type GetCalDavAccountByCustomerIdParams struct {
 	CustomerID    uuid.UUID
 	EncryptionKey string
 }
 
-type GetCalDAVAccountByCustomerIdRow struct {
+type GetCalDavAccountByCustomerIdRow struct {
 	ID                uuid.UUID
 	CustomerID        uuid.UUID
 	Email             string
@@ -69,9 +69,9 @@ type GetCalDAVAccountByCustomerIdRow struct {
 	DecryptedPassword string
 }
 
-func (q *Queries) GetCalDAVAccountByCustomerId(ctx context.Context, arg GetCalDAVAccountByCustomerIdParams) (GetCalDAVAccountByCustomerIdRow, error) {
-	row := q.db.QueryRowContext(ctx, getCalDAVAccountByCustomerId, arg.CustomerID, arg.EncryptionKey)
-	var i GetCalDAVAccountByCustomerIdRow
+func (q *Queries) GetCalDavAccountByCustomerId(ctx context.Context, arg GetCalDavAccountByCustomerIdParams) (GetCalDavAccountByCustomerIdRow, error) {
+	row := q.db.QueryRowContext(ctx, getCalDavAccountByCustomerId, arg.CustomerID, arg.EncryptionKey)
+	var i GetCalDavAccountByCustomerIdRow
 	err := row.Scan(
 		&i.ID,
 		&i.CustomerID,

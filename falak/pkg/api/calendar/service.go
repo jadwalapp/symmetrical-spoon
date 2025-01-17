@@ -44,12 +44,12 @@ func (s *service) GetCalDavAccount(ctx context.Context, r *connect.Request[calen
 		return nil, internalError
 	}
 
-	calDavAccount, err := s.store.GetCalDAVAccountByCustomerId(ctx, store.GetCalDAVAccountByCustomerIdParams{
+	calDavAccount, err := s.store.GetCalDavAccountByCustomerId(ctx, store.GetCalDavAccountByCustomerIdParams{
 		CustomerID:    customer.ID,
 		EncryptionKey: s.calDavPasswordEncryptionKey,
 	})
 	if err != nil {
-		log.Ctx(ctx).Err(err).Msg("failed running GetCalDAVAccountByCustomerId")
+		log.Ctx(ctx).Err(err).Msg("failed running GetCalDavAccountByCustomerId")
 		return nil, internalError
 	}
 
