@@ -6,82 +6,56 @@
 //
 
 import SwiftUI
+import EventKitUI
 
-struct AddEventView: View {
-    @EnvironmentObject var calendarViewModel: CalendarViewModel
-    
+struct AddEventView: UIViewControllerRepresentable {
+    @EnvironmentObject var viewModel: CalendarViewModel
     @Binding var isPresented: Bool
-    var selectedDate: DateComponents?
     
-    @State private var eventTitle = ""
-    @State private var eventLocation = ""
-    @State private var startDate = Date()
-    @State private var endDate = Date().addingTimeInterval(3600) // 1 hour later
-    @State private var notes = ""
-    @State private var isAllDay = false
-    
-    var isValid: Bool {
-        return eventTitle.count > 0 && startDate < endDate
+    func makeUIViewController(context: Context) -> EKEventEditViewController {
+        let controller = viewModel.addEvent()
+        return controller
     }
     
-    var body: some View {
-        NavigationStack {
-            Form {
-                Section {
-                    TextField("Title", text: $eventTitle)
-                    TextField("Location", text: $eventLocation)
-                } header: {
-                    Text("Event Details")
-                }
-                
-                Section {
-                    Toggle("All-day", isOn: $isAllDay)
-                    DatePicker(
-                        "Starts",
-                        selection: $startDate,
-                        displayedComponents: isAllDay ? .date : [.date, .hourAndMinute])
-                    DatePicker(
-                        "Ends",
-                        selection: $endDate,
-                        displayedComponents: isAllDay ? .date : [.date, .hourAndMinute])
-                }
-                
-                Section {
-                    TextEditor(text: $notes)
-                        .frame(height: 100)
-                } header: {
-                    Text("Notes")
-                }
-            }
-            .navigationTitle("New Event")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
-                        isPresented = false
-                    }
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Add") {
-                        print("add clicked")
-                    }
-                    .disabled(!isValid)
-                    
-                }
-            }
+    func updateUIViewController(_ uiViewController: EKEventEditViewController, context: Context) {}
+    
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+    
+    class Coordinator: NSObject, EKEventEditViewDelegate {
+        var parent: AddEventView
+        
+        init(_ parent: AddEventView) {
+            self.parent = parent
+            super.init()
+            
+            NotificationCenter.default.addObserver(
+                self,
+                selector: #selector(dismissAddEventView),
+                name: NSNotification.Name("DismissAddEventView"),
+                object: nil
+            )
+        }
+        
+        func eventEditViewController(_ controller: EKEventEditViewController, didCompleteWith action: EKEventEditViewAction) {
+            parent.viewModel.eventEditViewController(controller, didCompleteWith: action)
+        }
+        
+        @objc func dismissAddEventView() {
+            parent.isPresented = false
+        }
+        
+        deinit {
+            NotificationCenter.default.removeObserver(self)
         }
     }
 }
 
+
 #Preview {
     AddEventView(
-        isPresented: .constant(true),
-        selectedDate: DateComponents(
-            calendar: Calendar(identifier: .gregorian),
-            year: 2024,
-            month: 10,
-            day: 20
-        )
+        isPresented: .constant(true)
     )
     .environmentObject(CalendarViewModel())
 }

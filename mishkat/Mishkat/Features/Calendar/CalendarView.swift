@@ -9,22 +9,30 @@ import SwiftUI
 import EventKit
 
 struct CalendarView: View {
-    @State private var selectedDate: DateComponents?
-    @State private var displayEvents = false
+    @EnvironmentObject var viewModel: CalendarViewModel
     @State private var showingAddEventSheet = false
     @State private var showingCalendarsSheet = false
-    @EnvironmentObject var calendarViewModel: CalendarViewModel
 
     var body: some View {
         NavigationStack {
-            VStack {
-                CalendarViewRepresentable(
-                    selectedDate: $selectedDate,
-                    displayEvents: $displayEvents
-                )
-                
-                if displayEvents, let date = selectedDate?.date {
-                    EventsListView(events: calendarViewModel.fetchEvents(for: date))
+            ZStack {
+                VStack {
+                    CalendarViewRepresentable(
+                        selectedDate: $viewModel.selectedDate,
+                        displayEvents: Binding.constant(true)
+                    )
+                    
+                    if let date = viewModel.selectedDate?.date {
+                        EventsListView(events: viewModel.events)
+                            .onAppear {
+                                viewModel.fetchEvents(for: date)
+                            }
+                    }
+                }
+                .blur(radius: viewModel.authorizationStatus != .authorized ? 10 : 0)
+
+                if viewModel.authorizationStatus != .authorized {
+                    AccessRequestCard(status: viewModel.authorizationStatus, requestAccess: viewModel.requestAccess, openSettings: viewModel.openSettings)
                 }
             }
             .navigationTitle("Calendar")
@@ -48,18 +56,63 @@ struct CalendarView: View {
                 }
             }
             .sheet(isPresented: $showingAddEventSheet) {
-                AddEventView(
-                    isPresented: $showingAddEventSheet,
-                    selectedDate: selectedDate
-                ).environmentObject(calendarViewModel)
+                AddEventView(isPresented: $showingAddEventSheet)
+                    .edgesIgnoringSafeArea(.all)
             }
             .sheet(isPresented: $showingCalendarsSheet) {
-                CalendarsListView(sources: calendarViewModel.fetchCalendarSources())
-            }
-            .onAppear {
-                calendarViewModel.requestAccess()
+                CalendarsListView(sources: viewModel.calendarSources)
             }
         }
+    }
+}
+
+struct AccessRequestCard: View {
+    let status: EKAuthorizationStatus
+    let requestAccess: () -> Void
+    let openSettings: () -> Void
+
+    var body: some View {
+        VStack(spacing: 20) {
+            Image(systemName: "calendar.badge.exclamationmark")
+                .font(.system(size: 60))
+                .foregroundColor(.blue)
+            
+            Text("Calendar Access Required")
+                .font(.title2)
+                .fontWeight(.bold)
+            
+            Text("To use the calendar features, we need access to your calendar. This allows us to display and manage your events.")
+                .multilineTextAlignment(.center)
+                .font(.body)
+                .foregroundColor(.secondary)
+                .padding(.horizontal)
+            
+            Button(action: {
+                if status == .notDetermined {
+                    requestAccess()
+                } else {
+                    openSettings()
+                }
+            }) {
+                Text(status == .denied ? "Open Settings" : "Grant Access")
+                    .fontWeight(.semibold)
+                    .frame(minWidth: 200)
+                    .padding()
+                    .background(Color.blue)
+                    .foregroundColor(.white)
+                    .cornerRadius(10)
+            }
+            .buttonStyle(PlainButtonStyle())
+        }
+        .frame(maxWidth: 300)
+        .padding()
+        .background(Color(UIColor.systemBackground))
+        .cornerRadius(20)
+        .shadow(color: Color.black.opacity(0.2), radius: 15, x: 0, y: 5)
+        .overlay(
+            RoundedRectangle(cornerRadius: 20)
+                .stroke(Color.gray.opacity(0.2), lineWidth: 1)
+        )
     }
 }
 
