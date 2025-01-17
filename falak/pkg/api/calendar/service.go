@@ -28,7 +28,7 @@ type service struct {
 	pv                protovalidate.Validator
 	store             store.Queries
 	apiMetadata       apimetadata.ApiMetadata
-	geoLocationClient geolocationclient.GeoLocationClient
+	geoLocationClient geolocationclient.Client
 	prayerClient      prayerclient.Client
 	calendarv1connect.UnimplementedCalendarServiceHandler
 }
@@ -315,69 +315,19 @@ func (s *service) SchedulePrayerTimes(ctx context.Context, r *connect.Request[ca
 	fmt.Println(geoLocResp)
 	fmt.Println(time.Now().Format("02-01-2006"))
 
-	prayerTimes, err := s.prayerClient.GetPrayertimeInfo(ctx, &prayerclient.GetPrayertimeInfoRequest{
-		Date:    time.Now().Format("02-01-2006"),
-		City:    geoLocResp.City,
-		Country: geoLocResp.Country,
-	})
-	if err != nil {
-		log.Ctx(ctx).Err(err).Msg("failed to retrieve prayer times from Adhan API")
-		return nil, internalError
-	}
+	formattedLocation := fmt.Sprintf("%s_%s", replaceSpaces(geoLocResp.City), replaceSpaces(geoLocResp.Country))
 
-	fmt.Printf("prayer times: %v\n", prayerTimes)
+	prayerURL := fmt.Sprintf("https://prayerwebcal.dsultan.com/ics/%s", formattedLocation)
+	log.Ctx(ctx).Info().Msgf("Generated prayer time URL: %s", prayerURL)
 
-	// 4. Check if the location already exists in the database
-	// existingLocation, err := s.store.GetLocationByCoordinates(ctx, store.GetLocationByCoordinatesParams{
-	// 	Latitude:  location.Latitude,
-	// 	Longitude: location.Longitude,
-	// })
-	// if err != nil && !errors.Is(err, sql.ErrNoRows) {
-	// 	log.Ctx(ctx).Err(err).Msg("failed to check if location exists in database")
-	// 	return nil, internalError
-	// }
-
-	// 5. Save or update the prayer times in the database
-	// if existingLocation != nil {
-	// 	err = s.store.UpdatePrayerTimes(ctx, store.UpdatePrayerTimesParams{
-	// 		LocationID: existingLocation.ID,
-	// 		Times:      prayerTimes,
-	// 	})
-	// 	if err != nil {
-	// 		log.Ctx(ctx).Err(err).Msg("failed to update prayer times in database")
-	// 		return nil, internalError
-	// 	}
-	// } else {
-	// 6. Create a new location and save prayer times
-	// 	newLocationID, err := s.store.CreateLocation(ctx, store.CreateLocationParams{
-	// 		Latitude:  location.Latitude,
-	// 		Longitude: location.Longitude,
-	// 		City:      location.City,
-	// 		Country:   location.Country,
-	// 	})
-	// 	if err != nil {
-	// 		log.Ctx(ctx).Err(err).Msg("failed to create location in database")
-	// 		return nil, internalError
-	// 	}
-
-	// 	err = s.store.SavePrayerTimes(ctx, store.SavePrayerTimesParams{
-	// 		LocationID: newLocationID,
-	// 		Times:      prayerTimes,
-	// 	})
-	// 	if err != nil {
-	// 		log.Ctx(ctx).Err(err).Msg("failed to save prayer times in database")
-	// 		return nil, internalError
-	// 	}
-	// }
-
-	// Return response with the prayer times
 	return &connect.Response[calendarv1.SchedulePrayerTimesResponse]{
-		Msg: &calendarv1.SchedulePrayerTimesResponse{},
+		Msg: &calendarv1.SchedulePrayerTimesResponse{
+			IcalUrl: prayerURL,
+		},
 	}, nil
-
 }
 
-func NewService(pv protovalidate.Validator, store store.Queries, apiMetadata apimetadata.ApiMetadata, geoLocationClient geolocationclient.GeoLocationClient, prayerClient prayerclient.Client) calendarv1connect.CalendarServiceHandler {
+func NewService(pv protovalidate.Validator, store store.Queries, apiMetadata apimetadata.ApiMetadata, geoLocationClient geolocationclient.Client, prayerClient prayerclient.Client) calendarv1connect.CalendarServiceHandler {
 	return &service{
 		pv:                pv,
 		store:             store,

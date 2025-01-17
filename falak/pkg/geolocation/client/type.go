@@ -2,7 +2,7 @@ package client
 
 import "context"
 
-type GeoLocationClient interface {
+type Client interface {
 	GetGeoLocationInfo(context.Context, *GetGeoLocationInfoRequest) (*GetGeoLocationInfoResponse, error)
 }
 

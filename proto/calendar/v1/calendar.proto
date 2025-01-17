@@ -152,7 +152,7 @@ message SchedulePrayerTimesRequest{
     
 }
 message SchedulePrayerTimesResponse{
-    
+    string ical_url = 1;
 }
 
 

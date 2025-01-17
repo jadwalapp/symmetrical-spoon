@@ -4,7 +4,7 @@ import (
 	"context"
 )
 
-type prayer struct {
+type PrayersWithTime struct {
 	Fajar   string `json:"Fajr"`
 	Sunrise string `json:"Sunrise"`
 	Duhar   string `json:"Dhuhr"`
@@ -13,12 +13,12 @@ type prayer struct {
 	Isha    string `json:"Isha"`
 }
 
-type Timings struct {
-	Timings prayer `json:"timings"`
+type GetPrayertimeInfoResponseData struct {
+	Timings PrayersWithTime `json:"timings"`
 }
 
 type GetPrayertimeInfoResponse struct {
-	Data Timings `json:"data"`
+	Data GetPrayertimeInfoResponseData `json:"data"`
 }
 
 type GetPrayertimeInfoRequest struct {

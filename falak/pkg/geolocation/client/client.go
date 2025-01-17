@@ -3,7 +3,7 @@ package client
 import (
 	"context"
 	"encoding/json"
-	"fmt" // Import your custom client package
+	"fmt"
 	"io"
 
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/httpclient"
@@ -13,22 +13,18 @@ type client struct {
 	cli httpclient.HTTPClient
 }
 
-// GetGeoLocation fetches the location data using your custom HTTP client
 func (c *client) GetGeoLocationInfo(ctx context.Context, r *GetGeoLocationInfoRequest) (*GetGeoLocationInfoResponse, error) {
-	// Send the request using the custom client
 	resp, err := c.cli.Get(fmt.Sprintf("https://freeipapi.com/api/json/%s", r.Ip), nil, nil)
 	if err != nil {
 		return nil, fmt.Errorf("error fetching location: %v", err)
 	}
 	defer resp.Body.Close()
 
-	// Read the response body
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("error reading response body: %v", err)
 	}
 
-	// Unmarshal the JSON response
 	var location GetGeoLocationInfoResponse
 	if err := json.Unmarshal(body, &location); err != nil {
 		return nil, fmt.Errorf("error unmarshalling geolocation data: %v", err)
@@ -37,7 +33,7 @@ func (c *client) GetGeoLocationInfo(ctx context.Context, r *GetGeoLocationInfoRe
 	return &location, nil
 }
 
-func NewClient(cli httpclient.HTTPClient) GeoLocationClient {
+func NewClient(cli httpclient.HTTPClient) Client {
 	return &client{
 		cli: cli,
 	}

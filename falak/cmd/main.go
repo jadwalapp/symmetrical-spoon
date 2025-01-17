@@ -165,8 +165,8 @@ func main() {
 	// ======== GEO LOCATION CLIENT ========
 
 	// ======== Prayer Client ========
-	prayerClinetHttpCli := httpclient.NewClient(&http.Client{})
-	prayerTime := client.NewClient(prayerClinetHttpCli)
+	prayerClientHttpCli := httpclient.NewClient(&http.Client{})
+	prayerTime := client.NewClient(prayerClientHttpCli)
 	// ======== Prayer Client ========
 
 	// ======== INTERCEPTORS ========
