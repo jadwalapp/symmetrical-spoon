@@ -4,6 +4,8 @@
 <dict>
 	<key>NSCalendarsFullAccessUsageDescription</key>
 	<string>Jadwal needs full access to your calendars to allow you to manage them through Jadwal&apos;s app. No data will be transmitted, we just show it in the app.</string>
+	<key>NSCalendarsUsageDescription</key>
+	<string>Jadwal needs access to your calendars to allow you to manage them through Jadwal&apos;s app. No data will be transmitted, we just show it in the app.</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>LSApplicationQueriesSchemes</key>
