@@ -12,25 +12,13 @@ struct CalendarView: View {
     @EnvironmentObject var viewModel: CalendarViewModel
     @State private var showingAddEventSheet = false
     @State private var showingCalendarsSheet = false
-
+    
     var body: some View {
         NavigationStack {
             ZStack {
-                VStack {
-                    CalendarViewRepresentable(
-                        selectedDate: $viewModel.selectedDate,
-                        displayEvents: Binding.constant(true)
-                    )
-                    
-                    if let date = viewModel.selectedDate?.date {
-                        EventsListView(events: viewModel.events)
-                            .onAppear {
-                                viewModel.fetchEvents(for: date)
-                            }
-                    }
-                }
-                .blur(radius: viewModel.authorizationStatus != .authorized ? 10 : 0)
-
+                EnhancedCalendarView()
+                    .blur(radius: viewModel.authorizationStatus != .authorized ? 10 : 0)
+                
                 if viewModel.authorizationStatus != .authorized {
                     AccessRequestCard(status: viewModel.authorizationStatus, requestAccess: viewModel.requestAccess, openSettings: viewModel.openSettings)
                 }
@@ -60,7 +48,7 @@ struct CalendarView: View {
                     .edgesIgnoringSafeArea(.all)
             }
             .sheet(isPresented: $showingCalendarsSheet) {
-                CalendarsListView(sources: viewModel.calendarSources)
+                CalendarsListView()
             }
         }
     }
@@ -70,12 +58,12 @@ struct AccessRequestCard: View {
     let status: EKAuthorizationStatus
     let requestAccess: () -> Void
     let openSettings: () -> Void
-
+    
     var body: some View {
         VStack(spacing: 20) {
             Image(systemName: "calendar.badge.exclamationmark")
                 .font(.system(size: 60))
-                .foregroundColor(.blue)
+                .foregroundColor(.accentColor)
             
             Text("Calendar Access Required")
                 .font(.title2)
@@ -98,7 +86,7 @@ struct AccessRequestCard: View {
                     .fontWeight(.semibold)
                     .frame(minWidth: 200)
                     .padding()
-                    .background(Color.blue)
+                    .background(Color.accentColor)
                     .foregroundColor(.white)
                     .cornerRadius(10)
             }
@@ -115,6 +103,51 @@ struct AccessRequestCard: View {
         )
     }
 }
+
+struct CalendarsListView: View {
+    @EnvironmentObject var viewModel: CalendarViewModel
+    @Environment(\.dismiss) private var dismiss
+    
+    var body: some View {
+        NavigationView {
+            List {
+                ForEach(viewModel.calendarSources, id: \.sourceIdentifier) { source in
+                    Section(header: Text(source.title)) {
+                        ForEach(Array(source.calendars(for: .event)), id: \.calendarIdentifier) { calendar in
+                            HStack {
+                                Circle()
+                                    .fill(Color(calendar.cgColor))
+                                    .frame(width: 20, height: 20)
+                                Text(calendar.title)
+                                Spacer()
+                                Toggle("", isOn: Binding(
+                                    get: { viewModel.visibleCalendars.contains(calendar) },
+                                    set: { isOn in
+                                        if isOn {
+                                            viewModel.visibleCalendars.insert(calendar)
+                                        } else {
+                                            viewModel.visibleCalendars.remove(calendar)
+                                        }
+                                        viewModel.fetchEvents(for: viewModel.selectedDate)
+                                    }
+                                ))
+                            }
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Calendars")
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") {
+                        dismiss()
+                    }
+                }
+            }
+        }
+    }
+}
+
 
 struct EventsListView: View {
     let events: [EKEvent]
@@ -135,23 +168,6 @@ struct EventsListView: View {
         formatter.timeStyle = .short
         return formatter
     }()
-}
-
-struct CalendarsListView: View {
-    let sources: [EKSource]
-    
-    var body: some View {
-        NavigationView {
-            List(sources, id: \.sourceIdentifier) { source in
-                Section(header: Text(source.title)) {
-                    ForEach(Array(source.calendars(for: .event)), id: \.calendarIdentifier) { calendar in
-                        Text(calendar.title)
-                    }
-                }
-            }
-            .navigationTitle("Calendars")
-        }
-    }
 }
 
 struct CalendarViewRepresentable: UIViewRepresentable {

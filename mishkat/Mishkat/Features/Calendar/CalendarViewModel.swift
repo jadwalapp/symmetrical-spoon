@@ -14,21 +14,22 @@ class CalendarViewModel: NSObject, ObservableObject, EKEventEditViewDelegate {
     let eventStore = EKEventStore()
     
     @Published var authorizationStatus: EKAuthorizationStatus = .notDetermined
-    @Published var selectedDate: DateComponents?
+    @Published var selectedDate: Date = Date()
     @Published var events: [EKEvent] = []
     @Published var calendarSources: [EKSource] = []
-    @Published var defaultCalendar: EKCalendar?
+    @Published var visibleCalendars: Set<EKCalendar> = []
     
     override init() {
         super.init()
+        selectedDate = Date()
         checkAuthorizationStatus()
     }
+    
     
     func checkAuthorizationStatus() {
         authorizationStatus = EKEventStore.authorizationStatus(for: .event)
         if authorizationStatus == .authorized {
             fetchCalendarSources()
-            setDefaultCalendar()
         }
     }
     
@@ -38,25 +39,30 @@ class CalendarViewModel: NSObject, ObservableObject, EKEventEditViewDelegate {
                 self?.authorizationStatus = granted ? .authorized : .denied
                 if granted {
                     self?.fetchCalendarSources()
-                    self?.setDefaultCalendar()
                 }
             }
         }
     }
     
     func fetchCalendarSources() {
-        calendarSources = eventStore.sources.filter { $0.sourceType != .calDAV }
-    }
-    
-    func setDefaultCalendar() {
-        defaultCalendar = eventStore.defaultCalendarForNewEvents
+        calendarSources = eventStore.sources
+        let allCalendars = calendarSources.flatMap { $0.calendars(for: .event) }
+        visibleCalendars = Set(allCalendars)
     }
     
     func fetchEvents(for date: Date) {
-        let startOfDay = Calendar.current.startOfDay(for: date)
-        let endOfDay = Calendar.current.date(byAdding: .day, value: 1, to: startOfDay)!
-        let predicate = eventStore.predicateForEvents(withStart: startOfDay, end: endOfDay, calendars: nil)
-        events = eventStore.events(matching: predicate)
+        let calendar = Calendar.current
+        let startOfDay = calendar.startOfDay(for: date)
+        let endOfDay = calendar.date(byAdding: .day, value: 1, to: startOfDay)!
+        
+        let predicate = eventStore.predicateForEvents(withStart: startOfDay, end: endOfDay, calendars: Array(visibleCalendars))
+        
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            let fetchedEvents = self?.eventStore.events(matching: predicate) ?? []
+            DispatchQueue.main.async {
+                self?.events = fetchedEvents
+            }
+        }
     }
     
     func addEvent() -> EKEventEditViewController {
@@ -65,11 +71,8 @@ class CalendarViewModel: NSObject, ObservableObject, EKEventEditViewDelegate {
         editViewController.editViewDelegate = self
         
         let event = EKEvent(eventStore: eventStore)
-        if let date = selectedDate?.date {
-            event.startDate = date
-            event.endDate = date.addingTimeInterval(3600) // 1 hour later
-        }
-        event.calendar = defaultCalendar
+        event.startDate = selectedDate
+        event.endDate = selectedDate.addingTimeInterval(3600) // 1 hour later
         editViewController.event = event
         
         return editViewController
@@ -79,9 +82,7 @@ class CalendarViewModel: NSObject, ObservableObject, EKEventEditViewDelegate {
         NotificationCenter.default.post(name: NSNotification.Name("DismissAddEventView"), object: nil)
         
         if action == .saved {
-            if let date = selectedDate?.date {
-                fetchEvents(for: date)
-            }
+            fetchEvents(for: selectedDate)
         }
     }
     
@@ -91,4 +92,3 @@ class CalendarViewModel: NSObject, ObservableObject, EKEventEditViewDelegate {
         }
     }
 }
-

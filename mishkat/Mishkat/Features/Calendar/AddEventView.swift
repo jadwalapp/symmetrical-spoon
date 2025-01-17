@@ -11,21 +11,20 @@ import EventKitUI
 struct AddEventView: UIViewControllerRepresentable {
     @EnvironmentObject var viewModel: CalendarViewModel
     @Binding var isPresented: Bool
-    
+
     func makeUIViewController(context: Context) -> EKEventEditViewController {
-        let controller = viewModel.addEvent()
-        return controller
+        viewModel.addEvent()
     }
-    
+
     func updateUIViewController(_ uiViewController: EKEventEditViewController, context: Context) {}
-    
+
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
     }
-    
+
     class Coordinator: NSObject, EKEventEditViewDelegate {
         var parent: AddEventView
-        
+
         init(_ parent: AddEventView) {
             self.parent = parent
             super.init()
@@ -51,7 +50,6 @@ struct AddEventView: UIViewControllerRepresentable {
         }
     }
 }
-
 
 #Preview {
     AddEventView(
