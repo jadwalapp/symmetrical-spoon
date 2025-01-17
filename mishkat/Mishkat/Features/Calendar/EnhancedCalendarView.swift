@@ -10,14 +10,17 @@ import EventKit
 
 struct EnhancedCalendarView: View {
     @EnvironmentObject var viewModel: CalendarViewModel
-    @State private var isMonthView = true
+    @Binding var isMonthView: Bool
+    @Namespace private var animation
     
     var body: some View {
         VStack(spacing: 0) {
             if isMonthView {
-                MonthView(selectedDate: $viewModel.selectedDate, viewModel: viewModel, isMonthView: $isMonthView)
+                MonthView(selectedDate: $viewModel.selectedDate, viewModel: viewModel, isMonthView: $isMonthView, animation: animation)
+                    .transition(.opacity)
             } else {
-                DayView(selectedDate: $viewModel.selectedDate, events: viewModel.events, isMonthView: $isMonthView)
+                DayView(selectedDate: $viewModel.selectedDate, viewModel: viewModel, isMonthView: $isMonthView, animation: animation)
+                    .transition(.opacity)
             }
         }
         .onChange(of: viewModel.selectedDate) { newDate in
@@ -26,71 +29,126 @@ struct EnhancedCalendarView: View {
     }
 }
 
+
 struct MonthView: View {
     @Binding var selectedDate: Date
     @ObservedObject var viewModel: CalendarViewModel
     @Binding var isMonthView: Bool
+    var animation: Namespace.ID
     
     var body: some View {
-        VStack {
-            MonthCalendar(selectedDate: $selectedDate, viewModel: viewModel)
-                .frame(height: UIScreen.main.bounds.height * 0.7)
-            
-            Button("View Day") {
-                isMonthView = false
-            }
-            .padding()
-        }
+        MonthCalendar(selectedDate: $selectedDate, viewModel: viewModel, isMonthView: $isMonthView)
+            .matchedGeometryEffect(id: "calendar", in: animation)
     }
 }
 
 struct DayView: View {
     @Binding var selectedDate: Date
-    let events: [EKEvent]
+    @ObservedObject var viewModel: CalendarViewModel
     @Binding var isMonthView: Bool
+    var animation: Namespace.ID
+    @State private var dragOffset: CGFloat = 0
     
     var body: some View {
-        VStack {
-            WeekdayHeader(selectedDate: $selectedDate)
+        VStack(spacing: 0) {
+            DaySelector(selectedDate: $selectedDate, dateRange: generateDateRange())
+                .matchedGeometryEffect(id: "calendar", in: animation)
+                .padding(.vertical, 8)
             
             List {
-                ForEach(events, id: \.eventIdentifier) { event in
+                ForEach(viewModel.events, id: \.eventIdentifier) { event in
                     EventRow(event: event)
                 }
             }
+            .listStyle(PlainListStyle())
         }
-        .navigationBarItems(trailing: Button("Month") {
-            isMonthView = true
-        })
+        .gesture(
+            DragGesture()
+                .onChanged { value in
+                    dragOffset = value.translation.width
+                }
+                .onEnded { value in
+                    let threshold: CGFloat = 50
+                    if value.translation.width > threshold {
+                        selectedDate = Calendar.current.date(byAdding: .day, value: -1, to: selectedDate)!
+                    } else if value.translation.width < -threshold {
+                        selectedDate = Calendar.current.date(byAdding: .day, value: 1, to: selectedDate)!
+                    }
+                    dragOffset = 0
+                }
+        )
+        .animation(.spring(), value: selectedDate)
+        .onChange(of: selectedDate) { newDate in
+            viewModel.fetchEvents(for: newDate)
+        }
+    }
+    
+    private func generateDateRange() -> [Date] {
+        let calendar = Calendar.current
+        return (-3...3).compactMap { offset in
+            calendar.date(byAdding: .day, value: offset, to: selectedDate)
+        }
     }
 }
 
-struct WeekdayHeader: View {
+
+struct DaySelector: View {
     @Binding var selectedDate: Date
+    let dateRange: [Date]
     
     var body: some View {
-        HStack {
-            ForEach(-3...3, id: \.self) { offset in
-                let date = Calendar.current.date(byAdding: .day, value: offset, to: selectedDate)!
-                VStack {
-                    Text(dayOfWeek(for: date))
-                        .font(.caption)
-                    Text(String(Calendar.current.component(.day, from: date)))
-                        .font(.headline)
-                        .foregroundColor(offset == 0 ? .accentColor : .primary)
-                }
-                .frame(maxWidth: .infinity)
-                .onTapGesture {
-                    selectedDate = date
+        GeometryReader { geometry in
+            let itemWidth = geometry.size.width / 7
+            
+            ZStack {
+                // Background highlight circle
+                Circle()
+                    .fill(Color.accentColor)
+                    .frame(width: itemWidth - 8, height: itemWidth - 8)
+                    .offset(x: CGFloat(dateRange.firstIndex(of: selectedDate)!) * itemWidth - geometry.size.width / 2 + itemWidth / 2)
+                
+                HStack(spacing: 0) {
+                    ForEach(dateRange, id: \.self) { date in
+                        DayButton(date: date, isSelected: Calendar.current.isDate(date, inSameDayAs: selectedDate))
+                            .frame(width: itemWidth)
+                            .onTapGesture {
+                                withAnimation(.spring()) {
+                                    selectedDate = date
+                                }
+                            }
+                    }
                 }
             }
         }
-        .padding()
+        .frame(height: 70)
+        .clipped()
+    }
+}
+
+
+struct DayButton: View {
+    let date: Date
+    let isSelected: Bool
+    
+    var body: some View {
+        VStack(spacing: 4) {
+            Text(dayOfWeek(from: date))
+                .font(.system(size: 12))
+            Text(dayOfMonth(from: date))
+                .font(.system(size: 20, weight: .medium))
+        }
+        .foregroundColor(isSelected ? .white : .primary)
     }
     
-    func dayOfWeek(for date: Date) -> String {
+    private func dayOfWeek(from date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "EEE"
+        return formatter.string(from: date).uppercased()
+    }
+    
+    private func dayOfMonth(from date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "d"
         return formatter.string(from: date)
     }
 }
@@ -123,6 +181,7 @@ struct EventRow: View {
 struct MonthCalendar: UIViewRepresentable {
     @Binding var selectedDate: Date
     @ObservedObject var viewModel: CalendarViewModel
+    @Binding var isMonthView: Bool
     
     func makeUIView(context: Context) -> UICalendarView {
         let calendarView = UICalendarView()
@@ -161,6 +220,9 @@ struct MonthCalendar: UIViewRepresentable {
             guard let dateComponents = dateComponents,
                   let date = Calendar.current.date(from: dateComponents) else { return }
             parent.selectedDate = date
+            withAnimation(.easeInOut(duration: 0.3)) {
+                parent.isMonthView = false
+            }
         }
         
         func calendarView(_ calendarView: UICalendarView, decorationFor dateComponents: DateComponents) -> UICalendarView.Decoration? {
@@ -202,5 +264,3 @@ struct MonthCalendar: UIViewRepresentable {
         }
     }
 }
-
-

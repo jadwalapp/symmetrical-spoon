@@ -25,7 +25,6 @@ class CalendarViewModel: NSObject, ObservableObject, EKEventEditViewDelegate {
         checkAuthorizationStatus()
     }
     
-    
     func checkAuthorizationStatus() {
         authorizationStatus = EKEventStore.authorizationStatus(for: .event)
         if authorizationStatus == .authorized {

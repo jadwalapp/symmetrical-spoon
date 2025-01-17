@@ -12,19 +12,35 @@ struct CalendarView: View {
     @EnvironmentObject var viewModel: CalendarViewModel
     @State private var showingAddEventSheet = false
     @State private var showingCalendarsSheet = false
+    @State private var isMonthView = true
     
     var body: some View {
         NavigationStack {
             ZStack {
-                EnhancedCalendarView()
+                EnhancedCalendarView(isMonthView: $isMonthView)
                     .blur(radius: viewModel.authorizationStatus != .authorized ? 10 : 0)
                 
                 if viewModel.authorizationStatus != .authorized {
                     AccessRequestCard(status: viewModel.authorizationStatus, requestAccess: viewModel.requestAccess, openSettings: viewModel.openSettings)
                 }
             }
-            .navigationTitle("Calendar")
+            .navigationTitle(isMonthView ? "Calendar" : viewModel.selectedDate.formatted(.dateTime.month().year()))
+            .navigationBarTitleDisplayMode(.automatic)
             .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    if !isMonthView {
+                        Button(action: {
+                            withAnimation {
+                                isMonthView = true
+                            }
+                        }) {
+                            HStack {
+                                Image(systemName: "chevron.left")
+                                Text("Calendar")
+                            }
+                        }
+                    }
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     HStack(spacing: 16) {
                         Button {
@@ -53,6 +69,7 @@ struct CalendarView: View {
         }
     }
 }
+
 
 struct AccessRequestCard: View {
     let status: EKAuthorizationStatus
