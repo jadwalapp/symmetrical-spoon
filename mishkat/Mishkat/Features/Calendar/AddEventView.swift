@@ -83,5 +83,5 @@ struct AddEventView: View {
             day: 20
         )
     )
-    .environmentObject(CalendarViewModel(calendarRepository: DependencyContainer.shared.calendarRepository))
+    .environmentObject(CalendarViewModel())
 }

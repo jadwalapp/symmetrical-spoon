@@ -6,26 +6,35 @@
 //
 
 import SwiftUI
+import EventKit
 
 struct CalendarView: View {
     @State private var selectedDate: DateComponents?
     @State private var displayEvents = false
     @State private var showingAddEventSheet = false
-    
+    @State private var showingCalendarsSheet = false
+    @EnvironmentObject var calendarViewModel: CalendarViewModel
+
     var body: some View {
         NavigationStack {
-            CalendarViewRepresentable(
-                selectedDate: $selectedDate,
-                displayEvents: $displayEvents
-            )
+            VStack {
+                CalendarViewRepresentable(
+                    selectedDate: $selectedDate,
+                    displayEvents: $displayEvents
+                )
+                
+                if displayEvents, let date = selectedDate?.date {
+                    EventsListView(events: calendarViewModel.fetchEvents(for: date))
+                }
+            }
             .navigationTitle("Calendar")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     HStack(spacing: 16) {
                         Button {
-                            // Handle notifications
+                            showingCalendarsSheet.toggle()
                         } label: {
-                            Image(systemName: "bell")
+                            Image(systemName: "calendar")
                                 .foregroundStyle(.primary)
                         }
                         
@@ -42,10 +51,53 @@ struct CalendarView: View {
                 AddEventView(
                     isPresented: $showingAddEventSheet,
                     selectedDate: selectedDate
-                )
+                ).environmentObject(calendarViewModel)
+            }
+            .sheet(isPresented: $showingCalendarsSheet) {
+                CalendarsListView(sources: calendarViewModel.fetchCalendarSources())
+            }
+            .onAppear {
+                calendarViewModel.requestAccess()
             }
         }
-        
+    }
+}
+
+struct EventsListView: View {
+    let events: [EKEvent]
+    
+    var body: some View {
+        List(events, id: \.eventIdentifier) { event in
+            VStack(alignment: .leading) {
+                Text(event.title)
+                Text("\(event.startDate, formatter: dateFormatter) - \(event.endDate, formatter: dateFormatter)")
+                    .font(.caption)
+            }
+        }
+    }
+    
+    private let dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .short
+        formatter.timeStyle = .short
+        return formatter
+    }()
+}
+
+struct CalendarsListView: View {
+    let sources: [EKSource]
+    
+    var body: some View {
+        NavigationView {
+            List(sources, id: \.sourceIdentifier) { source in
+                Section(header: Text(source.title)) {
+                    ForEach(Array(source.calendars(for: .event)), id: \.calendarIdentifier) { calendar in
+                        Text(calendar.title)
+                    }
+                }
+            }
+            .navigationTitle("Calendars")
+        }
     }
 }
 
