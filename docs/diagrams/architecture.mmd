@@ -3,53 +3,59 @@
 graph TB
     subgraph "Frontend (Mishkat)"
         A[iOS SwiftUI App]
+        L[EventKit]
+        N[iOS Calendar System]
     end
 
     subgraph "Backend (Falak)"
         B[gRPC Server]
         C[Auth Service]
-        D[Calendar Service]
-        E[CalDAV Client]
-        I[Event Consumer]
+        D[Credential Service]
+        E[Event Service]
     end
 
     subgraph "WhatsApp Service"
-        F[Node.js gRPC Server]
-        G[WhatsApp Web.js]
-        J[Event Producer]
+        W[Node.js Service]
+        LLM[LLM Service]
     end
 
-    subgraph "Message Queue"
-        K[(RabbitMQ)]
+    subgraph "External Calendar Services"
+        M[Calendar Servers]
     end
 
     subgraph "Database"
         H[(PostgreSQL)]
     end
 
+    A --UI Events--> L
+    L --Calendar Data--> A
+    L --Sync--> N
+    N --CalDAV/Exchange--> M
+    
     A --gRPC--> B
     B --> C
     B --> D
-    D --> E
-    B --gRPC--> F
-    F --> G
+    B --> E
 
-    G --> J
-    J --"Publish Events"--> K
-    K --"Consume Events"--> I
-    I --> D
+    W --Monitor Messages--> W
+    W --Extract Event--> LLM
+    LLM --Event Data--> W
+    W --gRPC--> E
+    E --Add to Calendar--> D
 
     C --> H
     D --> H
+    E --> H
+    W --> H
 
     classDef frontend fill:#f9f,stroke:#333,stroke-width:4px;
     classDef backend fill:#bbf,stroke:#333,stroke-width:2px;
-    classDef whatsapp fill:#bfb,stroke:#333,stroke-width:2px;
+    classDef external fill:#bfb,stroke:#333,stroke-width:2px;
     classDef database fill:#fbb,stroke:#333,stroke-width:2px;
-    classDef queue fill:#ff9,stroke:#333,stroke-width:2px;
+    classDef whatsapp fill:#fbf,stroke:#333,stroke-width:2px;
 
-    class A frontend;
-    class B,C,D,E,I backend;
-    class F,G,J whatsapp;
+    class A,L,N frontend;
+    class B,C,D,E backend;
+    class M external;
     class H database;
-    class K queue;
+    class W,LLM whatsapp;

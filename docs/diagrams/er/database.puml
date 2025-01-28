@@ -41,77 +41,12 @@ table(magic_link) {
     updated_at: TIMESTAMPTZ
 }
 
-table(calendar_accounts) {
+table(caldav_account) {
     primary_key(id): UUID <<PK>>
     foreign_key(customer_id): UUID <<FK>>
-    provider: VARCHAR
-    --
-    created_at: TIMESTAMPTZ
-    updated_at: TIMESTAMPTZ
-}
-
-table(vcalendar) {
-    primary_key(uid): VARCHAR <<PK>>
-    foreign_key(account_id): UUID <<FK>>
-    prodid: VARCHAR
-    version: VARCHAR
-    display_name: VARCHAR
-    description: TEXT
-    color: VARCHAR(7)
-    timezone: VARCHAR
-    sequence: INTEGER
-    --
-    created_at: TIMESTAMPTZ
-    updated_at: TIMESTAMPTZ
-}
-
-table(vevent) {
-    primary_key(uid): VARCHAR <<PK>>
-    foreign_key(calendar_uid): VARCHAR <<FK>>
-    dtstamp: TIMESTAMPTZ
-    dtstart: TIMESTAMPTZ
-    dtend: TIMESTAMPTZ
-    duration: VARCHAR
-    summary: VARCHAR
-    description: TEXT
-    location: VARCHAR
-    status: VARCHAR
-    classification: VARCHAR
-    transp: VARCHAR
-    rrule: VARCHAR
-    rdate: JSONB
-    exdate: JSONB
-    sequence: INTEGER
-    --
-    created_at: TIMESTAMPTZ
-    updated_at: TIMESTAMPTZ
-}
-
-table(vevent_exception) {
-    primary_key(id): UUID <<PK>>
-    foreign_key(event_uid): VARCHAR <<FK>>
-    recurrence_id: TIMESTAMPTZ
-    summary: VARCHAR
-    description: TEXT
-    location: VARCHAR
-    dtstart: TIMESTAMPTZ
-    dtend: TIMESTAMPTZ
-    status: VARCHAR
-    --
-    created_at: TIMESTAMPTZ
-    updated_at: TIMESTAMPTZ
-}
-
-table(valarm) {
-    primary_key(id): UUID <<PK>>
-    foreign_key(event_uid): VARCHAR <<FK>>
-    action: VARCHAR
-    trigger: VARCHAR
-    description: TEXT
-    summary: VARCHAR
-    duration: VARCHAR
-    repeat: INTEGER
-    attendees: JSONB
+    email: VARCHAR(320)
+    username: VARCHAR(320)
+    password: TEXT
     --
     created_at: TIMESTAMPTZ
     updated_at: TIMESTAMPTZ
@@ -120,10 +55,6 @@ table(valarm) {
 ' Relationships
 customer ||--o| auth_google : has
 customer ||--o{ magic_link : uses
-customer ||--o{ calendar_accounts : owns
-calendar_accounts ||--o{ vcalendar : contains
-vcalendar ||--o{ vevent : schedules
-vevent ||--o{ vevent_exception : "has exceptions"
-vevent ||--o{ valarm : "has alarms"
+customer ||--o{ caldav_account : owns
 
 @enduml

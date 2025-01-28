@@ -112,45 +112,57 @@ User -> User : Delete JWT from device
 
 @startuml Connect Calendar
 actor User
+participant "iOS App" as App
+participant EventKit
+participant "iOS Calendar System" as iOS
 participant Backend
-participant CalDAV
 database Database
 
-activate User
+User -> App: Request Calendar Access
+App -> EventKit: Request Authorization
+EventKit --> App: Authorization Status
 
-User -> Backend ++ : ConnectCalDAVCalendar
+alt Authorization Granted
+    App -> Backend: Get CalDAV Credentials
+    Backend -> Database: Fetch CalDAV Account
+    Database --> Backend: Account Credentials
+    Backend --> App: CalDAV Credentials
 
-Backend -> CalDAV ++ : AuthenticateCredentials
-CalDAV --> Backend -- : AuthResponse
+    App -> iOS: Configure CalDAV Account
+    note right of iOS: iOS handles all CalDAV\ncommunication directly
+    iOS --> App: Account Configuration Status
 
-Backend -> Database ++ : StoreCalendarConnection
-Database --> Backend : ConnectionStored
+    App -> EventKit: Fetch Calendar Events
+    EventKit -> iOS: Get Events from All Sources
+    iOS --> EventKit: Calendar Events
+    EventKit --> App: Calendar Events
 
-Backend -> CalDAV ++ : SyncCalendarData
-CalDAV --> Backend -- : SyncedData
+    App -> App: Schedule Local Notifications
+else Authorization Denied
+    App --> User: Show Permission Error
+end
 
-Backend -> Database : Store Calendar Data
-Database --> Backend -- :  Database Response
-
-Backend --> User -- : ConnectCalDAVCalendar Response
-deactivate User
 @enduml
 
-@startuml Create Calendar
+@startuml "Create Calendar"
+title Create Calendar
+
 actor User
-participant Backend
-database Database
+participant "App" as App
+participant "iOS" as iOS
 
-activate User
+User -> App: Create Calendar Request
+activate App
 
-User -> Backend ++ : CreateCalendarRequest
+App -> iOS: Create Calendar via EventKit
+activate iOS
 
-Backend -> Database ++ : StoreCalendarInfo
-Database --> Backend -- : CalendarCreated
+iOS --> App: Calendar Creation Status
+deactivate iOS
 
-Backend --> User -- : CalendarResponse
+App --> User: Display Creation Status
+deactivate App
 
-deactivate User
 @enduml
 
 @startuml Connect WhatsApp
@@ -195,6 +207,8 @@ participant Backend
 participant "LLM Service" as LLM
 database Database
 participant "Apple Push Notification service (APNs)" as APN
+participant "iOS App\n(Background)" as App
+participant "iOS" as iOS
 
 activate WhatsApp
 loop Listen for Messages
@@ -218,8 +232,26 @@ loop Listen for Messages
         Backend -> Database: Get Device IDs of Event Owner
         Database --> Backend --: Return Device IDs
         
-        Backend -> APN ++: Send "New Event Added" notification
+        Backend -> APN ++: Send Silent Push Notification\nwith new event details
         APN --> Backend --: Notification Result
+        deactivate Backend
+        
+        APN -> App: Deliver Silent Push Notification
+        activate App
+        
+        App -> iOS: Fetch Calendar Events via EventKit
+        activate iOS
+        iOS --> App: Calendar Events
+        deactivate iOS
+        
+        App -> App: Check for Conflicts with\nnew WhatsApp event
+        
+        alt Conflicts Found
+            App -> App: Schedule Local Notification\nabout Conflict
+            note right: Shows conflict details\nand resolution options
+        end
+        
+        deactivate App
         
     else No Event Detected
         LLM --> Backend --: No Event Found
@@ -231,76 +263,107 @@ end
 @enduml
 
 @startuml Suggest Conflict Resolutions
-actor System
-database Database
+title Suggest Conflict Resolutions
+
+actor User
+participant "App" as App
+participant "iOS" as iOS
+participant Backend
 participant "Apple Push Notification service (APNs)" as APN
 
-activate System
+User -> App: Open Calendar View
+activate App
 
-System -> Database ++ : Check If Conflicts Exist Between Events
+App -> iOS: Fetch Calendar Events via EventKit
+activate iOS
+iOS --> App: Calendar Events
+deactivate iOS
+
+App -> App: Check for Conflicts
 note right
   Checks for:
   1. Time overlap between events
   2. Available alternative time slots
 end note
-Database --> System : ConflictedEvents Result
 
-alt ConflictedEvents are not empty
-    System -> Database : GetResolutionOptions(ConflictedEvents)
+alt Conflicts Found
+    App -> App: Generate Resolution Options
     note right
       Options are:
       1. Move event to another time slot
       2. Keep both with conflict warning
     end note
-    Database --> System : ResolutionOptions Result
 
-    System -> Database : Ask For Device IDs Of Customer Owning Event
-    Database --> System -- : Device IDs of Customer Owning Event
+    App --> User: Display Conflict Alert
 
-    System -> APN ++ : Send Push Notification "Telling User There is Conflict" to Device IDs
-    note right: Includes both resolution options
-    APN --> System -- : Push Notification Sending Result
+    alt User Chooses to Resolve
+        User -> App: Select Resolution Option
+        
+        App -> iOS: Modify Event via EventKit
+        activate iOS
+        iOS --> App: Event Update Status
+        deactivate iOS
 
-else ConflictedEvents are empty
-    note over System, Database : Do Nothing
+        alt Event Updated Successfully
+            App -> Backend: Log Resolution for Analytics
+            Backend --> App: Logging Confirmed
+            
+            App -> APN: Send Notification about Resolution
+            APN --> App: Notification Status
+        end
+    else User Keeps Conflict
+        App -> App: Mark Conflict as Acknowledged
+    end
 end
+
+deactivate App
 
 @enduml
 
 @startuml Manage Scheduling Conflicts
+title Manage Scheduling Conflicts
+
 actor User
+participant "App" as App
+participant "iOS" as iOS
 participant Backend
-database Database
 participant "Apple Push Notification service (APNs)" as APN
 
-activate User
+User -> App: View Calendar
+activate App
 
-User -> Backend ++ : ViewConflicts
+App -> iOS: Fetch Events via EventKit
+activate iOS
+iOS --> App: Calendar Events
+deactivate iOS
 
-Backend -> Database ++ : FetchConflicts
-Database --> Backend -- : ConflictsList
-
-Backend -> Backend : GenerateResolutionOptions
-Backend --> User -- : DisplayConflictsWithOptions
+App -> App: Detect Conflicts
+App --> User: Display Conflicts with Options
 
 alt User Selects Resolution
-    User -> Backend ++ : ResolveConflict(selectedOption)
+    User -> App: Choose Resolution Option
     
-    Backend -> Database ++ : UpdateEvents
-    Database --> Backend -- : EventsUpdated
+    App -> iOS: Update Event via EventKit
+    activate iOS
+    iOS --> App: Update Status
+    deactivate iOS
     
-    Backend -> Database ++ : Ask For Device IDs Of Customer Owning Event
-    Database --> Backend -- : Device IDs of Customer Owning Event
-    
-    Backend -> APN ++ : Send Push Notification "Conflict Resolved" to Device IDs
-    APN --> Backend -- : Push Notification Sending Result
-    
-    Backend --> User : ConflictResolved
-else User Rejects
-    note over User, Backend : Do Nothing
+    alt Update Successful
+        App -> Backend: Log Resolution
+        Backend --> App: Logging Confirmed
+        
+        App -> APN: Send Resolution Notification
+        APN --> App: Notification Status
+        
+        App --> User: Show Success Message
+    else Update Failed
+        App --> User: Show Error Message
+    end
+else User Ignores Conflict
+    App -> App: Mark Conflict as Acknowledged
 end
 
-deactivate User
+deactivate App
 
 @enduml
 
@@ -337,25 +400,37 @@ deactivate User
 
 @enduml
 
-@startuml View Integrated Calendar
+@startuml "View Integrated Calendar"
+title View Integrated Calendar
+
 actor User
-participant Backend
-database Database
+participant "App" as App
+participant "iOS" as iOS
 
-activate User
+User -> App: Open Calendar View
+activate App
 
-User -> Backend ++ : ViewIntegratedCalendar
+App -> iOS: Request Calendar Events via EventKit
+activate iOS
 
-Backend -> Database ++ : FetchAllCalendars
-Database --> Backend -- : IntegratedCalendars
+iOS --> App: Return Calendar Events
+deactivate iOS
 
-Backend -> Database ++ : FetchAllEvents
-Database --> Backend -- : AllEvents
+App -> App: Process and Format Events
 
-Backend -> Backend : MergeAndSortEvents
-Backend --> User -- : DisplayIntegratedCalendar
+App --> User: Display Integrated Calendar View
 
-deactivate User
+User -> App: Interact with Calendar
+activate App
+
+App -> iOS: Fetch Updated Events (if needed)
+activate iOS
+
+iOS --> App: Return Updated Events
+deactivate iOS
+
+App --> User: Update Calendar View
+deactivate App
 
 @enduml
 

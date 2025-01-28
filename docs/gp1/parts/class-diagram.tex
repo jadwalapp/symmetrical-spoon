@@ -1,6 +1,7 @@
 \section{Class Diagram}
 
-The figures below show the main classes Jadwal's system includes. The figures give an overview of interfaces in the system to help in understanding the different parts of the system. Since Golang will be used for the backend mainly, the diagrams below are more suited for it.
+The figures below show the main classes Jadwal's system includes. The figures give an overview of interfaces in the system to help in understanding the different parts of the system. The iOS app heavily utilizes EventKit for calendar management, while the backend handles user authentication and basic account management.
+Since Golang will be used for the backend mainly, the diagrams below are more suited for it.
 
 Of course that doesn't mean they can't be used for implementing in other languages, but the way it was written took into consideration the language features. Golang is neither fully object oriented neither fully functional. It has \texttt{interface} and \texttt{struct}, and has implicit implementation. Implicit implementation means as long as a struct has the methods that an interface expects, that struct implemented the interface. Below is a key for the class diagrams coming below:
 \begin{itemize}
@@ -42,8 +43,8 @@ This includes the flow for using email to authenticate and using Google.
 \end{figure}
 
 In Figure~\ref{fig:calendar-v1-class-diagram}, the diagram shows the api layer service calendar.
-It allows Jadwal's clients to manage their calendar data easily.
-It shows the interfaces and the implementation structs with their fields and methods.
+It allows Jadwal's clients to manage their calendar data efficiently through integration with Apple's EventKit framework and Baikal CalDAV server.
+It shows the interfaces and the implementation structs with their fields and methods, demonstrating how we bridge native iOS calendar capabilities with our backend services.
 
 
 

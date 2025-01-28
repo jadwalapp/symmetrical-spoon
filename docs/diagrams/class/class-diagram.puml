@@ -62,13 +62,7 @@ namespace authv1connect {
 @startuml calendarv1
 namespace calendarv1connect {
     interface CalendarServiceHandler  {
-        + CreateCalendar( context.Context,  *CreateCalendarRequest) (*CreateCalendarResponse, error)
-        + GetCalendars( context.Context,  *GetCalendarsRequest) (*GetCalendarsResponse, error)
-        + CreateEvent( context.Context,  *CreateEventRequest) (*CreateEventResponse, error)
-        + UpdateEvent( context.Context,  *UpdateEventRequest) (*UpdateEventResponse, error)
-        + DeleteEvent( context.Context,  *DeleteEventRequest) (*DeleteEventResponse, error)
-        + GetEventsByCalendar( context.Context,  *GetEventsByCalendarRequest) (*GetEventsByCalendarResponse, error)
-        + ConnectCalDAVCalendar( context.Context,  *ConnectCalDAVCalendarRequest) (*ConnectCalDAVCalendarResponse, error)
+        + GetCalDavAccount( context.Context,  *GetCalDavAccountRequest) (*GetCalDavAccountResponse, error)
     }
 }
 @enduml

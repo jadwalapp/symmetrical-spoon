@@ -265,7 +265,8 @@ The main objectives of Jadwal are:
 Jadwal is not just another calendar application; it's a comprehensive time management tool designed to aggregate and optimize your existing calendars and data sources. The scope of the project includes:
 \begin{itemize}
     \item Development of an iOS application as the primary platform.
-    \item Integration with calendars using CalDAV.
+    \item Integration with iOS's native calendar system through EventKit framework.
+    \item Secure storage of calendar account credentials.
     \item WhatsApp message parsing for event extraction using state-of-the-art LLMs (subject to technical feasibility).
     \item Target audience: Busy professionals, students, and anyone juggling multiple schedules.
     \item User testing phase to ensure ease of use and effectiveness. Our testing methods will include:
@@ -299,9 +300,12 @@ Nothing is perfect, and our project is not an outlier. The limitations we have f
     \item WhatsApp integration might not always be there, they are a third-party.
     \item Learning new technologies for iOS development might require more time than anticipated.
     \item Accuracy of our algorithms to detect keywords indicating an event agreement has happened, especially for languages other than English.
+    \item Integration with EventKit might require careful handling of permissions and access rights.
+    \item Local notifications need to be managed efficiently to avoid overwhelming the user.
+    \item Learning new technologies for iOS development might require more time than anticipated.
     \item Time and manpower constraints may limit the number of features we can implement.
     \item Dependency on third-party APIs and their limitations.
-    \item We may face a challenges to test the app due to lack of users for testing our app
+    \item We may face challenges to test the app due to lack of users for testing our app
 \end{itemize}
 
 \section{Organization of the Senior Project}
@@ -726,9 +730,7 @@ This architecture enables several key benefits:
 \end{itemize}
 
 \section{System Use Cases}
-The functionality of Jadwal can be best understood through its various use cases, which demonstrate how users interact with the system. Each use case details specific interactions and flows that make up the core functionality of Jadwal. The diagram in Figure~\ref{fig:use-case-diagram} provides an overview of all use cases and their relationships.
-
-\textbf{Figure~\ref{fig:use-case-diagram}} shows the complete use case diagram for Jadwal's system, illustrating the relationships between these fourteen distinct use cases and their actors.
+The functionality of Jadwal can be best understood through its various use cases, which demonstrate how users interact with the system. Each use case details specific interactions and flows that make up the core functionality of Jadwal.
 
 \begin{figure}[!h]
     \centering
@@ -736,6 +738,15 @@ The functionality of Jadwal can be best understood through its various use cases
     \caption{Use Case Diagram of Jadwal}
     \label{fig:use-case-diagram}
 \end{figure}
+
+\textbf{Figure~\ref{fig:use-case-diagram}} shows the complete use case diagram for Jadwal's system. The diagram illustrates how:
+\begin{itemize}
+    \item Users interact with calendars through iOS's EventKit framework
+    \item The system extracts events from WhatsApp messages
+    \item The backend securely stores calendar credentials
+    \item Local conflict detection happens on the device
+    \item Prayer times are scheduled and managed
+\end{itemize}
 
 \subsection{Authentication and User Management}
 User authentication is the first interaction point with Jadwal. We support both email-based authentication through magic links and Google OAuth to provide secure and convenient access options. The following use cases detail the login flows and account management features.
@@ -747,31 +758,29 @@ User authentication is the first interaction point with Jadwal. We support both 
 \input{parts/use-cases/logout}
 
 \subsection{Calendar Management}
-At its core, Jadwal helps users manage their calendars effectively. These use cases show how users can create new calendars, connect existing ones through CalDAV, and view all their calendars in one integrated interface.
+At its core, Jadwal helps users manage their calendars effectively through iOS's native calendar system. These use cases show how users can create new calendars, connect existing ones through EventKit, and view all their calendars in one integrated interface.
 
 \input{parts/use-cases/connect-calendar}
 \input{parts/use-cases/create-calendar}
 \input{parts/use-cases/view-integrated-calendar}
 
-\subsection{WhatsApp Integration and Event Extraction}
-One of Jadwal's key features is its ability to automatically extract events from WhatsApp conversations. These use cases explain how users connect their WhatsApp account and how the system processes messages to identify and add events to their calendar.
-
-\input{parts/use-cases/connect-whatsapp}
-\clearpage
-\input{parts/use-cases/extract-events-from-whatsapp}
-
 \subsection{Event Management and Conflict Resolution}
-Managing events and resolving scheduling conflicts are daily challenges for users. These use cases demonstrate how Jadwal handles event creation, conflict detection, and provides smart resolution options.
+Managing events and resolving scheduling conflicts are daily challenges for users. These use cases demonstrate how Jadwal leverages EventKit to handle event creation and provide smart conflict detection directly on the device.
 
 \input{parts/use-cases/suggest-conflict-resolutions}
 \input{parts/use-cases/manage-scheduling-conflicts}
 \input{parts/use-cases/add-event-manually}
 
-\subsection{Prayer Time and Notification Management}
-Prayer time scheduling is a unique feature of Jadwal, and timely notifications ensure users never miss important events. These use cases detail how prayer times are scheduled and how the notification system keeps users informed.
+\subsection{Prayer Time Management}
+Prayer time scheduling is a unique feature of Jadwal that helps users maintain their daily religious observances while managing their schedule effectively.
 
 \input{parts/use-cases/schedule-prayer-times}
-\input{parts/use-cases/receive-event-notifications}
+
+\subsection{WhatsApp Integration}
+One of Jadwal's key features is its ability to automatically extract events from WhatsApp conversations. These use cases explain how users connect their WhatsApp account and how the system processes messages to identify and add events to their calendar.
+
+\input{parts/use-cases/connect-whatsapp}
+\input{parts/use-cases/extract-events-from-whatsapp}
 
 % ==========
 
@@ -781,7 +790,7 @@ Prayer time scheduling is a unique feature of Jadwal, and timely notifications e
 
 \section{Database Design}
 
-The foundation of Jadwal's robust functionality lies in its carefully structured relational database architecture. This section presents both the Entity-Relationship model and Relational Schema that support the application's core features, from user authentication to calendar integration and event management. The database design ensures efficient data organization while maintaining the flexibility needed for future scalability.
+The foundation of Jadwal's functionality lies in its focused and efficient database architecture. This section presents both the Entity-Relationship model and Relational Schema that support the application's core features: user authentication and secure calendar credential storage. The database design ensures secure credential management while leveraging iOS's native calendar infrastructure for all calendar operations.
 
 \subsection{Entity-Relationship Model}
 
@@ -797,18 +806,11 @@ The Entity-Relationship model, illustrated in \textbf{Figure~\ref{fig:er-diagram
               \item \texttt{magic\_link}: Manages email-based authentication tokens
           \end{itemize}
 
-    \item \textbf{Calendar Organization}
+    \item \textbf{Calendar Credentials}
           \begin{itemize}
-              \item \texttt{calendar\_accounts}: Links customers to calendar providers
-              \item \texttt{vcalendar}: Represents individual calendars with metadata
-              \item One-to-many relationship from accounts to calendars
-          \end{itemize}
-
-    \item \textbf{Event Management}
-          \begin{itemize}
-              \item \texttt{vevent}: Core event entity with timing and details
-              \item \texttt{vevent\_exception}: Handles recurring event modifications
-              \item \texttt{valarm}: Manages event notifications
+              \item \texttt{caldav\_account}: Stores encrypted calendar account credentials
+              \item Securely manages usernames and passwords for calendar services
+              \item Links customers to their calendar providers
           \end{itemize}
 \end{enumerate}
 
@@ -817,9 +819,6 @@ The Entity-Relationship model, illustrated in \textbf{Figure~\ref{fig:er-diagram
 \begin{itemize}
     \item Customer "has" authentication methods (one-to-many)
     \item Customer "owns" calendar accounts (one-to-many)
-    \item Calendar accounts "contain" calendars (one-to-many)
-    \item Calendars "schedule" events (one-to-many)
-    \item Events "have" exceptions and alarms (one-to-many)
 \end{itemize}
 
 \subsection{Relational Database Schema}
@@ -831,22 +830,14 @@ The relational database schema, shown in \textbf{Figure~\ref{fig:relational-sche
 \begin{enumerate}
     \item \textbf{Authentication Tables}
           \begin{itemize}
-              \item \texttt{customer} (\underline{id}, name, email, created\_at, updated\_at)
-              \item \texttt{auth\_google} (\underline{id}, customer\_id, sub, created\_at, updated\_at)
-              \item \texttt{magic\_link} (\underline{id}, customer\_id, token\_hash, expires\_at, used\_at, created\_at, updated\_at)
+              \item \texttt{customer} (\underline{id}, email, created\_at, updated\_at)
+              \item \texttt{auth\_google} (\underline{id}, customer\_id, sid, created\_at, updated\_at)
+              \item \texttt{magic\_link} (\underline{id}, customer\_id, hashed\_token, expires\_at, created\_at, updated\_at)
           \end{itemize}
 
-    \item \textbf{Calendar Tables}
+    \item \textbf{Calendar Account Table}
           \begin{itemize}
-              \item \texttt{calendar\_accounts} (\underline{id}, customer\_id, provider, created\_at, updated\_at)
-              \item \texttt{vcalendar} (\underline{uid}, account\_id, prodid, version, display\_name, description, color, timezone, created\_at, updated\_at)
-          \end{itemize}
-
-    \item \textbf{Event Tables}
-          \begin{itemize}
-              \item \texttt{vevent} (\underline{uid}, calendar\_uid, dtstamp, dtstart, dtend, duration, summary, location, status, classification, transp, rrule, rdate, exdate, sequence, created\_at, updated\_at)
-              \item \texttt{vevent\_exception} (\underline{id}, event\_uid, recurrence\_id, summary, description, location, dtstart, dtend, status, created\_at, updated\_at)
-              \item \texttt{valarm} (\underline{id}, event\_uid, action, trigger, description, summary, duration, repeat, attendees, created\_at, updated\_at)
+              \item \texttt{caldav\_account} (\underline{id}, customer\_id, email, username, password, created\_at, updated\_at)
           \end{itemize}
 \end{enumerate}
 
@@ -854,14 +845,13 @@ The relational database schema, shown in \textbf{Figure~\ref{fig:relational-sche
 
 \begin{itemize}
     \item \textbf{Primary Keys}: Underlined attributes represent primary keys
-    \item \textbf{Foreign Keys}: Attributes ending in "\_id" or "\_uid" represent foreign key relationships
+    \item \textbf{Foreign Keys}: Attributes ending in "\_id" represent foreign key relationships
     \item \textbf{Audit Fields}: All tables include created\_at and updated\_at timestamps
-    \item \textbf{Data Types}:
+    \item \textbf{Security Features}:
           \begin{itemize}
-              \item UUID for unique identifiers
-              \item VARCHAR for variable-length strings
-              \item TIMESTAMPTZ for timezone-aware timestamps
-              \item JSONB for complex data structures (rdate, exdate, attendees)
+              \item Passwords are encrypted using pgcrypto extension
+              \item UUID used for identifiers to prevent enumeration
+              \item Timestamps are timezone-aware
           \end{itemize}
 \end{itemize}
 
@@ -893,19 +883,19 @@ The relational database schema, shown in \textbf{Figure~\ref{fig:relational-sche
 
 In a fast-paced and interconnected world, everyone struggles to manage their time efficiently, especially for someone who has multiple tasks every day. Jadwal addresses all these challenges by introducing features that help to bridge all the gaps that other platforms are unable to offer. Jadwal ensures a user-friendly interface for the user to manage their schedule and avoid missing any events.
 
-Jadwal integrates with CalDAV, a standardized protocol that facilitates seamless synchronization across various calendar platforms. This allows users to effortlessly connect and manage their calendars from different devices and applications, such as Apple Calendar and Google Calendar, making everything in one ecosystem.
+Jadwal leverages iOS's native calendar system through EventKit, providing seamless integration with all calendar services supported by iOS. This allows users to effortlessly manage their calendars from different providers like Apple Calendar and Google Calendar, all through iOS's built-in calendar infrastructure.
 
-Jadwal's state-of-the-art LLM WhatsApp event extraction feature enhances the application by extracting events from WhatsApp, which is an informal communication channel that people most likely use for discussing events. This creates a gap that could lead to missing or conflicting events, and Jadwal aims to solve this problem.
+The feature that makes Jadwal stand out is its state-of-the-art LLM WhatsApp event extraction feature, which enhances the application by automatically detecting and adding events from informal communications. This solves a critical problem where important events discussed in chat messages often get missed or lead to conflicts.
 
-The feature of scheduling prayer times highlights Jadwal as unique, and Jadwal sees it as important since it is a daily activity. Clearing and holding a place for this event would help the user to manage their day more efficiently.
+Prayer time scheduling highlights Jadwal's unique approach to time management, recognizing the importance of daily religious observances. By automatically blocking and managing prayer times, Jadwal helps users maintain their spiritual commitments while efficiently organizing their other activities.
 
-The feature that makes Jadwal stand out is managing events effectively by offering features like suggesting conflict resolution and integrating other calendars. This would reduce the chances of the user missing any events.
+The intelligent event management system offers features like local conflict detection and resolution through EventKit, ensuring real-time synchronization and reliable calendar operations. By utilizing iOS's native calendar capabilities alongside our smart conflict resolution system, Jadwal provides a comprehensive solution for managing overlapping commitments.
 
-Integration with CalDAV allows Jadwal to connect all the calendars that the user has and bring them to one platform, which helps a lot in managing the day. Why do we separate calendars to organize one day for one person?
+A key advantage of our architecture is that users can continue using their preferred calendar apps alongside Jadwal, as all changes are synchronized through iOS's calendar system. This creates a seamless experience where users can view and manage their events through any iOS calendar app while benefiting from Jadwal's enhanced features like WhatsApp integration and prayer time management.
 
 Throughout the project, a systematic approach was taken in developing Jadwal. The use cases clearly define how users interact with the system, covering all the features like Continue with Email, Resolve Conflicts, WhatsApp Integration, Scheduling Prayer Time, and many more. The database architecture and system design showcase the backbone of Jadwal, illustrating how the system works and how the data is managed perfectly. These technical aspects ensure that Jadwal is well-structured and easy to understand, making it simple to track everything happening in the backend.
 
-In conclusion, Jadwal stands out from all the existing solutions and provides an innovative calendar application that bridges the gaps and helps the user to manage their day more efficiently. With its comprehensive features, user-friendly interface, and robust technical foundation, Jadwal is poised to revolutionize the way individuals manage their time in today's fast-paced world.
+In conclusion, Jadwal stands out from all the existing solutions and provides an innovative calendar application that bridges the gaps and helps the user to manage their day more efficiently. With its comprehensive features including WhatsApp integration, prayer time scheduling, intelligent conflict resolution, and seamless calendar synchronization through EventKit, Jadwal is poised to revolutionize the way individuals manage their time in today's fast-paced world.
 
 
 % Bibliography
