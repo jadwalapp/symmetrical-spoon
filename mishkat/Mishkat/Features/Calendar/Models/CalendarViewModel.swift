@@ -8,20 +8,20 @@
 import Foundation
 import EventKit
 import EventKitUI
-import SwiftUI
 
+/// ViewModel for managing calendar events and authorization status.
 class CalendarViewModel: NSObject, ObservableObject, EKEventEditViewDelegate {
     let eventStore = EKEventStore()
     
     @Published var authorizationStatus: EKAuthorizationStatus = .notDetermined
     @Published var selectedDate: Date = Date()
-    @Published var events: [EKEvent] = []
+    @Published var dailyEvents: [EKEvent] = []
+    @Published var monthlyEvents: [EKEvent] = []
     @Published var calendarSources: [EKSource] = []
     @Published var visibleCalendars: Set<EKCalendar> = []
     
     override init() {
         super.init()
-        selectedDate = Date()
         checkAuthorizationStatus()
     }
     
@@ -33,7 +33,7 @@ class CalendarViewModel: NSObject, ObservableObject, EKEventEditViewDelegate {
     }
     
     func requestAccess() {
-        eventStore.requestAccess(to: .event) { [weak self] granted, error in
+        eventStore.requestAccess(to: .event) { [weak self] granted, _ in
             DispatchQueue.main.async {
                 self?.authorizationStatus = granted ? .authorized : .denied
                 if granted {
@@ -49,7 +49,7 @@ class CalendarViewModel: NSObject, ObservableObject, EKEventEditViewDelegate {
         visibleCalendars = Set(allCalendars)
     }
     
-    func fetchEvents(for date: Date) {
+    func fetchDailyEvents(for date: Date) {
         let calendar = Calendar.current
         let startOfDay = calendar.startOfDay(for: date)
         let endOfDay = calendar.date(byAdding: .day, value: 1, to: startOfDay)!
@@ -59,7 +59,22 @@ class CalendarViewModel: NSObject, ObservableObject, EKEventEditViewDelegate {
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
             let fetchedEvents = self?.eventStore.events(matching: predicate) ?? []
             DispatchQueue.main.async {
-                self?.events = fetchedEvents
+                self?.dailyEvents = fetchedEvents
+            }
+        }
+    }
+    
+    func fetchMonthlyEvents(for date: Date) {
+        let calendar = Calendar.current
+        let startOfMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: date))!
+        let endOfMonth = calendar.date(byAdding: DateComponents(month: 1, day: -1), to: startOfMonth)!
+        
+        let predicate = eventStore.predicateForEvents(withStart: startOfMonth, end: endOfMonth, calendars: Array(visibleCalendars))
+        
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            let fetchedEvents = self?.eventStore.events(matching: predicate) ?? []
+            DispatchQueue.main.async {
+                self?.monthlyEvents = fetchedEvents
             }
         }
     }
@@ -81,7 +96,7 @@ class CalendarViewModel: NSObject, ObservableObject, EKEventEditViewDelegate {
         NotificationCenter.default.post(name: NSNotification.Name("DismissAddEventView"), object: nil)
         
         if action == .saved {
-            fetchEvents(for: selectedDate)
+            fetchDailyEvents(for: selectedDate)
         }
     }
     

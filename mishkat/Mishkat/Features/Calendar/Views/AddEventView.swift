@@ -8,6 +8,7 @@
 import SwiftUI
 import EventKitUI
 
+/// View for adding a new event to the calendar.
 struct AddEventView: UIViewControllerRepresentable {
     @EnvironmentObject var viewModel: CalendarViewModel
     @Binding var isPresented: Bool
@@ -52,8 +53,6 @@ struct AddEventView: UIViewControllerRepresentable {
 }
 
 #Preview {
-    AddEventView(
-        isPresented: .constant(true)
-    )
-    .environmentObject(CalendarViewModel())
+    AddEventView(isPresented: .constant(true))
+        .environmentObject(CalendarViewModel())
 }
