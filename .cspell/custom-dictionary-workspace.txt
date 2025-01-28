@@ -3,6 +3,7 @@ AFFAN
 ALKHALAF
 Asana
 Calendi
+Createwhatsapp
 dtend
 dtstamp
 dtstart
@@ -25,5 +26,6 @@ VARCHAR
 vcalendar
 vevent
 WAZIR
+whatsappsvc
 YAMAMAH
 YAZED
