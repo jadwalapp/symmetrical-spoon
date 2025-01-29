@@ -109,12 +109,52 @@ services:
       - baikal-config:/var/www/baikal/config
       - baikal-data:/var/www/baikal/Specific
 
+  mongodb:
+    image: mongo:latest
+    networks:
+      - internal
+    volumes:
+      - mongodb-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    networks:
+      - internal
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_port_connectivity"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  wasapp:
+    build:
+      context: ./wasapp
+      dockerfile: Dockerfile
+    env_file: ./wasapp/.env
+    depends_on:
+      mongodb:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - web
+      - internal
+
 volumes:
   postgres_data:
   grafana-storage:
   loki-storage:
   baikal-config:
   baikal-data:
+  mongodb-data:
+  rabbitmq-data:
 
 networks:
   web:
