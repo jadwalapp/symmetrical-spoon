@@ -1,4 +1,4 @@
-package openai
+package whatsappsvc
 
 import (
 	"bytes"
@@ -7,7 +7,6 @@ import (
 	"os"
 )
 
-// CallOpenAI sends event details to OpenAI API and returns the response
 func CallOpenAI(eventJSON string) (string, error) {
 	requestBody, err := json.Marshal(map[string]interface{}{
 		"model": "gpt-3.5-turbo",

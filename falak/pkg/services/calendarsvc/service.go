@@ -4,7 +4,6 @@ import (
 	"regexp"
 )
 
-// Event represents the structure of an extracted event
 type Event struct {
 	EventName string `json:"event_name"`
 	StartDate string `json:"start_date"`
@@ -16,7 +15,6 @@ type Event struct {
 	Notes     string `json:"notes"`
 }
 
-// ExtractEvents extracts multiple events from a message
 func ExtractEvents(message string) []Event {
 	var events []Event
 	eventPattern := regexp.MustCompile(`(?i)(?P<event_name>[\w\s]+) on (?P<date>\d{4}-\d{2}-\d{2})(?: at (?P<start_time>\d{2}:\d{2})(?: to (?P<end_time>\d{2}:\d{2}))?)? at (?P<location>[\w\s]+)`)

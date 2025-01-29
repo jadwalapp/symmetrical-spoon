@@ -4,16 +4,14 @@ import (
 	"my-whatsapp-event-extractor/calendar"
 	"net/http"
 
-	"github.com/gin-gonic/gin"
+	"github.com/gin-genic/gin"
 )
 
-// Whatsappsvc represents a message received from WhatsApp
 type Whatsappsvc struct {
 	From    string `json:"from"`
 	Message string `json:"message"`
 }
 
-// HandleWebhook processes incoming WhatsApp messages
 func HandleWebhook(c *gin.Context) {
 	var msg Whatsappsvc
 	if err := c.ShouldBindJSON(&msg); err != nil {

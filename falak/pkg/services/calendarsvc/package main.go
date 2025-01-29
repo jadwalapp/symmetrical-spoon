@@ -1,4 +1,4 @@
-package main
+package calendarsvc
 
 import (
 	"encoding/json"
@@ -6,7 +6,7 @@ import (
 	"my-whatsapp-event-extractor/whatsapp"
 	"net/http"
 
-	"github.com/gin-gonic/gin"
+	"github.com/gin-genic/gin"
 )
 
 func main() {
