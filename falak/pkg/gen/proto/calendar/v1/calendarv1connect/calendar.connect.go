@@ -65,12 +65,6 @@ func NewCalendarServiceClient(httpClient connect.HTTPClient, baseURL string, opt
 			connect.WithSchema(calendarServiceGetCalDavAccountMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
-		schedulePrayerTimes: connect.NewClient[v1.SchedulePrayerTimesRequest, v1.SchedulePrayerTimesResponse](
-			httpClient,
-			baseURL+CalendarServiceSchedulePrayerTimesProcedure,
-			connect.WithSchema(calendarServiceSchedulePrayerTimesMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
 	}
 }
 
@@ -82,11 +76,6 @@ type calendarServiceClient struct {
 // GetCalDavAccount calls calendar.v1.CalendarService.GetCalDavAccount.
 func (c *calendarServiceClient) GetCalDavAccount(ctx context.Context, req *connect.Request[v1.GetCalDavAccountRequest]) (*connect.Response[v1.GetCalDavAccountResponse], error) {
 	return c.getCalDavAccount.CallUnary(ctx, req)
-}
-
-// SchedulePrayerTimes calls calendar.v1.CalendarService.SchedulePrayerTimes.
-func (c *calendarServiceClient) SchedulePrayerTimes(ctx context.Context, req *connect.Request[v1.SchedulePrayerTimesRequest]) (*connect.Response[v1.SchedulePrayerTimesResponse], error) {
-	return c.schedulePrayerTimes.CallUnary(ctx, req)
 }
 
 // CalendarServiceHandler is an implementation of the calendar.v1.CalendarService service.
@@ -106,12 +95,6 @@ func NewCalendarServiceHandler(svc CalendarServiceHandler, opts ...connect.Handl
 		connect.WithSchema(calendarServiceGetCalDavAccountMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
-	calendarServiceSchedulePrayerTimesHandler := connect.NewUnaryHandler(
-		CalendarServiceSchedulePrayerTimesProcedure,
-		svc.SchedulePrayerTimes,
-		connect.WithSchema(calendarServiceSchedulePrayerTimesMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
 	return "/calendar.v1.CalendarService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case CalendarServiceGetCalDavAccountProcedure:
@@ -127,8 +110,4 @@ type UnimplementedCalendarServiceHandler struct{}
 
 func (UnimplementedCalendarServiceHandler) GetCalDavAccount(context.Context, *connect.Request[v1.GetCalDavAccountRequest]) (*connect.Response[v1.GetCalDavAccountResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("calendar.v1.CalendarService.GetCalDavAccount is not implemented"))
-}
-
-func (UnimplementedCalendarServiceHandler) SchedulePrayerTimes(context.Context, *connect.Request[v1.SchedulePrayerTimesRequest]) (*connect.Response[v1.SchedulePrayerTimesResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("calendar.v1.CalendarService.SchedulePrayerTimes is not implemented"))
 }
