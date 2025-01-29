@@ -9,6 +9,8 @@ import (
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/apimetadata"
 	calendarv1 "github.com/jadwalapp/symmetrical-spoon/falak/pkg/gen/proto/calendar/v1"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/gen/proto/calendar/v1/calendarv1connect"
+	geolocationclient "github.com/jadwalapp/symmetrical-spoon/falak/pkg/geolocation/client"
+	prayerclient "github.com/jadwalapp/symmetrical-spoon/falak/pkg/prayer/client"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/store"
 	"github.com/rs/zerolog/log"
 )
@@ -21,6 +23,8 @@ type service struct {
 	pv                          protovalidate.Validator
 	store                       store.Queries
 	apiMetadata                 apimetadata.ApiMetadata
+	geoLocationClient           geolocationclient.Client
+	prayerClient                prayerclient.Client
 	calDavPasswordEncryptionKey string
 
 	calendarv1connect.UnimplementedCalendarServiceHandler
@@ -61,11 +65,13 @@ func (s *service) GetCalDavAccount(ctx context.Context, r *connect.Request[calen
 	}, nil
 }
 
-func NewService(pv protovalidate.Validator, store store.Queries, apiMetadata apimetadata.ApiMetadata, calDAVPasswordEncryptionKey string) calendarv1connect.CalendarServiceHandler {
+func NewService(pv protovalidate.Validator, store store.Queries, apiMetadata apimetadata.ApiMetadata, geoLocationClient geolocationclient.Client, prayerClient prayerclient.Client, calDAVPasswordEncryptionKey string) calendarv1connect.CalendarServiceHandler {
 	return &service{
 		pv:                          pv,
 		store:                       store,
 		apiMetadata:                 apiMetadata,
+		geoLocationClient:           geoLocationClient,
+		prayerClient:                prayerClient,
 		calDavPasswordEncryptionKey: calDAVPasswordEncryptionKey,
 	}
 }
