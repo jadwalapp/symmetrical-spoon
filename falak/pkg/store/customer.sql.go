@@ -100,13 +100,15 @@ func (q *Queries) GetCustomerById(ctx context.Context, id uuid.UUID) (Customer, 
 const isCustomerFirstLogin = `-- name: IsCustomerFirstLogin :one
 SELECT 
   (
+    -- not ((has magic link entry where used_at is not null) -> has account)
     NOT EXISTS (
       SELECT 1 
       FROM magic_link ml
       WHERE ml.customer_id = $1
         AND ml.used_at IS NOT NULL
     )
-    OR 
+    AND 
+    -- not ((has google entry) -> has account)
     NOT EXISTS (
       SELECT 1 
       FROM auth_google ag
@@ -120,4 +122,40 @@ func (q *Queries) IsCustomerFirstLogin(ctx context.Context, customerID uuid.UUID
 	var is_customer_first_login sql.NullBool
 	err := row.Scan(&is_customer_first_login)
 	return is_customer_first_login, err
+}
+
+const listCustomerWithoutCaldavAccount = `-- name: ListCustomerWithoutCaldavAccount :many
+SELECT c.id, c.name, c.email, c.created_at, c.updated_at
+FROM customer c
+LEFT OUTER JOIN caldav_account ca ON c.id = ca.customer_id
+WHERE ca.customer_id IS NULL
+`
+
+func (q *Queries) ListCustomerWithoutCaldavAccount(ctx context.Context) ([]Customer, error) {
+	rows, err := q.db.QueryContext(ctx, listCustomerWithoutCaldavAccount)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Customer
+	for rows.Next() {
+		var i Customer
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Email,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }

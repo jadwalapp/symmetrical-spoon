@@ -2,14 +2,18 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSCalendarsFullAccessUsageDescription</key>
+	<string>Jadwal needs full access to your calendars to allow you to manage them through Jadwal&apos;s app. No data will be transmitted, we just show it in the app.</string>
+	<key>NSCalendarsUsageDescription</key>
+	<string>Jadwal needs access to your calendars to allow you to manage them through Jadwal&apos;s app. No data will be transmitted, we just show it in the app.</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
-	    <string>googlegmail</string>
-	    <string>ms-outlook</string>
-	    <string>ymail</string>
-	    <string>mailto</string>
+		<string>googlegmail</string>
+		<string>ms-outlook</string>
+		<string>ymail</string>
+		<string>mailto</string>
 	</array>
 </dict>
 </plist>

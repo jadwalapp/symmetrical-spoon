@@ -17,7 +17,7 @@ you know, something :D
 
 - Beekeeper Studio: [https://www.beekeeperstudio.io/](https://www.beekeeperstudio.io/)
 
-## Generating connectRPC code from prot files
+## Generating connectRPC code from proto files
 
 ```bash
 buf lint

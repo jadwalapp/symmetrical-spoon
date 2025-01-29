@@ -101,10 +101,20 @@ services:
     volumes:
       - loki-storage:/loki
 
+  baikal:
+    image: ckulka/baikal:nginx
+    networks:
+      - web
+    volumes:
+      - baikal-config:/var/www/baikal/config
+      - baikal-data:/var/www/baikal/Specific
+
 volumes:
   postgres_data:
   grafana-storage:
   loki-storage:
+  baikal-config:
+  baikal-data:
 
 networks:
   web:

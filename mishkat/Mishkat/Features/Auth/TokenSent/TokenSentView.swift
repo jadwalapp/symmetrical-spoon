@@ -15,7 +15,6 @@ struct TokenSentView: View {
     
     var body: some View {
         ZStack {
-            // Main scrollable content
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
                     VStack(alignment: .leading, spacing: 20) {
@@ -95,14 +94,12 @@ struct TokenSentView: View {
                         ))
                     }
                     
-                    // Add padding at the bottom to prevent content from being hidden
                     Spacer()
-                        .frame(height: 160) // Increased height because we have two buttons
+                        .frame(height: 160)
                 }
                 .padding(24)
             }
             
-            // Fixed buttons at bottom
             VStack {
                 Spacer()
                 VStack(spacing: 0) {

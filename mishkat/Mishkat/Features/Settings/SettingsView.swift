@@ -24,6 +24,11 @@ struct SettingsView: View {
                 }
             }
             Section {
+                CalDAVCredentialsView()
+                    .listRowInsets(EdgeInsets())
+                    .listRowBackground(Color.clear)
+            }
+            Section {
                 Button {
                     print("connect whatsapp")
                 } label: {
@@ -60,9 +65,11 @@ struct SettingsView: View {
         }
         .onFirstAppear {
             profileViewModel.getProfile()
+            profileViewModel.getCalDavAccount()
         }
         .refreshable {
             profileViewModel.getProfile()
+            profileViewModel.getCalDavAccount()
         }
     }
 }
@@ -71,7 +78,8 @@ struct SettingsView: View {
     SettingsView()
         .environmentObject(
             ProfileViewModel(
-                profileRepository: DependencyContainer.shared.profileRepository
+                profileRepository: DependencyContainer.shared.profileRepository,
+                calendarRepository: DependencyContainer.shared.calendarRepository
             )
         )
 }
