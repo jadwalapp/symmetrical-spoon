@@ -1,3 +1,4 @@
+import { sleep } from "bun";
 import type { Mongoose } from "mongoose";
 import { Client, RemoteAuth } from "whatsapp-web.js";
 import { MongoStore } from "wwebjs-mongo";
@@ -7,6 +8,7 @@ export interface ClientDetails {
   status: "INITIALIZING" | "AUTHENTICATED" | "READY" | "DISCONNECTED";
   phoneNumber: string | null;
   name: string | null;
+  pairingCode: string | null;
 }
 
 export class WhatsappService {
@@ -37,11 +39,17 @@ export class WhatsappService {
       status: "INITIALIZING",
       phoneNumber: null,
       name: null,
+      pairingCode: null,
     });
     this.setupClientEvents(client, customerId, phoneNumber);
+
     await client.initialize();
 
-    // TODO: return the pairing code from here :D
+    if (phoneNumber !== null) {
+      const pairingCode = await client.requestPairingCode(phoneNumber, true);
+      return pairingCode;
+    }
+
     return null;
   }
 
@@ -54,10 +62,14 @@ export class WhatsappService {
       console.log(`👀 state changed: ${state}`);
     });
 
-    client.on("ready", () => {
+    client.on("ready", async () => {
       console.log("✅ client is ready!");
 
-      this.updateClientDetails(customerId, { status: "READY" });
+      this.updateClientDetails(customerId, {
+        status: "READY",
+        name: client.info.pushname,
+        phoneNumber: client.info.wid.user,
+      });
     });
 
     client.on("authenticated", (session) => {
@@ -75,26 +87,28 @@ export class WhatsappService {
       console.log(`🫧 message created | msg: ${JSON.stringify(msg)}`);
     });
 
-    client.on("auth_failure", (msg) => {
+    client.on("auth_failure", async (msg) => {
       console.log(`❌ auth failure | msg: ${msg}`);
+      this.updateClientDetails(customerId, { status: "DISCONNECTED" });
+      await client.destroy();
+      this.clientsDetails.delete(customerId);
     });
 
-    client.on("disconnected", (reason) => {
+    client.on("disconnected", async (reason) => {
       console.log(`❌ client disconnected | reason: ${reason}`);
-
       this.updateClientDetails(customerId, { status: "DISCONNECTED" });
+      await client.destroy();
+      this.clientsDetails.delete(customerId);
     });
 
     client.on("loading_screen", (percent, msg) => {
       console.log(`⏳ loading screen | percent: ${percent} | msg: ${msg}`);
     });
 
-    client.on("qr", async (qr) => {
-      console.log(`qr code received | qr: ${qr}`);
-
-      if (phoneNumber != null) {
+    client.on("qr", async (_) => {
+      if (phoneNumber !== null) {
         const pairingCode = await client.requestPairingCode(phoneNumber, true);
-        console.log(`↔️ pairing code received: ${pairingCode}`);
+        this.updateClientDetails(customerId, { pairingCode: pairingCode });
       }
     });
 
@@ -142,5 +156,21 @@ export class WhatsappService {
       ...oldClientDetails,
       ...newDetails,
     });
+  }
+
+  getClientDetails(customerId: string): ClientDetails | undefined {
+    return this.clientsDetails.get(customerId);
+  }
+
+  getAllClientDetails(): Map<string, ClientDetails> {
+    return this.clientsDetails;
+  }
+
+  async disconnectClient(customerId: string) {
+    const clientDetails = this.getClientDetails(customerId);
+    if (!clientDetails) return;
+
+    await clientDetails.client.logout();
+    this.clientsDetails.delete(customerId);
   }
 }

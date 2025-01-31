@@ -1,5 +1,8 @@
 import fastify, { type RouteShorthandOptions } from "fastify";
-import { WhatsappService } from "./src/services/whatsapp/whatsapp_service";
+import {
+  WhatsappService,
+  type ClientDetails,
+} from "./src/services/whatsapp/whatsapp_service";
 import mongoose from "mongoose";
 import { getConfig } from "./src/config/config";
 
@@ -62,11 +65,52 @@ async function main() {
   });
 
   app.get("/wasapp/status", (req, res) => {
-    res.send("not implemented :D");
+    const allClientDetails = whatsappService.getAllClientDetails();
+
+    const statusObject = Object.fromEntries(
+      Array.from(allClientDetails.entries()).map(([id, details]) => [
+        id,
+        {
+          status: details.status,
+          phoneNumber: details.phoneNumber,
+          name: details.name,
+          pairingCode: details.pairingCode,
+        },
+      ])
+    );
+
+    res.send(statusObject);
   });
 
-  app.post("/wasapp/disconnect", (req, res) => {
-    res.send("not implemented :D");
+  const wasappDisconnectOpts: RouteShorthandOptions = {
+    schema: {
+      body: {
+        type: "object",
+        properties: {
+          customerId: { type: "string" },
+        },
+        required: ["customerId"],
+      },
+      response: {
+        500: {
+          type: "object",
+          properties: {
+            error: { type: "string" },
+          },
+        },
+      },
+    },
+  };
+  app.post("/wasapp/disconnect", wasappDisconnectOpts, async (req, res) => {
+    try {
+      const { customerId } = req.body as { customerId: string };
+
+      await whatsappService.disconnectClient(customerId);
+
+      res.status(200);
+    } catch (error) {
+      res.status(500).send({ error: error });
+    }
   });
 
   const listenUrl = await app.listen({
