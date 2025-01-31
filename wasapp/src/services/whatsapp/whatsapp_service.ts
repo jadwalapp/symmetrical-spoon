@@ -2,12 +2,19 @@ import type { Mongoose } from "mongoose";
 import { Client, RemoteAuth } from "whatsapp-web.js";
 import { MongoStore } from "wwebjs-mongo";
 
+export interface ClientDetails {
+  client: Client;
+  status: "INITIALIZING" | "AUTHENTICATED" | "READY" | "DISCONNECTED";
+  phoneNumber: string | null;
+  name: string | null;
+}
+
 export class WhatsappService {
   private mongooseConn: Mongoose;
-  private clients: Map<string, Client>;
+  private clientsDetails: Map<string, ClientDetails>;
   constructor(mongooseConn: Mongoose) {
     this.mongooseConn = mongooseConn;
-    this.clients = new Map<string, Client>();
+    this.clientsDetails = new Map<string, ClientDetails>();
   }
 
   async initialize(
@@ -20,25 +27,37 @@ export class WhatsappService {
         clientId: customerId,
         backupSyncIntervalMs: 60 * 1000,
       }),
+      webVersion: "2.3000.1019739601",
       puppeteer: {
         headless: false,
       },
     });
-    this.clients.set(customerId, client);
-    this.setupClientEvents(client, phoneNumber);
-    client.initialize();
+    this.clientsDetails.set(customerId, {
+      client: client,
+      status: "INITIALIZING",
+      phoneNumber: null,
+      name: null,
+    });
+    this.setupClientEvents(client, customerId, phoneNumber);
+    await client.initialize();
 
     // TODO: return the pairing code from here :D
     return null;
   }
 
-  private setupClientEvents(client: Client, phoneNumber: string | null) {
+  private setupClientEvents(
+    client: Client,
+    customerId: string,
+    phoneNumber: string | null
+  ) {
     client.on("change_state", (state) => {
       console.log(`👀 state changed: ${state}`);
     });
 
     client.on("ready", () => {
       console.log("✅ client is ready!");
+
+      this.updateClientDetails(customerId, { status: "READY" });
     });
 
     client.on("authenticated", (session) => {
@@ -47,11 +66,8 @@ export class WhatsappService {
           session && JSON.stringify(session)
         }`
       );
-    });
 
-    client.on("message", (msg) => {
-      console.log("🫧🫧🫧🫧🫧🫧🫧🫧🫧");
-      console.log(`🫧 message received | msg: ${JSON.stringify(msg)}`);
+      this.updateClientDetails(customerId, { status: "AUTHENTICATED" });
     });
 
     client.on("message_create", (msg) => {
@@ -65,6 +81,8 @@ export class WhatsappService {
 
     client.on("disconnected", (reason) => {
       console.log(`❌ client disconnected | reason: ${reason}`);
+
+      this.updateClientDetails(customerId, { status: "DISCONNECTED" });
     });
 
     client.on("loading_screen", (percent, msg) => {
@@ -110,6 +128,19 @@ export class WhatsappService {
     const customerIds = await this.getSavedCustomerIds();
     customerIds.forEach(async (customerId) => {
       await this.initialize(customerId, null);
+    });
+  }
+
+  private updateClientDetails(
+    customerId: string,
+    newDetails: Partial<ClientDetails>
+  ) {
+    const oldClientDetails = this.clientsDetails.get(customerId);
+    if (!oldClientDetails) return;
+
+    this.clientsDetails.set(customerId, {
+      ...oldClientDetails,
+      ...newDetails,
     });
   }
 }
