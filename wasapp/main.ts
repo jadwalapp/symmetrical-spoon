@@ -1,21 +1,19 @@
 import Fastify, { type RouteShorthandOptions } from "fastify";
 import { getConfig } from "./src/config/config";
 import { WhatsappService } from "./src/services/whatsapp/whatsapp_service";
-import { MongoStore } from "wwebjs-mongo";
 import mongoose from "mongoose";
 
 async function main() {
   const config = getConfig();
   const app = Fastify({
     logger: true,
-    requestTimeout: 30000, // 30 seconds is more reasonable
+    requestTimeout: 30000,
   });
 
   const mongooseConn = await mongoose.connect(config.mongodb.uri, {
     dbName: config.mongodb.database,
   });
 
-  const mongoStore = new MongoStore({ mongoose: mongooseConn });
   const whatsappService = new WhatsappService(mongooseConn, app.log);
   await whatsappService.initializeService();
 
@@ -35,10 +33,7 @@ async function main() {
         properties: {
           customerId: { type: "string" },
           phoneNumber: { type: "string" },
-        } as const satisfies Record<
-          keyof WhatsappInitializeBody,
-          { type: "string" }
-        >,
+        },
         required: ["customerId", "phoneNumber"],
       },
       response: {
@@ -86,63 +81,6 @@ async function main() {
     }
   );
 
-  const whatsappPairingCodeOpts: RouteShorthandOptions = {
-    schema: {
-      body: {
-        type: "object",
-        properties: {
-          customerId: { type: "string" },
-          phoneNumber: { type: "string" },
-        } as const satisfies Record<
-          keyof WhatsappInitializeBody,
-          { type: "string" }
-        >,
-        required: ["customerId", "phoneNumber"],
-      },
-      response: {
-        200: {
-          type: "object",
-          properties: {
-            pairingCode: { type: "string" },
-          },
-        },
-        500: {
-          type: "object",
-          properties: {
-            error: { type: "string" },
-          },
-        },
-      },
-    },
-  };
-
-  app.post(
-    "/whatsapp/pairing-code",
-    whatsappPairingCodeOpts,
-    async (request, reply) => {
-      try {
-        const { customerId, phoneNumber } =
-          request.body as WhatsappInitializeBody;
-        const code = await whatsappService.getPairingCode(
-          customerId,
-          phoneNumber
-        );
-        if (code === null) {
-          return reply.status(400).send({
-            error: "Failed to generate pairing code. Please try again later.",
-          });
-        }
-
-        reply.send({ pairingCode: code }); // Fixed to match schema
-      } catch (error) {
-        request.log.error(error);
-        return reply.status(500).send({
-          error: "Internal server error",
-        });
-      }
-    }
-  );
-
   const statusOpts: RouteShorthandOptions = {
     schema: {
       querystring: {
@@ -161,8 +99,7 @@ async function main() {
               properties: {
                 isReady: { type: "boolean" },
                 isAuthenticated: { type: "boolean" },
-                phoneNumber: { type: "string" },
-                lastSeen: { type: "string" },
+                phoneNumber: { type: "string", nullable: true },
               },
             },
             clients: {
@@ -172,8 +109,7 @@ async function main() {
                 properties: {
                   isReady: { type: "boolean" },
                   isAuthenticated: { type: "boolean" },
-                  phoneNumber: { type: "string" },
-                  lastSeen: { type: "string" },
+                  phoneNumber: { type: "string", nullable: true },
                 },
               },
             },
@@ -204,62 +140,6 @@ async function main() {
       });
     }
   });
-
-  const disconnectOpts: RouteShorthandOptions = {
-    schema: {
-      body: {
-        type: "object",
-        properties: {
-          customerId: { type: "string" },
-        },
-        required: ["customerId"],
-      },
-      response: {
-        200: {
-          type: "object",
-          properties: {
-            message: { type: "string" },
-          },
-        },
-        404: {
-          type: "object",
-          properties: {
-            error: { type: "string" },
-          },
-        },
-        500: {
-          type: "object",
-          properties: {
-            error: { type: "string" },
-          },
-        },
-      },
-    },
-  };
-
-  app.post(
-    "/whatsapp/disconnect",
-    disconnectOpts,
-    async function (request, reply) {
-      try {
-        const { customerId } = request.body as { customerId: string };
-        const success = await whatsappService.disconnectClient(customerId);
-
-        if (success) {
-          return reply.send({ message: "Client disconnected successfully" });
-        } else {
-          return reply.status(404).send({
-            error: "Client not found or already disconnected",
-          });
-        }
-      } catch (error) {
-        request.log.error(error);
-        return reply.status(500).send({
-          error: "Internal server error",
-        });
-      }
-    }
-  );
 
   try {
     await app.listen({ port: config.port, host: "0.0.0.0" });

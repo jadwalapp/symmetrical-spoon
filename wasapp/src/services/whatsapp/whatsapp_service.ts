@@ -1,168 +1,208 @@
-import { Client, LocalAuth, RemoteAuth } from "whatsapp-web.js";
-import type { Store } from "whatsapp-web.js";
+import { Client, RemoteAuth } from "whatsapp-web.js";
 import { MongoStore } from "wwebjs-mongo";
 import type { FastifyBaseLogger } from "fastify";
 import type { Mongoose } from "mongoose";
+import { ConversationService } from "../conversation/conversation_service";
 
 export interface ClientStatus {
   isReady: boolean;
   isAuthenticated: boolean;
   phoneNumber?: string;
-  lastSeen?: Date;
-  state:
-    | "INITIALIZING"
-    | "WAITING_FOR_PAIRING"
-    | "AUTHENTICATING"
-    | "READY"
-    | "FAILED"
-    | "DISCONNECTED";
-  error?: string;
 }
 
 export class WhatsappService {
   private clients: Map<string, Client>;
   private clientStatus: Map<string, ClientStatus>;
-  private store: Mongoose;
+  private mongoStore: InstanceType<typeof MongoStore>;
   private logger: FastifyBaseLogger;
-  private initializationTimeouts: Map<string, ReturnType<typeof setTimeout>>;
-  private mongoStore: typeof MongoStore.prototype;
+  private conversationService: ConversationService;
 
   constructor(store: Mongoose, logger: FastifyBaseLogger) {
-    this.clients = new Map<string, Client>();
-    this.clientStatus = new Map<string, ClientStatus>();
-    this.store = store;
+    this.clients = new Map();
+    this.clientStatus = new Map();
     this.logger = logger;
-    this.initializationTimeouts = new Map();
     this.mongoStore = new MongoStore({ mongoose: store });
+    this.conversationService = new ConversationService(logger);
   }
 
   async initializeService() {
-    if (!this.store.connection?.db) {
-      throw new Error("Database connection not established");
-    }
-
     try {
-      // First check if the store is ready
-      await this.mongoStore.sessionExists("test-connection");
-      this.logger.info("MongoDB store is ready");
-    } catch (error) {
-      this.logger.error({ err: error }, "Failed to initialize MongoDB store");
-      throw new Error("Failed to initialize MongoDB store");
-    }
+      const collections = await this.mongoStore.mongoose.connection.db
+        .listCollections()
+        .toArray();
+      const customerIds = new Set<string>();
 
-    const collections = await this.store.connection.db
-      .listCollections()
-      .toArray();
-    const whatsappCollections = collections.filter(
-      (col: any) =>
-        col.name.startsWith("whatsapp-") &&
-        col.name !== "whatsapp-test-connection"
-    );
+      collections.forEach((col: any) => {
+        const match = col.name.match(/^whatsapp-RemoteAuth-(.+?)\.files$/);
+        if (match && match[1]) {
+          customerIds.add(match[1]);
+        }
+      });
 
-    this.logger.info(
-      "Found %d existing WhatsApp sessions",
-      whatsappCollections.length
-    );
-
-    // Restore sessions in parallel with a limit
-    const batchSize = 3; // Process 3 sessions at a time
-    for (let i = 0; i < whatsappCollections.length; i += batchSize) {
-      const batch = whatsappCollections.slice(i, i + batchSize);
-      await Promise.all(
-        batch.map(async (collection) => {
-          const customerId = collection.name
-            .replace("whatsapp-", "")
-            .replace(".files", "");
-          try {
-            await this.restoreSession(customerId);
-          } catch (error) {
-            this.logger.error(
-              { err: error, customerId },
-              "Failed to restore session in batch"
-            );
-          }
-        })
+      this.logger.info(
+        { customerIds: Array.from(customerIds) },
+        "Found WhatsApp sessions"
       );
+
+      for (const customerId of customerIds) {
+        try {
+          await this.setupClient(customerId);
+          await new Promise((resolve) => setTimeout(resolve, 2000));
+        } catch (error) {
+          this.logger.error(
+            { err: error, customerId },
+            "Failed to restore client"
+          );
+        }
+      }
+    } catch (error) {
+      this.logger.error({ err: error }, "Failed to initialize service");
     }
   }
 
-  private async restoreSession(customerId: string) {
-    try {
-      this.logger.info(
-        { customerId },
-        "Attempting to restore WhatsApp session"
-      );
+  private createClient(customerId: string): Client {
+    return new Client({
+      authStrategy: new RemoteAuth({
+        store: this.mongoStore,
+        clientId: customerId,
+        backupSyncIntervalMs: 60 * 1000,
+      }),
+      puppeteer: {
+        args: ["--no-sandbox"],
+        headless: false,
+        timeout: 0,
+      },
+    });
+  }
 
-      // Check if session exists in MongoDB
-      const sessionExists = await this.mongoStore.sessionExists(customerId);
-      if (!sessionExists) {
-        this.logger.warn(
-          { customerId },
-          "No existing session found in MongoDB store"
-        );
-        return false;
+  private setupClientEvents(client: Client, customerId: string) {
+    client.on("ready", () => {
+      this.logger.info({ customerId }, "Client is ready");
+      this.clientStatus.set(customerId, {
+        ...this.clientStatus.get(customerId)!,
+        isReady: true,
+      });
+    });
+
+    client.on("authenticated", () => {
+      this.logger.info({ customerId }, "Client authenticated");
+      this.clientStatus.set(customerId, {
+        ...this.clientStatus.get(customerId)!,
+        isAuthenticated: true,
+      });
+    });
+
+    client.on("auth_failure", () => {
+      this.logger.warn({ customerId }, "Authentication failed");
+      this.clientStatus.set(customerId, {
+        ...this.clientStatus.get(customerId)!,
+        isAuthenticated: false,
+        isReady: false,
+      });
+    });
+
+    client.on("message_create", async (msg) => {
+      if (!this.clientStatus.get(customerId)?.isReady) {
+        return;
       }
 
-      const client = new Client({
-        authStrategy: new RemoteAuth({
-          store: this.mongoStore,
-          clientId: customerId,
-          backupSyncIntervalMs: 300 * 1000, // Backup every 5 minutes
-        }),
-        puppeteer: {
-          args: [
-            "--no-sandbox",
-            "--disable-setuid-sandbox",
-            "--disable-gpu",
-            "--disable-dev-shm-usage",
-            "--no-first-run",
-            "--no-zygote",
-            "--single-process",
-          ],
-          timeout: 120000, // Increase timeout to 2 minutes for restoration
-        },
-      });
+      try {
+        if (msg.isStatus) return;
 
-      // Set up event handlers before initialization
-      this.setupClientEvents(client, customerId);
+        const chat = await msg.getChat();
+        if (chat.isGroup) return;
 
-      // Update status before initialization
-      this.updateClientStatus(customerId, {
-        isReady: false,
-        isAuthenticated: false,
-        state: "INITIALIZING",
-      });
+        const contact = await msg.getContact();
 
-      // Store client reference before initialization
-      this.clients.set(customerId, client);
+        this.logger.info(
+          {
+            customerId,
+            from: msg.from,
+            fromMe: msg.fromMe,
+            body: msg.body,
+          },
+          "Message received"
+        );
 
-      // Initialize with longer timeout for restoration
-      const initPromise = client.initialize();
-      const timeoutPromise = new Promise((_, reject) => {
-        const timeout = setTimeout(() => {
-          reject(new Error("Session restoration timed out"));
-        }, 120000); // 2 minute timeout
-        this.initializationTimeouts.set(customerId, timeout);
-      });
-
-      await Promise.race([initPromise, timeoutPromise]).catch(async (error) => {
+        await this.conversationService.handleNewMessage(
+          customerId,
+          msg.id._serialized,
+          msg.fromMe,
+          msg.body,
+          {
+            phone: chat.id.user,
+            name: contact.name || undefined,
+            pushName: contact.pushname || undefined,
+          }
+        );
+      } catch (error) {
         this.logger.error(
           { err: error, customerId },
-          "Session restoration failed or timed out"
+          "Failed to handle message"
         );
-        await this.disconnectClient(customerId);
-        throw error;
+      }
+    });
+
+    client.on("disconnected", async (reason) => {
+      this.logger.warn({ customerId, reason }, "Client disconnected");
+      this.clientStatus.set(customerId, {
+        ...this.clientStatus.get(customerId)!,
+        isReady: false,
+        isAuthenticated: false,
       });
 
-      this.logger.info({ customerId }, "Session restored successfully");
-      return true;
+      // Try to reconnect after a delay
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+      try {
+        await this.setupClient(customerId);
+      } catch (error) {
+        this.logger.error(
+          { err: error, customerId },
+          "Failed to reconnect client"
+        );
+      }
+    });
+  }
+
+  private async setupClient(
+    customerId: string,
+    phoneNumber?: string
+  ): Promise<void> {
+    // Clean up existing client if any
+    const existingClient = this.clients.get(customerId);
+    if (existingClient) {
+      try {
+        await existingClient.destroy();
+      } catch (error) {
+        this.logger.warn(
+          { err: error, customerId },
+          "Error destroying existing client"
+        );
+      }
+      this.clients.delete(customerId);
+    }
+
+    const client = this.createClient(customerId);
+    this.setupClientEvents(client, customerId);
+
+    this.clients.set(customerId, client);
+    this.clientStatus.set(customerId, {
+      isReady: false,
+      isAuthenticated: false,
+      phoneNumber,
+    });
+
+    try {
+      await client.initialize();
+      this.logger.info({ customerId }, "Client initialized successfully");
     } catch (error) {
       this.logger.error(
         { err: error, customerId },
-        "Failed to restore WhatsApp session"
+        "Failed to initialize client"
       );
-      await this.disconnectClient(customerId);
-      return false;
+      this.clients.delete(customerId);
+      this.clientStatus.delete(customerId);
+      throw error;
     }
   }
 
@@ -171,222 +211,30 @@ export class WhatsappService {
     phoneNumber: string
   ): Promise<string | null> {
     try {
-      // Clean up any existing client
-      await this.disconnectClient(customerId);
-
-      this.logger.info(
-        { customerId, phoneNumber },
-        "Initializing new WhatsApp client"
-      );
-
-      const client = new Client({
-        authStrategy: new RemoteAuth({
-          store: new MongoStore({ mongoose: this.store }),
-          clientId: customerId,
-          backupSyncIntervalMs: 300 * 1000,
-        }),
-        puppeteer: {
-          args: ["--no-sandbox", "--disable-setuid-sandbox"],
-          timeout: 60000,
-        },
-      });
-
-      this.updateClientStatus(customerId, {
-        isReady: false,
-        isAuthenticated: false,
-        phoneNumber,
-        state: "INITIALIZING",
-        lastSeen: new Date(),
-      });
-
-      this.setupClientEvents(client, customerId);
-      this.clients.set(customerId, client);
-
-      await client.initialize();
-
-      // Set initialization timeout
-      const timeout = setTimeout(async () => {
-        const status = await this.getClientStatus(customerId);
-        if (
-          status.state === "INITIALIZING" ||
-          status.state === "WAITING_FOR_PAIRING"
-        ) {
-          this.logger.warn({ customerId }, "Client initialization timed out");
-          await this.disconnectClient(customerId);
-        }
-      }, 60000); // 60 second timeout
-
-      this.initializationTimeouts.set(customerId, timeout);
-
-      try {
-        const code = await client.requestPairingCode(phoneNumber);
-        this.updateClientStatus(customerId, { state: "WAITING_FOR_PAIRING" });
-        return code;
-      } catch (error) {
-        this.logger.error(
-          { err: error, customerId },
-          "Failed to generate pairing code"
-        );
-        await this.disconnectClient(customerId);
-        return null;
-      }
-    } catch (error) {
-      this.logger.error(
-        { err: error, customerId },
-        "Error in client initialization"
-      );
-      await this.disconnectClient(customerId);
-      return null;
-    }
-  }
-
-  async getPairingCode(
-    customerId: string,
-    phoneNumber: string
-  ): Promise<string | null> {
-    try {
+      await this.setupClient(customerId, phoneNumber);
       const client = this.clients.get(customerId);
-      const status = await this.getClientStatus(customerId);
-
-      if (
-        !client ||
-        status.state === "FAILED" ||
-        status.state === "DISCONNECTED"
-      ) {
-        // Try to reinitialize if client is in a bad state
-        return this.initializeClient(customerId, phoneNumber);
-      }
+      if (!client) throw new Error("Client not initialized");
 
       const code = await client.requestPairingCode(phoneNumber);
-      this.updateClientStatus(customerId, { state: "WAITING_FOR_PAIRING" });
       return code;
     } catch (error) {
       this.logger.error(
         { err: error, customerId },
-        "Error generating pairing code"
+        "Failed to initialize client"
       );
-      await this.disconnectClient(customerId);
       return null;
     }
   }
 
-  private setupClientEvents(client: Client, customerId: string) {
-    client.on("ready", () => {
-      this.logger.info({ customerId }, "WhatsApp client is ready");
-      this.clearInitializationTimeout(customerId);
-      this.updateClientStatus(customerId, {
-        isReady: true,
-        isAuthenticated: true,
-        state: "READY",
-      });
-    });
-
-    client.on("auth_failure", async () => {
-      this.logger.warn({ customerId }, "WhatsApp authentication failed");
-      this.updateClientStatus(customerId, {
-        isAuthenticated: false,
-        state: "FAILED",
-        error: "Authentication failed",
-      });
-      await this.disconnectClient(customerId);
-    });
-
-    client.on("authenticated", () => {
-      this.logger.info({ customerId }, "WhatsApp client authenticated");
-      this.updateClientStatus(customerId, {
-        isAuthenticated: true,
-        state: "AUTHENTICATING",
-      });
-    });
-
-    client.on("remote_session_saved", () => {
-      this.logger.info({ customerId }, "Remote WhatsApp session saved");
-    });
-
-    client.on("message_create", async (msg) => {
-      const chat = await msg.getChat();
-      if (chat.isGroup) {
-        this.logger.debug(
-          { customerId, chatId: chat.id },
-          "Ignoring group message"
-        );
-        return;
-      }
-
-      this.logger.debug(
-        { customerId, chatId: chat.id, messageId: msg.id },
-        "New message received"
-      );
-      this.updateClientStatus(customerId, { lastSeen: new Date() });
-    });
-
-    client.on("disconnected", async (reason) => {
-      this.logger.warn({ customerId, reason }, "WhatsApp client disconnected");
-      this.updateClientStatus(customerId, {
-        isReady: false,
-        isAuthenticated: false,
-        state: "DISCONNECTED",
-        error: reason,
-      });
-      await this.disconnectClient(customerId);
-    });
-  }
-
-  private clearInitializationTimeout(customerId: string) {
-    const timeout = this.initializationTimeouts.get(customerId);
-    if (timeout) {
-      clearTimeout(timeout);
-      this.initializationTimeouts.delete(customerId);
-    }
-  }
-
-  private updateClientStatus(
-    customerId: string,
-    updates: Partial<ClientStatus>
-  ) {
-    const currentStatus = this.clientStatus.get(customerId) || {
-      isReady: false,
-      isAuthenticated: false,
-      state: "INITIALIZING",
-    };
-    this.clientStatus.set(customerId, { ...currentStatus, ...updates });
-  }
-
-  async getClientStatus(customerId: string): Promise<ClientStatus> {
-    const status = this.clientStatus.get(customerId);
-    if (!status) {
-      return {
-        isReady: false,
-        isAuthenticated: false,
-        state: "DISCONNECTED",
-      };
-    }
-    return status;
+  async getClientStatus(customerId: string): Promise<ClientStatus | null> {
+    return this.clientStatus.get(customerId) || null;
   }
 
   async getAllClientsStatus(): Promise<Record<string, ClientStatus>> {
     const statuses: Record<string, ClientStatus> = {};
-    for (const [customerId] of this.clients) {
-      statuses[customerId] = await this.getClientStatus(customerId);
+    for (const [customerId, status] of this.clientStatus) {
+      statuses[customerId] = status;
     }
     return statuses;
-  }
-
-  async disconnectClient(customerId: string): Promise<boolean> {
-    this.clearInitializationTimeout(customerId);
-    const client = this.clients.get(customerId);
-    if (!client) return false;
-
-    try {
-      await client.destroy();
-    } catch (error) {
-      this.logger.error({ err: error, customerId }, "Error destroying client");
-    } finally {
-      // Clean up regardless of errors
-      this.clients.delete(customerId);
-      this.clientStatus.delete(customerId);
-      this.logger.info({ customerId }, "Client cleanup completed");
-    }
-    return true;
   }
 }
