@@ -1,5 +1,5 @@
-import { sleep } from "bun";
 import type { Mongoose } from "mongoose";
+import type { Db } from "mongodb";
 import { Client, RemoteAuth } from "whatsapp-web.js";
 import { MongoStore } from "wwebjs-mongo";
 import type { FastifyBaseLogger } from "fastify";
@@ -138,8 +138,13 @@ export class WhatsappService {
     });
   }
 
-  private async getSavedCustomerIds(): Promise<string[]> {
+  private getMongoDb(): Db | undefined {
     const db = this.mongooseConn.connection.db;
+    return db;
+  }
+
+  private async getSavedCustomerIds(): Promise<string[]> {
+    const db = this.getMongoDb();
     if (!db) {
       this.logger.error("MongoDB connection not found");
       return [];
@@ -192,6 +197,15 @@ export class WhatsappService {
     if (!clientDetails) return;
 
     await clientDetails.client.logout();
+    await clientDetails.client.destroy();
     this.clientsDetails.delete(customerId);
+
+    const db = this.getMongoDb();
+    if (!db) {
+      this.logger.error("MongoDB connection not found");
+      return;
+    }
+    await db.dropCollection(`whatsapp-RemoteAuth-${customerId}.files`);
+    await db.dropCollection(`whatsapp-RemoteAuth-${customerId}.chunks`);
   }
 }

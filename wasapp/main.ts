@@ -98,7 +98,7 @@ async function main() {
 
     const clientDetails = whatsappService.getClientDetails(customerId);
     if (!clientDetails) {
-      res.status(404);
+      res.status(404).send();
       return;
     }
 
