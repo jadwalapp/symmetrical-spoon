@@ -83,25 +83,36 @@ async function main() {
     }
   });
 
-  app.get("/wasapp/status", (req, res) => {
-    const allClientDetails = whatsappService.getAllClientDetails();
-
-    const statusObject = Object.fromEntries(
-      Array.from(allClientDetails.entries()).map(([id, details]) => [
-        id,
-        {
-          status: details.status,
-          phoneNumber: details.phoneNumber,
-          name: details.name,
-          pairingCode: details.pairingCode,
-          isReady: details.status === "READY",
-          isAuthenticated: ["AUTHENTICATED", "READY"].includes(details.status),
+  const wasappStatusOpts: RouteShorthandOptions = {
+    schema: {
+      params: {
+        type: "object",
+        properties: {
+          customerId: { type: "string" },
         },
-      ])
-    );
+      },
+    },
+  };
+  app.get("/wasapp/status/:customerId", wasappStatusOpts, (req, res) => {
+    const { customerId } = req.params as { customerId: string };
+
+    const clientDetails = whatsappService.getClientDetails(customerId);
+    if (!clientDetails) {
+      res.status(404);
+      return;
+    }
 
     res.send({
-      clients: statusObject,
+      client: {
+        status: clientDetails.status,
+        phoneNumber: clientDetails.phoneNumber,
+        name: clientDetails.name,
+        pairingCode: clientDetails.pairingCode,
+        isReady: clientDetails.status === "READY",
+        isAuthenticated: ["AUTHENTICATED", "READY"].includes(
+          clientDetails.status
+        ),
+      },
       timestamp: new Date().toISOString(),
     });
   });
