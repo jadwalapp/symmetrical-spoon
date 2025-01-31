@@ -12,9 +12,21 @@ async function main() {
   const mongooseConn = await mongoose.connect(cfg.mongodb.uri, {
     dbName: cfg.mongodb.database,
   });
-  const whatsappService = new WhatsappService(mongooseConn);
 
-  const app = fastify();
+  const app = fastify({
+    logger: {
+      level: "info",
+      transport: {
+        target: "pino-pretty",
+        options: {
+          translateTime: "HH:MM:ss Z",
+          ignore: "pid,hostname",
+        },
+      },
+    },
+  });
+
+  const whatsappService = new WhatsappService(mongooseConn, app.log);
 
   app.get("/health", (req, res) => {
     res.status(200).send("ok");
@@ -57,10 +69,17 @@ async function main() {
         customerId,
         phoneNumber
       );
+      if (!pairingCode) {
+        throw new Error("Failed to get pairing code");
+      }
 
       res.send({ pairingCode: pairingCode });
     } catch (error) {
-      res.status(500).send({ error: error });
+      req.log.error({ error }, "Failed to initialize WhatsApp client");
+      res.status(500).send({
+        error:
+          error instanceof Error ? error.message : "Unknown error occurred",
+      });
     }
   });
 
@@ -75,11 +94,16 @@ async function main() {
           phoneNumber: details.phoneNumber,
           name: details.name,
           pairingCode: details.pairingCode,
+          isReady: details.status === "READY",
+          isAuthenticated: ["AUTHENTICATED", "READY"].includes(details.status),
         },
       ])
     );
 
-    res.send(statusObject);
+    res.send({
+      clients: statusObject,
+      timestamp: new Date().toISOString(),
+    });
   });
 
   const wasappDisconnectOpts: RouteShorthandOptions = {
@@ -109,6 +133,7 @@ async function main() {
 
       res.status(200);
     } catch (error) {
+      req.log.error({ error }, "Failed to disconnect WhatsApp client");
       res.status(500).send({ error: error });
     }
   });
@@ -117,7 +142,7 @@ async function main() {
     port: cfg.port,
     host: "0.0.0.0",
   });
-  console.log(`👂 listening on: ${listenUrl}`);
+  app.log.info(`👂 listening on: ${listenUrl}`);
 
   await whatsappService.initializeSavedClients();
 }
