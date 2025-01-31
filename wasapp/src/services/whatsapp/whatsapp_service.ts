@@ -1,240 +1,115 @@
+import type { Mongoose } from "mongoose";
 import { Client, RemoteAuth } from "whatsapp-web.js";
 import { MongoStore } from "wwebjs-mongo";
-import type { FastifyBaseLogger } from "fastify";
-import type { Mongoose } from "mongoose";
-import { ConversationService } from "../conversation/conversation_service";
-
-export interface ClientStatus {
-  isReady: boolean;
-  isAuthenticated: boolean;
-  phoneNumber?: string;
-}
 
 export class WhatsappService {
+  private mongooseConn: Mongoose;
   private clients: Map<string, Client>;
-  private clientStatus: Map<string, ClientStatus>;
-  private mongoStore: InstanceType<typeof MongoStore>;
-  private logger: FastifyBaseLogger;
-  private conversationService: ConversationService;
-
-  constructor(store: Mongoose, logger: FastifyBaseLogger) {
-    this.clients = new Map();
-    this.clientStatus = new Map();
-    this.logger = logger;
-    this.mongoStore = new MongoStore({ mongoose: store });
-    this.conversationService = new ConversationService(logger);
+  constructor(mongooseConn: Mongoose) {
+    this.mongooseConn = mongooseConn;
+    this.clients = new Map<string, Client>();
   }
 
-  async initializeService() {
-    try {
-      const collections = await this.mongoStore.mongoose.connection.db
-        .listCollections()
-        .toArray();
-      const customerIds = new Set<string>();
-
-      collections.forEach((col: any) => {
-        const match = col.name.match(/^whatsapp-RemoteAuth-(.+?)\.files$/);
-        if (match && match[1]) {
-          customerIds.add(match[1]);
-        }
-      });
-
-      this.logger.info(
-        { customerIds: Array.from(customerIds) },
-        "Found WhatsApp sessions"
-      );
-
-      for (const customerId of customerIds) {
-        try {
-          await this.setupClient(customerId);
-          await new Promise((resolve) => setTimeout(resolve, 2000));
-        } catch (error) {
-          this.logger.error(
-            { err: error, customerId },
-            "Failed to restore client"
-          );
-        }
-      }
-    } catch (error) {
-      this.logger.error({ err: error }, "Failed to initialize service");
-    }
-  }
-
-  private createClient(customerId: string): Client {
-    return new Client({
+  async initialize(
+    customerId: string,
+    phoneNumber: string | null
+  ): Promise<string | null> {
+    const client = new Client({
       authStrategy: new RemoteAuth({
-        store: this.mongoStore,
+        store: new MongoStore({ mongoose: this.mongooseConn }),
         clientId: customerId,
         backupSyncIntervalMs: 60 * 1000,
       }),
       puppeteer: {
-        args: ["--no-sandbox"],
         headless: false,
-        timeout: 0,
       },
     });
-  }
-
-  private setupClientEvents(client: Client, customerId: string) {
-    client.on("ready", () => {
-      this.logger.info({ customerId }, "Client is ready");
-      this.clientStatus.set(customerId, {
-        ...this.clientStatus.get(customerId)!,
-        isReady: true,
-      });
-    });
-
-    client.on("authenticated", () => {
-      this.logger.info({ customerId }, "Client authenticated");
-      this.clientStatus.set(customerId, {
-        ...this.clientStatus.get(customerId)!,
-        isAuthenticated: true,
-      });
-    });
-
-    client.on("auth_failure", () => {
-      this.logger.warn({ customerId }, "Authentication failed");
-      this.clientStatus.set(customerId, {
-        ...this.clientStatus.get(customerId)!,
-        isAuthenticated: false,
-        isReady: false,
-      });
-    });
-
-    client.on("message_create", async (msg) => {
-      if (!this.clientStatus.get(customerId)?.isReady) {
-        return;
-      }
-
-      try {
-        if (msg.isStatus) return;
-
-        const chat = await msg.getChat();
-        if (chat.isGroup) return;
-
-        const contact = await msg.getContact();
-
-        this.logger.info(
-          {
-            customerId,
-            from: msg.from,
-            fromMe: msg.fromMe,
-            body: msg.body,
-          },
-          "Message received"
-        );
-
-        await this.conversationService.handleNewMessage(
-          customerId,
-          msg.id._serialized,
-          msg.fromMe,
-          msg.body,
-          {
-            phone: chat.id.user,
-            name: contact.name || undefined,
-            pushName: contact.pushname || undefined,
-          }
-        );
-      } catch (error) {
-        this.logger.error(
-          { err: error, customerId },
-          "Failed to handle message"
-        );
-      }
-    });
-
-    client.on("disconnected", async (reason) => {
-      this.logger.warn({ customerId, reason }, "Client disconnected");
-      this.clientStatus.set(customerId, {
-        ...this.clientStatus.get(customerId)!,
-        isReady: false,
-        isAuthenticated: false,
-      });
-
-      // Try to reconnect after a delay
-      await new Promise((resolve) => setTimeout(resolve, 5000));
-      try {
-        await this.setupClient(customerId);
-      } catch (error) {
-        this.logger.error(
-          { err: error, customerId },
-          "Failed to reconnect client"
-        );
-      }
-    });
-  }
-
-  private async setupClient(
-    customerId: string,
-    phoneNumber?: string
-  ): Promise<void> {
-    // Clean up existing client if any
-    const existingClient = this.clients.get(customerId);
-    if (existingClient) {
-      try {
-        await existingClient.destroy();
-      } catch (error) {
-        this.logger.warn(
-          { err: error, customerId },
-          "Error destroying existing client"
-        );
-      }
-      this.clients.delete(customerId);
-    }
-
-    const client = this.createClient(customerId);
-    this.setupClientEvents(client, customerId);
-
     this.clients.set(customerId, client);
-    this.clientStatus.set(customerId, {
-      isReady: false,
-      isAuthenticated: false,
-      phoneNumber,
+    this.setupClientEvents(client, phoneNumber);
+    client.initialize();
+
+    // TODO: return the pairing code from here :D
+    return null;
+  }
+
+  private setupClientEvents(client: Client, phoneNumber: string | null) {
+    client.on("change_state", (state) => {
+      console.log(`👀 state changed: ${state}`);
     });
 
-    try {
-      await client.initialize();
-      this.logger.info({ customerId }, "Client initialized successfully");
-    } catch (error) {
-      this.logger.error(
-        { err: error, customerId },
-        "Failed to initialize client"
+    client.on("ready", () => {
+      console.log("✅ client is ready!");
+    });
+
+    client.on("authenticated", (session) => {
+      console.log(
+        `🛡️ client is authenticated! | session: ${
+          session && JSON.stringify(session)
+        }`
       );
-      this.clients.delete(customerId);
-      this.clientStatus.delete(customerId);
-      throw error;
-    }
+    });
+
+    client.on("message", (msg) => {
+      console.log("🫧🫧🫧🫧🫧🫧🫧🫧🫧");
+      console.log(`🫧 message received | msg: ${JSON.stringify(msg)}`);
+    });
+
+    client.on("message_create", (msg) => {
+      console.log("🫧🫧🫧🫧🫧🫧🫧🫧🫧");
+      console.log(`🫧 message created | msg: ${JSON.stringify(msg)}`);
+    });
+
+    client.on("auth_failure", (msg) => {
+      console.log(`❌ auth failure | msg: ${msg}`);
+    });
+
+    client.on("disconnected", (reason) => {
+      console.log(`❌ client disconnected | reason: ${reason}`);
+    });
+
+    client.on("loading_screen", (percent, msg) => {
+      console.log(`⏳ loading screen | percent: ${percent} | msg: ${msg}`);
+    });
+
+    client.on("qr", async (qr) => {
+      console.log(`qr code received | qr: ${qr}`);
+
+      if (phoneNumber != null) {
+        const pairingCode = await client.requestPairingCode(phoneNumber, true);
+        console.log(`↔️ pairing code received: ${pairingCode}`);
+      }
+    });
+
+    client.on("remote_session_saved", () => {
+      console.log(`remote session saved`);
+    });
   }
 
-  async initializeClient(
-    customerId: string,
-    phoneNumber: string
-  ): Promise<string | null> {
-    try {
-      await this.setupClient(customerId, phoneNumber);
-      const client = this.clients.get(customerId);
-      if (!client) throw new Error("Client not initialized");
-
-      const code = await client.requestPairingCode(phoneNumber);
-      return code;
-    } catch (error) {
-      this.logger.error(
-        { err: error, customerId },
-        "Failed to initialize client"
-      );
-      return null;
+  private async getSavedCustomerIds(): Promise<string[]> {
+    const db = this.mongooseConn.connection.db;
+    if (!db) {
+      console.error("sheet, no db found :D");
+      return [];
     }
+
+    const collections = await db.listCollections().toArray();
+    const filteredCollections = collections.filter(
+      (col) =>
+        col.name.startsWith("whatsapp-RemoteAuth-") &&
+        col.name.endsWith(".files")
+    );
+
+    const customerIds = filteredCollections.map((col) =>
+      col.name.replace("whatsapp-RemoteAuth-", "").replace(".files", "")
+    );
+
+    return customerIds;
   }
 
-  async getClientStatus(customerId: string): Promise<ClientStatus | null> {
-    return this.clientStatus.get(customerId) || null;
-  }
-
-  async getAllClientsStatus(): Promise<Record<string, ClientStatus>> {
-    const statuses: Record<string, ClientStatus> = {};
-    for (const [customerId, status] of this.clientStatus) {
-      statuses[customerId] = status;
-    }
-    return statuses;
+  async initializeSavedClients() {
+    const customerIds = await this.getSavedCustomerIds();
+    customerIds.forEach(async (customerId) => {
+      await this.initialize(customerId, null);
+    });
   }
 }

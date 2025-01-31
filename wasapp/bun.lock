@@ -7,7 +7,7 @@
         "dotenv": "^16.4.7",
         "fastify": "^5.2.1",
         "mongoose": "^8.9.5",
-        "whatsapp-web.js": "^1.26.0",
+        "whatsapp-web.js": "git@github.com:pedroslopez/whatsapp-web.js.git",
         "wwebjs-mongo": "^1.1.0",
       },
       "devDependencies": {
@@ -420,7 +420,7 @@
 
     "webidl-conversions": ["webidl-conversions@3.0.1", "", {}, "sha512-2JAn3z8AR6rjK8Sm8orRC0h/bcl/DqL7tRPdGZ4I1CjdF+EaMLmYxBHyXuKL849eucPFhvBoxMsflfOb8kxaeQ=="],
 
-    "whatsapp-web.js": ["whatsapp-web.js@1.26.0", "", { "dependencies": { "@pedroslopez/moduleraid": "^5.0.2", "fluent-ffmpeg": "2.1.2", "mime": "^3.0.0", "node-fetch": "^2.6.9", "node-webpmux": "3.1.7", "puppeteer": "^18.2.1" }, "optionalDependencies": { "archiver": "^5.3.1", "fs-extra": "^10.1.0", "unzipper": "^0.10.11" } }, "sha512-JUbpwVmJE427KgYIXju+ycHq65SNnXkAsoWwnEUpyI4E0O45S5aG1stRML7aGJxVb6aycTR+hLrTlEiygsNJug=="],
+    "whatsapp-web.js": ["whatsapp-web.js@git+ssh://git@github.com:pedroslopez/whatsapp-web.js.git#f56d25f1c4cca15cb708b3e8b5532584c4bdf572", { "dependencies": { "@pedroslopez/moduleraid": "^5.0.2", "fluent-ffmpeg": "2.1.2", "mime": "^3.0.0", "node-fetch": "^2.6.9", "node-webpmux": "3.1.7", "puppeteer": "^18.2.1" }, "optionalDependencies": { "archiver": "^5.3.1", "fs-extra": "^10.1.0", "unzipper": "^0.10.11" } }, "f56d25f1c4cca15cb708b3e8b5532584c4bdf572"],
 
     "whatwg-url": ["whatwg-url@5.0.0", "", { "dependencies": { "tr46": "~0.0.3", "webidl-conversions": "^3.0.0" } }, "sha512-saE57nupxk6v3HY35+jzBwYa0rKSy0XR8JSxZPwgLr7ys0IBzhGviA1/TUGJLmSVqs8pb9AnvICXEuOHLprYTw=="],
 

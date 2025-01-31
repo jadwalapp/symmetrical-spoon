@@ -1,32 +1,23 @@
-import Fastify, { type RouteShorthandOptions } from "fastify";
-import { getConfig } from "./src/config/config";
+import fastify, { type RouteShorthandOptions } from "fastify";
 import { WhatsappService } from "./src/services/whatsapp/whatsapp_service";
 import mongoose from "mongoose";
+import { getConfig } from "./src/config/config";
 
 async function main() {
-  const config = getConfig();
-  const app = Fastify({
-    logger: true,
-    requestTimeout: 30000,
+  const cfg = getConfig();
+
+  const mongooseConn = await mongoose.connect(cfg.mongodb.uri, {
+    dbName: cfg.mongodb.database,
+  });
+  const whatsappService = new WhatsappService(mongooseConn);
+
+  const app = fastify();
+
+  app.get("/health", (req, res) => {
+    res.status(200).send("ok");
   });
 
-  const mongooseConn = await mongoose.connect(config.mongodb.uri, {
-    dbName: config.mongodb.database,
-  });
-
-  const whatsappService = new WhatsappService(mongooseConn, app.log);
-  await whatsappService.initializeService();
-
-  app.get("/", function (request, reply) {
-    reply.send({ hello: "world" });
-  });
-
-  interface WhatsappInitializeBody {
-    customerId: string;
-    phoneNumber: string;
-  }
-
-  const whatsappInitializeOpts: RouteShorthandOptions = {
+  const wasappInitializeOpts: RouteShorthandOptions = {
     schema: {
       body: {
         type: "object",
@@ -52,105 +43,39 @@ async function main() {
       },
     },
   };
-
-  app.post(
-    "/whatsapp/initialize",
-    whatsappInitializeOpts,
-    async (request, reply) => {
-      const { customerId, phoneNumber } =
-        request.body as WhatsappInitializeBody;
-
-      try {
-        const pairingCode = await whatsappService.initializeClient(
-          customerId,
-          phoneNumber
-        );
-        if (pairingCode === null) {
-          return reply.status(500).send({
-            error: "Failed to initialize WhatsApp client",
-          });
-        }
-
-        return reply.send({ pairingCode });
-      } catch (error) {
-        request.log.error(error);
-        return reply.status(500).send({
-          error: "Internal server error",
-        });
-      }
-    }
-  );
-
-  const statusOpts: RouteShorthandOptions = {
-    schema: {
-      querystring: {
-        type: "object",
-        properties: {
-          customerId: { type: "string" },
-        },
-      },
-      response: {
-        200: {
-          type: "object",
-          properties: {
-            customerId: { type: "string" },
-            status: {
-              type: "object",
-              properties: {
-                isReady: { type: "boolean" },
-                isAuthenticated: { type: "boolean" },
-                phoneNumber: { type: "string", nullable: true },
-              },
-            },
-            clients: {
-              type: "object",
-              additionalProperties: {
-                type: "object",
-                properties: {
-                  isReady: { type: "boolean" },
-                  isAuthenticated: { type: "boolean" },
-                  phoneNumber: { type: "string", nullable: true },
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-  };
-
-  app.get("/whatsapp/status", statusOpts, async function (request, reply) {
+  app.post("/wasapp/initialize", wasappInitializeOpts, async (req, res) => {
     try {
-      const { customerId } = request.query as { customerId?: string };
+      const { customerId, phoneNumber } = req.body as {
+        customerId: string;
+        phoneNumber: string;
+      };
 
-      if (customerId) {
-        const status = await whatsappService.getClientStatus(customerId);
-        return reply.send({
-          customerId,
-          status,
-        });
-      }
+      const pairingCode = await whatsappService.initialize(
+        customerId,
+        phoneNumber
+      );
 
-      const statuses = await whatsappService.getAllClientsStatus();
-      return reply.send({ clients: statuses });
+      res.send({ pairingCode: pairingCode });
     } catch (error) {
-      request.log.error(error);
-      return reply.status(500).send({
-        error: "Internal server error",
-      });
+      res.status(500).send({ error: error });
     }
   });
 
-  try {
-    await app.listen({ port: config.port, host: "0.0.0.0" });
-    console.log(`Server is running on port ${config.port}`);
-  } catch (err) {
-    app.log.error(err);
-    process.exit(1);
-  }
+  app.get("/wasapp/status", (req, res) => {
+    res.send("not implemented :D");
+  });
+
+  app.post("/wasapp/disconnect", (req, res) => {
+    res.send("not implemented :D");
+  });
+
+  const listenUrl = await app.listen({
+    port: cfg.port,
+    host: "0.0.0.0",
+  });
+  console.log(`👂 listening on: ${listenUrl}`);
+
+  await whatsappService.initializeSavedClients();
 }
 
-main().catch((err) => {
-  console.error("Fatal error:", err);
-  process.exit(1);
-});
+main();

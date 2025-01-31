@@ -16,7 +16,7 @@
     "fastify": "^5.2.1",
     "mongoose": "^8.9.5",
     "wwebjs-mongo": "^1.1.0",
-    "whatsapp-web.js": "^1.26.0"
+    "whatsapp-web.js": "git@github.com:jadwalapp/whatsapp-web.js.git"
   },
   "devDependencies": {
     "typescript": "^5.7.3",
