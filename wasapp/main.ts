@@ -26,7 +26,11 @@ async function main() {
     },
   });
 
-  const whatsappService = new WhatsappService(mongooseConn, app.log);
+  const whatsappService = new WhatsappService(
+    mongooseConn,
+    app.log,
+    cfg.isHeadless
+  );
 
   app.get("/health", (req, res) => {
     res.status(200).send("ok");

@@ -4,6 +4,7 @@ export interface WasappConfig {
     uri: string;
     database: string;
   };
+  isHeadless: boolean;
 }
 
 export function getConfig(): WasappConfig {
@@ -15,5 +16,6 @@ export function getConfig(): WasappConfig {
       uri: envStuff.MONGODB_URI || "mongodb://localhost:27017",
       database: envStuff.MONGODB_DATABASE || "wasapp",
     },
+    isHeadless: envStuff.IS_HEADLESS === "true",
   };
 }

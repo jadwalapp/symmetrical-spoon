@@ -27,20 +27,6 @@ services:
     # ports:
     #   - ${POSTGRES_PORT}:${POSTGRES_PORT}
 
-  rabbitmq:
-    restart: always
-
-  wasapp:
-    image: ghcr.io/jadwalapp/symmetrical-spoon/wasapp:main
-    restart: always
-    labels:
-      - "traefik.enable=true"
-      - "traefik.docker.network=symmetrical-spoon_web"
-      - "traefik.http.routers.wasapp.rule=Host(`${WASAPP_HOST}`)"
-      - "traefik.http.routers.wasapp.entrypoints=websecure"
-      - "traefik.http.routers.wasapp.tls.certresolver=myresolver"
-      - "traefik.http.services.wasapp.loadbalancer.server.port=3000"
-
   falak:
     image: ghcr.io/jadwalapp/symmetrical-spoon/falak:main
     restart: always
@@ -84,6 +70,10 @@ services:
       - "traefik.http.services.baikal.loadbalancer.server.port=80"
 
   mongodb:
+    restart: always
+
+  wasapp:
+    image: ghcr.io/jadwalapp/symmetrical-spoon/wasapp:main
     restart: always
 
 volumes:

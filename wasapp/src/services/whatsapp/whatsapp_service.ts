@@ -21,11 +21,17 @@ export class WhatsappService {
   private mongooseConn: Mongoose;
   private clientsDetails: Map<string, ClientDetails>;
   private logger: FastifyBaseLogger;
+  private makeHeadlessClients: boolean;
 
-  constructor(mongooseConn: Mongoose, logger: FastifyBaseLogger) {
+  constructor(
+    mongooseConn: Mongoose,
+    logger: FastifyBaseLogger,
+    makeHeadlessClients: boolean
+  ) {
     this.mongooseConn = mongooseConn;
     this.clientsDetails = new Map<string, ClientDetails>();
     this.logger = logger;
+    this.makeHeadlessClients = makeHeadlessClients;
   }
 
   async initialize(
@@ -40,10 +46,11 @@ export class WhatsappService {
       }),
       webVersion: "2.3000.1019739601",
       puppeteer: {
-        headless: false,
+        headless: this.makeHeadlessClients,
         handleSIGINT: true,
         handleSIGTERM: false,
         handleSIGHUP: false,
+        args: ["--no-sandbox", "--disable-setuid-sandbox"],
       },
     });
 
@@ -105,7 +112,7 @@ export class WhatsappService {
     });
 
     client.on("message_create", (msg) => {
-      this.logger.debug({ customerId, msg }, "WhatsApp message created");
+      this.logger.info({ customerId, msg }, "WhatsApp message created");
     });
 
     client.on("auth_failure", async (msg) => {

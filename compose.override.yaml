@@ -20,21 +20,6 @@ services:
     ports:
       - ${POSTGRES_PORT}:${POSTGRES_PORT}
 
-  rabbitmq:
-    ports:
-      - "5672:5672" # AMQP protocol port
-      - "15672:15672" # Management UI
-
-  wasapp:
-    labels:
-      - "traefik.enable=true"
-      - "traefik.docker.network=symmetrical-spoon_web"
-      - "traefik.http.routers.wasapp.rule=Host(`${WASAPP_HOST}`)"
-      - "traefik.http.routers.wasapp.entrypoints=web"
-      - "traefik.http.services.wasapp.loadbalancer.server.port=3000"
-    ports:
-      - "3000:3000"
-
   falak:
     labels:
       - "traefik.enable=true"
@@ -79,6 +64,11 @@ services:
     ports:
       - 27017:27017
 
+  wasapp:
+    ports:
+      - 3000:3000
+
+  # extra stuff - only local
   plantuml:
     image: plantuml/plantuml-server:jetty
     labels:
