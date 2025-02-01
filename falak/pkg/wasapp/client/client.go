@@ -17,7 +17,11 @@ type client struct {
 
 func (c *client) Initialize(ctx context.Context, r *InitializeRequest) (*InitializeResponse, error) {
 	url := fmt.Sprintf("%s/wasapp/initialize", c.baseUrl)
-	resp, err := c.cli.Post(url, r, nil)
+	headers := map[string]string{
+		"Content-Type": "application/json",
+	}
+
+	resp, err := c.cli.Post(url, r, headers)
 	if err != nil {
 		log.Err(err).Msg("failed to initialize in wasapp")
 		return nil, err
@@ -40,7 +44,8 @@ func (c *client) Initialize(ctx context.Context, r *InitializeRequest) (*Initial
 
 func (c *client) GetStatus(ctx context.Context, r *GetStatusRequest) (*GetStatusResponse, error) {
 	url := fmt.Sprintf("%s/wasapp/status/%s", c.baseUrl, r.CustomerId)
-	resp, err := c.cli.Post(url, r, nil)
+
+	resp, err := c.cli.Get(url, nil, nil)
 	if err != nil {
 		log.Err(err).Msg("failed to initialize in wasapp")
 		return nil, err
@@ -63,7 +68,11 @@ func (c *client) GetStatus(ctx context.Context, r *GetStatusRequest) (*GetStatus
 
 func (c *client) Disconnect(ctx context.Context, r *DisconnectRequest) (*DisconnectResponse, error) {
 	url := fmt.Sprintf("%s/wasapp/disconnect", c.baseUrl)
-	resp, err := c.cli.Post(url, r, nil)
+	headers := map[string]string{
+		"Content-Type": "application/json",
+	}
+
+	resp, err := c.cli.Post(url, r, headers)
 	if err != nil {
 		log.Err(err).Msg("failed to disconnect from wasapp")
 		return nil, err

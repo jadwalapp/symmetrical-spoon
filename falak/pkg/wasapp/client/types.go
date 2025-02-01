@@ -14,12 +14,12 @@ type GetStatusRequest struct {
 	CustomerId string `json:"customerId"`
 }
 type GetStatusClientDetails struct {
-	Status          string `json:"status"`
-	PhoneNumber     string `json:"phoneNumber"`
-	Name            string `json:"name"`
-	PairingCode     string `json:"pairingCode"`
-	IsReady         string `json:"isReady"`
-	IsAuthenticated string `json:"isAuthenticated"`
+	Status          string  `json:"status"`
+	PhoneNumber     string  `json:"phoneNumber"`
+	Name            string  `json:"name"`
+	PairingCode     *string `json:"pairingCode"`
+	IsReady         bool    `json:"isReady"`
+	IsAuthenticated bool    `json:"isAuthenticated"`
 }
 type GetStatusResponse struct {
 	ClientDetails GetStatusClientDetails `json:"client"`

@@ -41,6 +41,9 @@ export class WhatsappService {
       webVersion: "2.3000.1019739601",
       puppeteer: {
         headless: false,
+        handleSIGINT: true,
+        handleSIGTERM: false,
+        handleSIGHUP: false,
       },
     });
 
@@ -124,13 +127,6 @@ export class WhatsappService {
         { customerId, percent, msg },
         "WhatsApp loading screen update"
       );
-    });
-
-    client.on("qr", async (_) => {
-      if (phoneNumber !== null) {
-        const pairingCode = await client.requestPairingCode(phoneNumber, true);
-        this.updateClientDetails(customerId, { pairingCode: pairingCode });
-      }
     });
 
     client.on("remote_session_saved", () => {
