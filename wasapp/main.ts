@@ -79,7 +79,11 @@ async function main() {
 
       res.send({ pairingCode: pairingCode });
     } catch (error) {
-      req.log.error({ error }, "Failed to initialize WhatsApp client");
+      console.log(`we got this error: ${error}`);
+      req.log.error(
+        { error: JSON.stringify(error) },
+        "Failed to initialize WhatsApp client"
+      );
       res.status(500).send({
         error:
           error instanceof Error ? error.message : "Unknown error occurred",
