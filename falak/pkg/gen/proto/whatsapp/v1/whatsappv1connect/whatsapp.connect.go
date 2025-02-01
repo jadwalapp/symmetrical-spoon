@@ -21,8 +21,8 @@ import (
 const _ = connect.IsAtLeastVersion1_13_0
 
 const (
-	// ProfileServiceName is the fully-qualified name of the ProfileService service.
-	ProfileServiceName = "whatsapp.v1.ProfileService"
+	// WhatsappServiceName is the fully-qualified name of the WhatsappService service.
+	WhatsappServiceName = "whatsapp.v1.WhatsappService"
 )
 
 // These constants are the fully-qualified names of the RPCs defined in this package. They're
@@ -33,179 +33,149 @@ const (
 // reflection-formatted method names, remove the leading slash and convert the remaining slash to a
 // period.
 const (
-	// ProfileServiceInitiateConnectWhatsappAccountProcedure is the fully-qualified name of the
-	// ProfileService's InitiateConnectWhatsappAccount RPC.
-	ProfileServiceInitiateConnectWhatsappAccountProcedure = "/whatsapp.v1.ProfileService/InitiateConnectWhatsappAccount"
-	// ProfileServiceCompleteConnectWhatsappAccountProcedure is the fully-qualified name of the
-	// ProfileService's CompleteConnectWhatsappAccount RPC.
-	ProfileServiceCompleteConnectWhatsappAccountProcedure = "/whatsapp.v1.ProfileService/CompleteConnectWhatsappAccount"
-	// ProfileServiceRemoveWhatsappAccountConnectionProcedure is the fully-qualified name of the
-	// ProfileService's RemoveWhatsappAccountConnection RPC.
-	ProfileServiceRemoveWhatsappAccountConnectionProcedure = "/whatsapp.v1.ProfileService/RemoveWhatsappAccountConnection"
-	// ProfileServiceGetWhatsappAccountProcedure is the fully-qualified name of the ProfileService's
+	// WhatsappServiceConnectWhatsappAccountProcedure is the fully-qualified name of the
+	// WhatsappService's ConnectWhatsappAccount RPC.
+	WhatsappServiceConnectWhatsappAccountProcedure = "/whatsapp.v1.WhatsappService/ConnectWhatsappAccount"
+	// WhatsappServiceDisconnectWhatsappAccountProcedure is the fully-qualified name of the
+	// WhatsappService's DisconnectWhatsappAccount RPC.
+	WhatsappServiceDisconnectWhatsappAccountProcedure = "/whatsapp.v1.WhatsappService/DisconnectWhatsappAccount"
+	// WhatsappServiceGetWhatsappAccountProcedure is the fully-qualified name of the WhatsappService's
 	// GetWhatsappAccount RPC.
-	ProfileServiceGetWhatsappAccountProcedure = "/whatsapp.v1.ProfileService/GetWhatsappAccount"
+	WhatsappServiceGetWhatsappAccountProcedure = "/whatsapp.v1.WhatsappService/GetWhatsappAccount"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
 var (
-	profileServiceServiceDescriptor                               = v1.File_whatsapp_v1_whatsapp_proto.Services().ByName("ProfileService")
-	profileServiceInitiateConnectWhatsappAccountMethodDescriptor  = profileServiceServiceDescriptor.Methods().ByName("InitiateConnectWhatsappAccount")
-	profileServiceCompleteConnectWhatsappAccountMethodDescriptor  = profileServiceServiceDescriptor.Methods().ByName("CompleteConnectWhatsappAccount")
-	profileServiceRemoveWhatsappAccountConnectionMethodDescriptor = profileServiceServiceDescriptor.Methods().ByName("RemoveWhatsappAccountConnection")
-	profileServiceGetWhatsappAccountMethodDescriptor              = profileServiceServiceDescriptor.Methods().ByName("GetWhatsappAccount")
+	whatsappServiceServiceDescriptor                         = v1.File_whatsapp_v1_whatsapp_proto.Services().ByName("WhatsappService")
+	whatsappServiceConnectWhatsappAccountMethodDescriptor    = whatsappServiceServiceDescriptor.Methods().ByName("ConnectWhatsappAccount")
+	whatsappServiceDisconnectWhatsappAccountMethodDescriptor = whatsappServiceServiceDescriptor.Methods().ByName("DisconnectWhatsappAccount")
+	whatsappServiceGetWhatsappAccountMethodDescriptor        = whatsappServiceServiceDescriptor.Methods().ByName("GetWhatsappAccount")
 )
 
-// ProfileServiceClient is a client for the whatsapp.v1.ProfileService service.
-type ProfileServiceClient interface {
-	InitiateConnectWhatsappAccount(context.Context, *connect.Request[v1.InitiateConnectWhatsappAccountRequest]) (*connect.Response[v1.InitiateConnectWhatsappAccountResponse], error)
-	CompleteConnectWhatsappAccount(context.Context, *connect.Request[v1.CompleteConnectWhatsappAccountRequest]) (*connect.Response[v1.CompleteConnectWhatsappAccountResponse], error)
+// WhatsappServiceClient is a client for the whatsapp.v1.WhatsappService service.
+type WhatsappServiceClient interface {
+	ConnectWhatsappAccount(context.Context, *connect.Request[v1.ConnectWhatsappAccountRequest]) (*connect.Response[v1.ConnectWhatsappAccountResponse], error)
 	// possible errors:
 	//   - not found
-	RemoveWhatsappAccountConnection(context.Context, *connect.Request[v1.RemoveWhatsappAccountConnectionRequest]) (*connect.Response[v1.RemoveWhatsappAccountConnectionResponse], error)
+	DisconnectWhatsappAccount(context.Context, *connect.Request[v1.DisconnectWhatsappAccountRequest]) (*connect.Response[v1.DisconnectWhatsappAccountResponse], error)
 	// possible errors:
 	//   - not found
 	GetWhatsappAccount(context.Context, *connect.Request[v1.GetWhatsappAccountRequest]) (*connect.Response[v1.GetWhatsappAccountResponse], error)
 }
 
-// NewProfileServiceClient constructs a client for the whatsapp.v1.ProfileService service. By
+// NewWhatsappServiceClient constructs a client for the whatsapp.v1.WhatsappService service. By
 // default, it uses the Connect protocol with the binary Protobuf Codec, asks for gzipped responses,
 // and sends uncompressed requests. To use the gRPC or gRPC-Web protocols, supply the
 // connect.WithGRPC() or connect.WithGRPCWeb() options.
 //
 // The URL supplied here should be the base URL for the Connect or gRPC server (for example,
 // http://api.acme.com or https://acme.com/grpc).
-func NewProfileServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) ProfileServiceClient {
+func NewWhatsappServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) WhatsappServiceClient {
 	baseURL = strings.TrimRight(baseURL, "/")
-	return &profileServiceClient{
-		initiateConnectWhatsappAccount: connect.NewClient[v1.InitiateConnectWhatsappAccountRequest, v1.InitiateConnectWhatsappAccountResponse](
+	return &whatsappServiceClient{
+		connectWhatsappAccount: connect.NewClient[v1.ConnectWhatsappAccountRequest, v1.ConnectWhatsappAccountResponse](
 			httpClient,
-			baseURL+ProfileServiceInitiateConnectWhatsappAccountProcedure,
-			connect.WithSchema(profileServiceInitiateConnectWhatsappAccountMethodDescriptor),
+			baseURL+WhatsappServiceConnectWhatsappAccountProcedure,
+			connect.WithSchema(whatsappServiceConnectWhatsappAccountMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
-		completeConnectWhatsappAccount: connect.NewClient[v1.CompleteConnectWhatsappAccountRequest, v1.CompleteConnectWhatsappAccountResponse](
+		disconnectWhatsappAccount: connect.NewClient[v1.DisconnectWhatsappAccountRequest, v1.DisconnectWhatsappAccountResponse](
 			httpClient,
-			baseURL+ProfileServiceCompleteConnectWhatsappAccountProcedure,
-			connect.WithSchema(profileServiceCompleteConnectWhatsappAccountMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
-		removeWhatsappAccountConnection: connect.NewClient[v1.RemoveWhatsappAccountConnectionRequest, v1.RemoveWhatsappAccountConnectionResponse](
-			httpClient,
-			baseURL+ProfileServiceRemoveWhatsappAccountConnectionProcedure,
-			connect.WithSchema(profileServiceRemoveWhatsappAccountConnectionMethodDescriptor),
+			baseURL+WhatsappServiceDisconnectWhatsappAccountProcedure,
+			connect.WithSchema(whatsappServiceDisconnectWhatsappAccountMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
 		getWhatsappAccount: connect.NewClient[v1.GetWhatsappAccountRequest, v1.GetWhatsappAccountResponse](
 			httpClient,
-			baseURL+ProfileServiceGetWhatsappAccountProcedure,
-			connect.WithSchema(profileServiceGetWhatsappAccountMethodDescriptor),
+			baseURL+WhatsappServiceGetWhatsappAccountProcedure,
+			connect.WithSchema(whatsappServiceGetWhatsappAccountMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
 	}
 }
 
-// profileServiceClient implements ProfileServiceClient.
-type profileServiceClient struct {
-	initiateConnectWhatsappAccount  *connect.Client[v1.InitiateConnectWhatsappAccountRequest, v1.InitiateConnectWhatsappAccountResponse]
-	completeConnectWhatsappAccount  *connect.Client[v1.CompleteConnectWhatsappAccountRequest, v1.CompleteConnectWhatsappAccountResponse]
-	removeWhatsappAccountConnection *connect.Client[v1.RemoveWhatsappAccountConnectionRequest, v1.RemoveWhatsappAccountConnectionResponse]
-	getWhatsappAccount              *connect.Client[v1.GetWhatsappAccountRequest, v1.GetWhatsappAccountResponse]
+// whatsappServiceClient implements WhatsappServiceClient.
+type whatsappServiceClient struct {
+	connectWhatsappAccount    *connect.Client[v1.ConnectWhatsappAccountRequest, v1.ConnectWhatsappAccountResponse]
+	disconnectWhatsappAccount *connect.Client[v1.DisconnectWhatsappAccountRequest, v1.DisconnectWhatsappAccountResponse]
+	getWhatsappAccount        *connect.Client[v1.GetWhatsappAccountRequest, v1.GetWhatsappAccountResponse]
 }
 
-// InitiateConnectWhatsappAccount calls whatsapp.v1.ProfileService.InitiateConnectWhatsappAccount.
-func (c *profileServiceClient) InitiateConnectWhatsappAccount(ctx context.Context, req *connect.Request[v1.InitiateConnectWhatsappAccountRequest]) (*connect.Response[v1.InitiateConnectWhatsappAccountResponse], error) {
-	return c.initiateConnectWhatsappAccount.CallUnary(ctx, req)
+// ConnectWhatsappAccount calls whatsapp.v1.WhatsappService.ConnectWhatsappAccount.
+func (c *whatsappServiceClient) ConnectWhatsappAccount(ctx context.Context, req *connect.Request[v1.ConnectWhatsappAccountRequest]) (*connect.Response[v1.ConnectWhatsappAccountResponse], error) {
+	return c.connectWhatsappAccount.CallUnary(ctx, req)
 }
 
-// CompleteConnectWhatsappAccount calls whatsapp.v1.ProfileService.CompleteConnectWhatsappAccount.
-func (c *profileServiceClient) CompleteConnectWhatsappAccount(ctx context.Context, req *connect.Request[v1.CompleteConnectWhatsappAccountRequest]) (*connect.Response[v1.CompleteConnectWhatsappAccountResponse], error) {
-	return c.completeConnectWhatsappAccount.CallUnary(ctx, req)
+// DisconnectWhatsappAccount calls whatsapp.v1.WhatsappService.DisconnectWhatsappAccount.
+func (c *whatsappServiceClient) DisconnectWhatsappAccount(ctx context.Context, req *connect.Request[v1.DisconnectWhatsappAccountRequest]) (*connect.Response[v1.DisconnectWhatsappAccountResponse], error) {
+	return c.disconnectWhatsappAccount.CallUnary(ctx, req)
 }
 
-// RemoveWhatsappAccountConnection calls whatsapp.v1.ProfileService.RemoveWhatsappAccountConnection.
-func (c *profileServiceClient) RemoveWhatsappAccountConnection(ctx context.Context, req *connect.Request[v1.RemoveWhatsappAccountConnectionRequest]) (*connect.Response[v1.RemoveWhatsappAccountConnectionResponse], error) {
-	return c.removeWhatsappAccountConnection.CallUnary(ctx, req)
-}
-
-// GetWhatsappAccount calls whatsapp.v1.ProfileService.GetWhatsappAccount.
-func (c *profileServiceClient) GetWhatsappAccount(ctx context.Context, req *connect.Request[v1.GetWhatsappAccountRequest]) (*connect.Response[v1.GetWhatsappAccountResponse], error) {
+// GetWhatsappAccount calls whatsapp.v1.WhatsappService.GetWhatsappAccount.
+func (c *whatsappServiceClient) GetWhatsappAccount(ctx context.Context, req *connect.Request[v1.GetWhatsappAccountRequest]) (*connect.Response[v1.GetWhatsappAccountResponse], error) {
 	return c.getWhatsappAccount.CallUnary(ctx, req)
 }
 
-// ProfileServiceHandler is an implementation of the whatsapp.v1.ProfileService service.
-type ProfileServiceHandler interface {
-	InitiateConnectWhatsappAccount(context.Context, *connect.Request[v1.InitiateConnectWhatsappAccountRequest]) (*connect.Response[v1.InitiateConnectWhatsappAccountResponse], error)
-	CompleteConnectWhatsappAccount(context.Context, *connect.Request[v1.CompleteConnectWhatsappAccountRequest]) (*connect.Response[v1.CompleteConnectWhatsappAccountResponse], error)
+// WhatsappServiceHandler is an implementation of the whatsapp.v1.WhatsappService service.
+type WhatsappServiceHandler interface {
+	ConnectWhatsappAccount(context.Context, *connect.Request[v1.ConnectWhatsappAccountRequest]) (*connect.Response[v1.ConnectWhatsappAccountResponse], error)
 	// possible errors:
 	//   - not found
-	RemoveWhatsappAccountConnection(context.Context, *connect.Request[v1.RemoveWhatsappAccountConnectionRequest]) (*connect.Response[v1.RemoveWhatsappAccountConnectionResponse], error)
+	DisconnectWhatsappAccount(context.Context, *connect.Request[v1.DisconnectWhatsappAccountRequest]) (*connect.Response[v1.DisconnectWhatsappAccountResponse], error)
 	// possible errors:
 	//   - not found
 	GetWhatsappAccount(context.Context, *connect.Request[v1.GetWhatsappAccountRequest]) (*connect.Response[v1.GetWhatsappAccountResponse], error)
 }
 
-// NewProfileServiceHandler builds an HTTP handler from the service implementation. It returns the
+// NewWhatsappServiceHandler builds an HTTP handler from the service implementation. It returns the
 // path on which to mount the handler and the handler itself.
 //
 // By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
 // and JSON codecs. They also support gzip compression.
-func NewProfileServiceHandler(svc ProfileServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
-	profileServiceInitiateConnectWhatsappAccountHandler := connect.NewUnaryHandler(
-		ProfileServiceInitiateConnectWhatsappAccountProcedure,
-		svc.InitiateConnectWhatsappAccount,
-		connect.WithSchema(profileServiceInitiateConnectWhatsappAccountMethodDescriptor),
+func NewWhatsappServiceHandler(svc WhatsappServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
+	whatsappServiceConnectWhatsappAccountHandler := connect.NewUnaryHandler(
+		WhatsappServiceConnectWhatsappAccountProcedure,
+		svc.ConnectWhatsappAccount,
+		connect.WithSchema(whatsappServiceConnectWhatsappAccountMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
-	profileServiceCompleteConnectWhatsappAccountHandler := connect.NewUnaryHandler(
-		ProfileServiceCompleteConnectWhatsappAccountProcedure,
-		svc.CompleteConnectWhatsappAccount,
-		connect.WithSchema(profileServiceCompleteConnectWhatsappAccountMethodDescriptor),
+	whatsappServiceDisconnectWhatsappAccountHandler := connect.NewUnaryHandler(
+		WhatsappServiceDisconnectWhatsappAccountProcedure,
+		svc.DisconnectWhatsappAccount,
+		connect.WithSchema(whatsappServiceDisconnectWhatsappAccountMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
-	profileServiceRemoveWhatsappAccountConnectionHandler := connect.NewUnaryHandler(
-		ProfileServiceRemoveWhatsappAccountConnectionProcedure,
-		svc.RemoveWhatsappAccountConnection,
-		connect.WithSchema(profileServiceRemoveWhatsappAccountConnectionMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
-	profileServiceGetWhatsappAccountHandler := connect.NewUnaryHandler(
-		ProfileServiceGetWhatsappAccountProcedure,
+	whatsappServiceGetWhatsappAccountHandler := connect.NewUnaryHandler(
+		WhatsappServiceGetWhatsappAccountProcedure,
 		svc.GetWhatsappAccount,
-		connect.WithSchema(profileServiceGetWhatsappAccountMethodDescriptor),
+		connect.WithSchema(whatsappServiceGetWhatsappAccountMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
-	return "/whatsapp.v1.ProfileService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	return "/whatsapp.v1.WhatsappService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
-		case ProfileServiceInitiateConnectWhatsappAccountProcedure:
-			profileServiceInitiateConnectWhatsappAccountHandler.ServeHTTP(w, r)
-		case ProfileServiceCompleteConnectWhatsappAccountProcedure:
-			profileServiceCompleteConnectWhatsappAccountHandler.ServeHTTP(w, r)
-		case ProfileServiceRemoveWhatsappAccountConnectionProcedure:
-			profileServiceRemoveWhatsappAccountConnectionHandler.ServeHTTP(w, r)
-		case ProfileServiceGetWhatsappAccountProcedure:
-			profileServiceGetWhatsappAccountHandler.ServeHTTP(w, r)
+		case WhatsappServiceConnectWhatsappAccountProcedure:
+			whatsappServiceConnectWhatsappAccountHandler.ServeHTTP(w, r)
+		case WhatsappServiceDisconnectWhatsappAccountProcedure:
+			whatsappServiceDisconnectWhatsappAccountHandler.ServeHTTP(w, r)
+		case WhatsappServiceGetWhatsappAccountProcedure:
+			whatsappServiceGetWhatsappAccountHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
 	})
 }
 
-// UnimplementedProfileServiceHandler returns CodeUnimplemented from all methods.
-type UnimplementedProfileServiceHandler struct{}
+// UnimplementedWhatsappServiceHandler returns CodeUnimplemented from all methods.
+type UnimplementedWhatsappServiceHandler struct{}
 
-func (UnimplementedProfileServiceHandler) InitiateConnectWhatsappAccount(context.Context, *connect.Request[v1.InitiateConnectWhatsappAccountRequest]) (*connect.Response[v1.InitiateConnectWhatsappAccountResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("whatsapp.v1.ProfileService.InitiateConnectWhatsappAccount is not implemented"))
+func (UnimplementedWhatsappServiceHandler) ConnectWhatsappAccount(context.Context, *connect.Request[v1.ConnectWhatsappAccountRequest]) (*connect.Response[v1.ConnectWhatsappAccountResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("whatsapp.v1.WhatsappService.ConnectWhatsappAccount is not implemented"))
 }
 
-func (UnimplementedProfileServiceHandler) CompleteConnectWhatsappAccount(context.Context, *connect.Request[v1.CompleteConnectWhatsappAccountRequest]) (*connect.Response[v1.CompleteConnectWhatsappAccountResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("whatsapp.v1.ProfileService.CompleteConnectWhatsappAccount is not implemented"))
+func (UnimplementedWhatsappServiceHandler) DisconnectWhatsappAccount(context.Context, *connect.Request[v1.DisconnectWhatsappAccountRequest]) (*connect.Response[v1.DisconnectWhatsappAccountResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("whatsapp.v1.WhatsappService.DisconnectWhatsappAccount is not implemented"))
 }
 
-func (UnimplementedProfileServiceHandler) RemoveWhatsappAccountConnection(context.Context, *connect.Request[v1.RemoveWhatsappAccountConnectionRequest]) (*connect.Response[v1.RemoveWhatsappAccountConnectionResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("whatsapp.v1.ProfileService.RemoveWhatsappAccountConnection is not implemented"))
-}
-
-func (UnimplementedProfileServiceHandler) GetWhatsappAccount(context.Context, *connect.Request[v1.GetWhatsappAccountRequest]) (*connect.Response[v1.GetWhatsappAccountResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("whatsapp.v1.ProfileService.GetWhatsappAccount is not implemented"))
+func (UnimplementedWhatsappServiceHandler) GetWhatsappAccount(context.Context, *connect.Request[v1.GetWhatsappAccountRequest]) (*connect.Response[v1.GetWhatsappAccountResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("whatsapp.v1.WhatsappService.GetWhatsappAccount is not implemented"))
 }

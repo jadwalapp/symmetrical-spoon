@@ -15,6 +15,7 @@ import (
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/api/auth"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/api/calendar"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/api/profile"
+	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/api/whatsapp"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/apimetadata"
 	baikalclient "github.com/jadwalapp/symmetrical-spoon/falak/pkg/baikal/client"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/email/emailer"
@@ -22,6 +23,7 @@ import (
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/gen/proto/auth/v1/authv1connect"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/gen/proto/calendar/v1/calendarv1connect"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/gen/proto/profile/v1/profilev1connect"
+	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/gen/proto/whatsapp/v1/whatsappv1connect"
 	googlesvc "github.com/jadwalapp/symmetrical-spoon/falak/pkg/google"
 	googleclient "github.com/jadwalapp/symmetrical-spoon/falak/pkg/google/client"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/httpclient"
@@ -30,6 +32,7 @@ import (
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/store"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/tokens"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/util"
+	wasappclient "github.com/jadwalapp/symmetrical-spoon/falak/pkg/wasapp/client"
 	"github.com/resendlabs/resend-go"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -156,6 +159,11 @@ func main() {
 	baikalCli := baikalclient.NewClient(baikalHttpCli, config.BaikalHost, config.BaikalPhpSessionID)
 	// ======== BAIKAL CLIENT ========
 
+	// ======== BAIKAL CLIENT ========
+	wasappHttpCli := httpclient.NewClient(&http.Client{})
+	wasappCli := wasappclient.NewClient(wasappHttpCli, config.WasappBaseUrl)
+	// ======== BAIKAL CLIENT ========
+
 	// ======== PROTOVALIDATE ========
 	pv, err := protovalidate.New()
 	if err != nil {
@@ -178,6 +186,7 @@ func main() {
 		authv1connect.AuthServiceName,
 		profilev1connect.ProfileServiceName,
 		calendarv1connect.CalendarServiceName,
+		whatsappv1connect.WhatsappServiceName,
 	)
 	mux.Handle(grpcreflect.NewHandlerV1(reflector))
 	mux.Handle(grpcreflect.NewHandlerV1Alpha(reflector))
@@ -190,6 +199,9 @@ func main() {
 
 	calendarServer := calendar.NewService(*pv, *dbStore, apiMetadata, config.CalDAVPasswordEncryptionKey)
 	mux.Handle(calendarv1connect.NewCalendarServiceHandler(calendarServer, interceptorsForServer))
+
+	whatsappServer := whatsapp.NewService(*pv, apiMetadata, wasappCli)
+	mux.Handle(whatsappv1connect.NewWhatsappServiceHandler(whatsappServer, interceptorsForServer))
 
 	addr := fmt.Sprintf("0.0.0.0:%s", config.Port)
 	log.Info().Msgf("listening on %s", addr)

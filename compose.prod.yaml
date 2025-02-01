@@ -69,5 +69,12 @@ services:
       - "traefik.http.routers.baikal.tls.certresolver=myresolver"
       - "traefik.http.services.baikal.loadbalancer.server.port=80"
 
+  mongodb:
+    restart: always
+
+  wasapp:
+    image: ghcr.io/jadwalapp/symmetrical-spoon/wasapp:main
+    restart: always
+
 volumes:
   traefik-certificates:

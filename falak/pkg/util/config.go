@@ -29,6 +29,7 @@ type FalakConfig struct {
 	BaikalHost                  string `mapstructure:"BAIKAL_HOST"`
 	BaikalPhpSessionID          string `mapstructure:"BAIKAL_PHPSESSID"`
 	CalDAVPasswordEncryptionKey string `mapstructure:"CALDAV_PASSWORD_ENCRYPTION_KEY"`
+	WasappBaseUrl               string `mapstructure:"WASAPP_BASE_URL"`
 }
 
 // LoadFalakConfig reads configuration from the provided path or environment variables.

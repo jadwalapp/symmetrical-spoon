@@ -1,0 +1,22 @@
+name: Build and Push Wasapp Image
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'wasapp/**'
+      - 'compose.yaml'
+      - 'compose.override.yaml'
+      - 'compose.prod.yaml'
+      - '.github/workflows/reuseable-build-and-push.yaml'
+      - '.github/workflows/wasapp.yaml'
+
+jobs:
+  build-and-push:
+    uses: ./.github/workflows/reuseable-build-and-push.yaml
+    permissions:
+      contents: read
+      packages: write
+    with:
+      image_name: wasapp
+      context_path: ./wasapp

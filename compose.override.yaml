@@ -60,6 +60,15 @@ services:
       - "traefik.http.routers.baikal.entrypoints=web"
       - "traefik.http.services.baikal.loadbalancer.server.port=80"
 
+  mongodb:
+    ports:
+      - 27017:27017
+
+  wasapp:
+    ports:
+      - 3000:3000
+
+  # extra stuff - only local
   plantuml:
     image: plantuml/plantuml-server:jetty
     labels:

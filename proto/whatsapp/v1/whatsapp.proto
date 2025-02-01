@@ -4,35 +4,31 @@ option go_package = "github.com/jadwalapp/symmetrical-spoon/falak/pkg/gen/proto/
 
 package whatsapp.v1;
 
-message InitiateConnectWhatsappAccountRequest {
+message ConnectWhatsappAccountRequest {
     string mobile = 1;
 }
-
-message InitiateConnectWhatsappAccountResponse {
-    string whatsapp_completion_token = 1;
+message ConnectWhatsappAccountResponse {
+    string pairing_code = 1;
 }
 
-message CompleteConnectWhatsappAccountRequest {
-    string whatsapp_completion_token = 1;
-    string whatsapp_provided_code = 2;
-}
-
-message CompleteConnectWhatsappAccountResponse {}
-
-message RemoveWhatsappAccountConnectionRequest {}
-
-message RemoveWhatsappAccountConnectionResponse {}
+message DisconnectWhatsappAccountRequest {}
+message DisconnectWhatsappAccountResponse {}
 
 message GetWhatsappAccountRequest {}
+message GetWhatsappAccountResponse {
+    string status = 1;
+    string phone_number = 2;
+    string name = 3;
+    string pairing_code = 4;
+    bool is_ready = 5;
+    bool is_authenticated = 6;
+}
 
-message GetWhatsappAccountResponse {}
-
-service ProfileService {
-    rpc InitiateConnectWhatsappAccount(InitiateConnectWhatsappAccountRequest) returns (InitiateConnectWhatsappAccountResponse);
-    rpc CompleteConnectWhatsappAccount(CompleteConnectWhatsappAccountRequest) returns (CompleteConnectWhatsappAccountResponse);
+service WhatsappService {
+    rpc ConnectWhatsappAccount(ConnectWhatsappAccountRequest) returns (ConnectWhatsappAccountResponse);
     // possible errors:
     //   - not found
-    rpc RemoveWhatsappAccountConnection(RemoveWhatsappAccountConnectionRequest) returns (RemoveWhatsappAccountConnectionResponse);
+    rpc DisconnectWhatsappAccount(DisconnectWhatsappAccountRequest) returns (DisconnectWhatsappAccountResponse);
     // possible errors:
     //   - not found
     rpc GetWhatsappAccount(GetWhatsappAccountRequest) returns (GetWhatsappAccountResponse);

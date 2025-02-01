@@ -20,7 +20,7 @@ fileprivate struct _GeneratedWithProtocGenSwiftVersion: SwiftProtobuf.ProtobufAP
   typealias Version = _2
 }
 
-public struct Whatsapp_V1_InitiateConnectWhatsappAccountRequest: Sendable {
+public struct Whatsapp_V1_ConnectWhatsappAccountRequest: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -32,33 +32,19 @@ public struct Whatsapp_V1_InitiateConnectWhatsappAccountRequest: Sendable {
   public init() {}
 }
 
-public struct Whatsapp_V1_InitiateConnectWhatsappAccountResponse: Sendable {
+public struct Whatsapp_V1_ConnectWhatsappAccountResponse: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var whatsappCompletionToken: String = String()
+  public var pairingCode: String = String()
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   public init() {}
 }
 
-public struct Whatsapp_V1_CompleteConnectWhatsappAccountRequest: Sendable {
-  // SwiftProtobuf.Message conformance is added in an extension below. See the
-  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
-  // methods supported on all messages.
-
-  public var whatsappCompletionToken: String = String()
-
-  public var whatsappProvidedCode: String = String()
-
-  public var unknownFields = SwiftProtobuf.UnknownStorage()
-
-  public init() {}
-}
-
-public struct Whatsapp_V1_CompleteConnectWhatsappAccountResponse: Sendable {
+public struct Whatsapp_V1_DisconnectWhatsappAccountRequest: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -68,17 +54,7 @@ public struct Whatsapp_V1_CompleteConnectWhatsappAccountResponse: Sendable {
   public init() {}
 }
 
-public struct Whatsapp_V1_RemoveWhatsappAccountConnectionRequest: Sendable {
-  // SwiftProtobuf.Message conformance is added in an extension below. See the
-  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
-  // methods supported on all messages.
-
-  public var unknownFields = SwiftProtobuf.UnknownStorage()
-
-  public init() {}
-}
-
-public struct Whatsapp_V1_RemoveWhatsappAccountConnectionResponse: Sendable {
+public struct Whatsapp_V1_DisconnectWhatsappAccountResponse: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -103,6 +79,18 @@ public struct Whatsapp_V1_GetWhatsappAccountResponse: Sendable {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
+  public var status: String = String()
+
+  public var phoneNumber: String = String()
+
+  public var name: String = String()
+
+  public var pairingCode: String = String()
+
+  public var isReady: Bool = false
+
+  public var isAuthenticated: Bool = false
+
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   public init() {}
@@ -112,8 +100,8 @@ public struct Whatsapp_V1_GetWhatsappAccountResponse: Sendable {
 
 fileprivate let _protobuf_package = "whatsapp.v1"
 
-extension Whatsapp_V1_InitiateConnectWhatsappAccountRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  public static let protoMessageName: String = _protobuf_package + ".InitiateConnectWhatsappAccountRequest"
+extension Whatsapp_V1_ConnectWhatsappAccountRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".ConnectWhatsappAccountRequest"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "mobile"),
   ]
@@ -137,17 +125,17 @@ extension Whatsapp_V1_InitiateConnectWhatsappAccountRequest: SwiftProtobuf.Messa
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Whatsapp_V1_InitiateConnectWhatsappAccountRequest, rhs: Whatsapp_V1_InitiateConnectWhatsappAccountRequest) -> Bool {
+  public static func ==(lhs: Whatsapp_V1_ConnectWhatsappAccountRequest, rhs: Whatsapp_V1_ConnectWhatsappAccountRequest) -> Bool {
     if lhs.mobile != rhs.mobile {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension Whatsapp_V1_InitiateConnectWhatsappAccountResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  public static let protoMessageName: String = _protobuf_package + ".InitiateConnectWhatsappAccountResponse"
+extension Whatsapp_V1_ConnectWhatsappAccountResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".ConnectWhatsappAccountResponse"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .standard(proto: "whatsapp_completion_token"),
+    1: .standard(proto: "pairing_code"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -156,66 +144,28 @@ extension Whatsapp_V1_InitiateConnectWhatsappAccountResponse: SwiftProtobuf.Mess
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeSingularStringField(value: &self.whatsappCompletionToken) }()
+      case 1: try { try decoder.decodeSingularStringField(value: &self.pairingCode) }()
       default: break
       }
     }
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if !self.whatsappCompletionToken.isEmpty {
-      try visitor.visitSingularStringField(value: self.whatsappCompletionToken, fieldNumber: 1)
+    if !self.pairingCode.isEmpty {
+      try visitor.visitSingularStringField(value: self.pairingCode, fieldNumber: 1)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Whatsapp_V1_InitiateConnectWhatsappAccountResponse, rhs: Whatsapp_V1_InitiateConnectWhatsappAccountResponse) -> Bool {
-    if lhs.whatsappCompletionToken != rhs.whatsappCompletionToken {return false}
+  public static func ==(lhs: Whatsapp_V1_ConnectWhatsappAccountResponse, rhs: Whatsapp_V1_ConnectWhatsappAccountResponse) -> Bool {
+    if lhs.pairingCode != rhs.pairingCode {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension Whatsapp_V1_CompleteConnectWhatsappAccountRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  public static let protoMessageName: String = _protobuf_package + ".CompleteConnectWhatsappAccountRequest"
-  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .standard(proto: "whatsapp_completion_token"),
-    2: .standard(proto: "whatsapp_provided_code"),
-  ]
-
-  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
-    while let fieldNumber = try decoder.nextFieldNumber() {
-      // The use of inline closures is to circumvent an issue where the compiler
-      // allocates stack space for every case branch when no optimizations are
-      // enabled. https://github.com/apple/swift-protobuf/issues/1034
-      switch fieldNumber {
-      case 1: try { try decoder.decodeSingularStringField(value: &self.whatsappCompletionToken) }()
-      case 2: try { try decoder.decodeSingularStringField(value: &self.whatsappProvidedCode) }()
-      default: break
-      }
-    }
-  }
-
-  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if !self.whatsappCompletionToken.isEmpty {
-      try visitor.visitSingularStringField(value: self.whatsappCompletionToken, fieldNumber: 1)
-    }
-    if !self.whatsappProvidedCode.isEmpty {
-      try visitor.visitSingularStringField(value: self.whatsappProvidedCode, fieldNumber: 2)
-    }
-    try unknownFields.traverse(visitor: &visitor)
-  }
-
-  public static func ==(lhs: Whatsapp_V1_CompleteConnectWhatsappAccountRequest, rhs: Whatsapp_V1_CompleteConnectWhatsappAccountRequest) -> Bool {
-    if lhs.whatsappCompletionToken != rhs.whatsappCompletionToken {return false}
-    if lhs.whatsappProvidedCode != rhs.whatsappProvidedCode {return false}
-    if lhs.unknownFields != rhs.unknownFields {return false}
-    return true
-  }
-}
-
-extension Whatsapp_V1_CompleteConnectWhatsappAccountResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  public static let protoMessageName: String = _protobuf_package + ".CompleteConnectWhatsappAccountResponse"
+extension Whatsapp_V1_DisconnectWhatsappAccountRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".DisconnectWhatsappAccountRequest"
   public static let _protobuf_nameMap = SwiftProtobuf._NameMap()
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -227,14 +177,14 @@ extension Whatsapp_V1_CompleteConnectWhatsappAccountResponse: SwiftProtobuf.Mess
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Whatsapp_V1_CompleteConnectWhatsappAccountResponse, rhs: Whatsapp_V1_CompleteConnectWhatsappAccountResponse) -> Bool {
+  public static func ==(lhs: Whatsapp_V1_DisconnectWhatsappAccountRequest, rhs: Whatsapp_V1_DisconnectWhatsappAccountRequest) -> Bool {
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension Whatsapp_V1_RemoveWhatsappAccountConnectionRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  public static let protoMessageName: String = _protobuf_package + ".RemoveWhatsappAccountConnectionRequest"
+extension Whatsapp_V1_DisconnectWhatsappAccountResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".DisconnectWhatsappAccountResponse"
   public static let _protobuf_nameMap = SwiftProtobuf._NameMap()
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -246,26 +196,7 @@ extension Whatsapp_V1_RemoveWhatsappAccountConnectionRequest: SwiftProtobuf.Mess
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Whatsapp_V1_RemoveWhatsappAccountConnectionRequest, rhs: Whatsapp_V1_RemoveWhatsappAccountConnectionRequest) -> Bool {
-    if lhs.unknownFields != rhs.unknownFields {return false}
-    return true
-  }
-}
-
-extension Whatsapp_V1_RemoveWhatsappAccountConnectionResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  public static let protoMessageName: String = _protobuf_package + ".RemoveWhatsappAccountConnectionResponse"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap()
-
-  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
-    // Load everything into unknown fields
-    while try decoder.nextFieldNumber() != nil {}
-  }
-
-  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    try unknownFields.traverse(visitor: &visitor)
-  }
-
-  public static func ==(lhs: Whatsapp_V1_RemoveWhatsappAccountConnectionResponse, rhs: Whatsapp_V1_RemoveWhatsappAccountConnectionResponse) -> Bool {
+  public static func ==(lhs: Whatsapp_V1_DisconnectWhatsappAccountResponse, rhs: Whatsapp_V1_DisconnectWhatsappAccountResponse) -> Bool {
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
@@ -292,18 +223,61 @@ extension Whatsapp_V1_GetWhatsappAccountRequest: SwiftProtobuf.Message, SwiftPro
 
 extension Whatsapp_V1_GetWhatsappAccountResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GetWhatsappAccountResponse"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap()
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "status"),
+    2: .standard(proto: "phone_number"),
+    3: .same(proto: "name"),
+    4: .standard(proto: "pairing_code"),
+    5: .standard(proto: "is_ready"),
+    6: .standard(proto: "is_authenticated"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
-    // Load everything into unknown fields
-    while try decoder.nextFieldNumber() != nil {}
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularStringField(value: &self.status) }()
+      case 2: try { try decoder.decodeSingularStringField(value: &self.phoneNumber) }()
+      case 3: try { try decoder.decodeSingularStringField(value: &self.name) }()
+      case 4: try { try decoder.decodeSingularStringField(value: &self.pairingCode) }()
+      case 5: try { try decoder.decodeSingularBoolField(value: &self.isReady) }()
+      case 6: try { try decoder.decodeSingularBoolField(value: &self.isAuthenticated) }()
+      default: break
+      }
+    }
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if !self.status.isEmpty {
+      try visitor.visitSingularStringField(value: self.status, fieldNumber: 1)
+    }
+    if !self.phoneNumber.isEmpty {
+      try visitor.visitSingularStringField(value: self.phoneNumber, fieldNumber: 2)
+    }
+    if !self.name.isEmpty {
+      try visitor.visitSingularStringField(value: self.name, fieldNumber: 3)
+    }
+    if !self.pairingCode.isEmpty {
+      try visitor.visitSingularStringField(value: self.pairingCode, fieldNumber: 4)
+    }
+    if self.isReady != false {
+      try visitor.visitSingularBoolField(value: self.isReady, fieldNumber: 5)
+    }
+    if self.isAuthenticated != false {
+      try visitor.visitSingularBoolField(value: self.isAuthenticated, fieldNumber: 6)
+    }
     try unknownFields.traverse(visitor: &visitor)
   }
 
   public static func ==(lhs: Whatsapp_V1_GetWhatsappAccountResponse, rhs: Whatsapp_V1_GetWhatsappAccountResponse) -> Bool {
+    if lhs.status != rhs.status {return false}
+    if lhs.phoneNumber != rhs.phoneNumber {return false}
+    if lhs.name != rhs.name {return false}
+    if lhs.pairingCode != rhs.pairingCode {return false}
+    if lhs.isReady != rhs.isReady {return false}
+    if lhs.isAuthenticated != rhs.isAuthenticated {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
