@@ -1,8 +1,5 @@
 import fastify, { type RouteShorthandOptions } from "fastify";
-import {
-  WhatsappService,
-  type ClientDetails,
-} from "./src/services/whatsapp/whatsapp_service";
+import { WhatsappService } from "./src/services/whatsapp/whatsapp_service";
 import mongoose from "mongoose";
 import { getConfig } from "./src/config/config";
 
@@ -26,11 +23,7 @@ async function main() {
     },
   });
 
-  const whatsappService = new WhatsappService(
-    mongooseConn,
-    app.log,
-    cfg.isHeadless
-  );
+  const whatsappService = new WhatsappService(mongooseConn, cfg.isHeadless);
 
   app.get("/health", (req, res) => {
     res.status(200).send("ok");

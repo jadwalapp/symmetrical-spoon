@@ -2,7 +2,6 @@ import type { Mongoose } from "mongoose";
 import type { Db } from "mongodb";
 import { Client, RemoteAuth } from "whatsapp-web.js";
 import { MongoStore } from "wwebjs-mongo";
-import type { FastifyBaseLogger } from "fastify";
 
 export interface ClientDetails {
   client: Client;
@@ -22,11 +21,7 @@ export class WhatsappService {
   private clientsDetails: Map<string, ClientDetails>;
   private makeHeadlessClients: boolean;
 
-  constructor(
-    mongooseConn: Mongoose,
-    logger: FastifyBaseLogger,
-    makeHeadlessClients: boolean
-  ) {
+  constructor(mongooseConn: Mongoose, makeHeadlessClients: boolean) {
     this.mongooseConn = mongooseConn;
     this.clientsDetails = new Map<string, ClientDetails>();
     this.makeHeadlessClients = makeHeadlessClients;
@@ -46,6 +41,7 @@ export class WhatsappService {
       webVersion: "2.3000.1019739601",
       puppeteer: {
         headless: this.makeHeadlessClients,
+        executablePath: "/usr/bin/chromium-browser",
         handleSIGINT: true,
         handleSIGTERM: false,
         handleSIGHUP: false,
