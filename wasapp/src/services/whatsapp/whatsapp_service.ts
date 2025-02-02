@@ -41,7 +41,7 @@ export class WhatsappService {
       webVersion: "2.3000.1019739601",
       puppeteer: {
         headless: this.makeHeadlessClients,
-        executablePath: "/usr/bin/chromium-browser",
+        executablePath: "/usr/bin/chromium",
         handleSIGINT: true,
         handleSIGTERM: false,
         handleSIGHUP: false,
