@@ -133,6 +133,8 @@ services:
       - internal
     volumes:
       - wasapp-wwebjs_auth:/app/.wwebjs_auth
+    # so it has time to shutdown all whatsapp stuff, so no data is corrupt
+    stop_grace_period: 60s
 
 volumes:
   postgres_data:

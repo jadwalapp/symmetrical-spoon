@@ -210,12 +210,39 @@ export class WhatsappService {
     return this.clientsDetails;
   }
 
-  async disconnectClient(customerId: string) {
+  async deleteClient(customerId: string) {
     const clientDetails = this.getClientDetails(customerId);
     if (!clientDetails) return;
 
     await clientDetails.client.logout();
     await clientDetails.client.destroy();
     this.clientsDetails.delete(customerId);
+  }
+
+  async disconnectClient(customerId: string) {
+    const clientDetails = this.getClientDetails(customerId);
+    if (!clientDetails) return;
+
+    // Just destroy the client without logging out to allow future reconnection
+    await clientDetails.client.destroy();
+    this.updateClientDetails(customerId, { status: "DISCONNECTED" });
+  }
+
+  async gracefulShutdown() {
+    console.log("Starting graceful shutdown of WhatsApp service...");
+    const shutdownPromises = Array.from(this.clientsDetails.entries()).map(
+      async ([customerId, clientDetails]) => {
+        try {
+          console.log(`Disconnecting client ${customerId}...`);
+          await this.disconnectClient(customerId);
+          console.log(`Successfully disconnected client ${customerId}`);
+        } catch (error) {
+          console.error(`Failed to disconnect client ${customerId}:`, error);
+        }
+      }
+    );
+
+    await Promise.all(shutdownPromises);
+    console.log("Completed WhatsApp service shutdown");
   }
 }

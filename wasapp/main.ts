@@ -29,6 +29,41 @@ async function main() {
     res.status(200).send("ok");
   });
 
+  // Setup graceful shutdown
+  const signals = ["SIGTERM", "SIGINT"] as const;
+  let shuttingDown = false;
+
+  async function gracefulShutdown(signal: string) {
+    if (shuttingDown) return;
+    shuttingDown = true;
+
+    console.log(`Received ${signal}. Starting graceful shutdown...`);
+
+    try {
+      console.log("Closing HTTP server...");
+      await app.close();
+      console.log("HTTP server closed");
+
+      console.log("Shutting down WhatsApp service...");
+      await whatsappService.gracefulShutdown();
+      console.log("WhatsApp service shut down");
+
+      console.log("Closing MongoDB connection...");
+      await mongoose.disconnect();
+      console.log("MongoDB connection closed");
+
+      console.log("Graceful shutdown completed");
+      process.exit(0);
+    } catch (error) {
+      console.error("Error during shutdown:", error);
+      process.exit(1);
+    }
+  }
+
+  signals.forEach((signal) => {
+    process.on(signal, () => gracefulShutdown(signal));
+  });
+
   const wasappInitializeOpts: RouteShorthandOptions = {
     schema: {
       body: {
@@ -147,9 +182,9 @@ async function main() {
     try {
       const { customerId } = req.body as { customerId: string };
 
-      await whatsappService.disconnectClient(customerId);
+      await whatsappService.deleteClient(customerId);
 
-      res.status(200);
+      res.status(200).send();
     } catch (error) {
       req.log.error({ error }, "Failed to disconnect WhatsApp client");
       res.status(500).send({ error: error });
