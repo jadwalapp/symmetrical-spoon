@@ -36,6 +36,7 @@ export class WhatsappService {
     customerId: string,
     phoneNumber: string | null
   ): Promise<string | null> {
+    console.log(`[DEBUG - wasapp service] started initialize`);
     const client = new Client({
       authStrategy: new RemoteAuth({
         store: new MongoStore({ mongoose: this.mongooseConn }),
@@ -55,6 +56,7 @@ export class WhatsappService {
         ],
       },
     });
+    console.log(`[DEBUG - wasapp service] created client object :D`);
 
     this.clientsDetails.set(customerId, {
       client: client,
@@ -63,18 +65,29 @@ export class WhatsappService {
       name: null,
       pairingCode: null,
     });
+    console.log(
+      `[DEBUG - wasapp service] set the client in the clientsDetails`
+    );
 
     this.setupClientEvents(client, customerId, phoneNumber);
+    console.log(`[DEBUG - wasapp service] finished setupClientEvents`);
     await client.initialize();
+    console.log(`[DEBUG - wasapp service] finished client.initialize`);
 
     if (phoneNumber !== null) {
       try {
+        console.log(`[DEBUG - wasapp service] started requestPairingCode`);
         const pairingCode = await client.requestPairingCode(phoneNumber, true);
+        console.log(`[DEBUG - wasapp service] finished requestPairingCode`);
         this.updateClientDetails(customerId, {
           status: "WAITING_FOR_PAIRING",
           pairingCode: pairingCode,
           phoneNumber: phoneNumber,
         });
+
+        console.log(
+          `[DEBUG - wasapp service] finished initialize with pairing code`
+        );
         return pairingCode;
       } catch (error) {
         console.log(
@@ -85,6 +98,8 @@ export class WhatsappService {
         throw error;
       }
     }
+
+    console.log(`[DEBUG - wasapp service] finished initialize with null`);
 
     return null;
   }
