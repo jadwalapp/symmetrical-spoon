@@ -29,7 +29,7 @@ async function main() {
     res.status(200).send("ok");
   });
 
-  // Setup graceful shutdown
+  // START - Setup graceful shutdown
   const signals = ["SIGTERM", "SIGINT"] as const;
   let shuttingDown = false;
 
@@ -63,6 +63,7 @@ async function main() {
   signals.forEach((signal) => {
     process.on(signal, () => gracefulShutdown(signal));
   });
+  // END - Setup graceful shutdown
 
   const wasappInitializeOpts: RouteShorthandOptions = {
     schema: {
