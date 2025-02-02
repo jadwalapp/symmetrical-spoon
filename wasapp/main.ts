@@ -25,7 +25,7 @@ async function main() {
 
   const whatsappService = new WhatsappService(cfg.isHeadless);
 
-  app.get("/health", (req, res) => {
+  app.get("/health", (_, res) => {
     res.status(200).send("ok");
   });
 

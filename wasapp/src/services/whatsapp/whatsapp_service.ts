@@ -217,16 +217,5 @@ export class WhatsappService {
     await clientDetails.client.logout();
     await clientDetails.client.destroy();
     this.clientsDetails.delete(customerId);
-
-    // TODO: fix this if needed, like delete the folders if they still exist
-    // const db = this.getMongoDb();
-    // if (!db) {
-    //   console.error(
-    //     `[Customer: ${customerId}] MongoDB connection not found - Unable to disconnect client`
-    //   );
-    //   return;
-    // }
-    // await db.dropCollection(`whatsapp-RemoteAuth-${customerId}.files`);
-    // await db.dropCollection(`whatsapp-RemoteAuth-${customerId}.chunks`);
   }
 }
