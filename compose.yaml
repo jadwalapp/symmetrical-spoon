@@ -131,6 +131,8 @@ services:
         condition: service_healthy
     networks:
       - internal
+    volumes:
+      - wasapp-wwebjs_auth:/app/.wwebjs_auth
 
 volumes:
   postgres_data:
@@ -139,6 +141,7 @@ volumes:
   baikal-config:
   baikal-data:
   mongodb-data:
+  wasapp-wwebjs_auth:
 
 networks:
   web:

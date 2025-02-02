@@ -69,13 +69,19 @@ async function main() {
         phoneNumber: string;
       };
 
+      console.log("before initialize");
+
       const pairingCode = await whatsappService.initialize(
         customerId,
         phoneNumber
       );
+      console.log(`after initialize: ${pairingCode}`);
       if (!pairingCode) {
+        console.log("failed to get pairing code");
         throw new Error("Failed to get pairing code");
       }
+
+      console.log("before sending pairing code");
 
       res.send({ pairingCode: pairingCode });
     } catch (error) {
@@ -163,7 +169,9 @@ async function main() {
   });
   app.log.info(`👂 listening on: ${listenUrl}`);
 
+  console.log(`before initialize saved clients`);
   await whatsappService.initializeSavedClients();
+  console.log(`after initialize saved clients`);
 }
 
 main();
