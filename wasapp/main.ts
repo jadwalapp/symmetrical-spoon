@@ -23,7 +23,7 @@ async function main() {
     },
   });
 
-  const whatsappService = new WhatsappService(mongooseConn, cfg.isHeadless);
+  const whatsappService = new WhatsappService(cfg.isHeadless);
 
   app.get("/health", (req, res) => {
     res.status(200).send("ok");
@@ -167,4 +167,8 @@ async function main() {
   console.log(`after initialize saved clients`);
 }
 
-main();
+try {
+  main();
+} catch (error) {
+  console.error(`things went south: ${error}`);
+}

@@ -5,6 +5,7 @@ export interface WasappConfig {
     database: string;
   };
   isHeadless: boolean;
+  puppeteer_execuable_path?: string;
 }
 
 export function getConfig(): WasappConfig {
@@ -17,5 +18,6 @@ export function getConfig(): WasappConfig {
       database: envStuff.MONGODB_DATABASE || "wasapp",
     },
     isHeadless: envStuff.IS_HEADLESS === "true",
+    puppeteer_execuable_path: envStuff.PUPPETEER_EXECUTABLE_PATH,
   };
 }

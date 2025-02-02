@@ -1,7 +1,5 @@
-import type { Mongoose } from "mongoose";
-import type { Db } from "mongodb";
-import { Client, RemoteAuth } from "whatsapp-web.js";
-import { MongoStore } from "wwebjs-mongo";
+import { Client, LocalAuth } from "whatsapp-web.js";
+import { readdir } from "node:fs/promises";
 
 export interface ClientDetails {
   client: Client;
@@ -17,14 +15,14 @@ export interface ClientDetails {
 }
 
 export class WhatsappService {
-  private mongooseConn: Mongoose;
   private clientsDetails: Map<string, ClientDetails>;
   private makeHeadlessClients: boolean;
+  private puppeteerExecutablePath?: string;
 
-  constructor(mongooseConn: Mongoose, makeHeadlessClients: boolean) {
-    this.mongooseConn = mongooseConn;
+  constructor(makeHeadlessClients: boolean, puppeteerExecutablePath?: string) {
     this.clientsDetails = new Map<string, ClientDetails>();
     this.makeHeadlessClients = makeHeadlessClients;
+    this.puppeteerExecutablePath = puppeteerExecutablePath;
   }
 
   async initialize(
@@ -33,15 +31,13 @@ export class WhatsappService {
   ): Promise<string | null> {
     console.log(`[DEBUG - wasapp service] started initialize`);
     const client = new Client({
-      authStrategy: new RemoteAuth({
-        store: new MongoStore({ mongoose: this.mongooseConn }),
+      authStrategy: new LocalAuth({
         clientId: customerId,
-        backupSyncIntervalMs: 60 * 1000,
       }),
       webVersion: "2.3000.1019739601",
       puppeteer: {
         headless: this.makeHeadlessClients,
-        executablePath: "/usr/bin/chromium",
+        executablePath: this.puppeteerExecutablePath,
         handleSIGINT: true,
         handleSIGTERM: false,
         handleSIGHUP: false,
@@ -162,29 +158,19 @@ export class WhatsappService {
     });
   }
 
-  private getMongoDb(): Db | undefined {
-    const db = this.mongooseConn.connection.db;
-    return db;
-  }
-
   private async getSavedCustomerIds(): Promise<string[]> {
-    const db = this.getMongoDb();
-    if (!db) {
-      console.error(
-        "[MongoDB] Connection not found - Unable to get saved customer IDs"
-      );
-      return [];
+    let folderNames: string[] = [];
+    try {
+      folderNames = await readdir(".wwebjs_auth");
+    } catch (error) {
+      folderNames = [];
     }
 
-    const collections = await db.listCollections().toArray();
-    const filteredCollections = collections.filter(
-      (col) =>
-        col.name.startsWith("whatsapp-RemoteAuth-") &&
-        col.name.endsWith(".files")
+    const filteredCollections = folderNames.filter((folderName) =>
+      folderName.startsWith("session-")
     );
-
-    const customerIds = filteredCollections.map((col) =>
-      col.name.replace("whatsapp-RemoteAuth-", "").replace(".files", "")
+    const customerIds = filteredCollections.map((folderName) =>
+      folderName.replace("session-", "")
     );
 
     return customerIds;
@@ -232,14 +218,15 @@ export class WhatsappService {
     await clientDetails.client.destroy();
     this.clientsDetails.delete(customerId);
 
-    const db = this.getMongoDb();
-    if (!db) {
-      console.error(
-        `[Customer: ${customerId}] MongoDB connection not found - Unable to disconnect client`
-      );
-      return;
-    }
-    await db.dropCollection(`whatsapp-RemoteAuth-${customerId}.files`);
-    await db.dropCollection(`whatsapp-RemoteAuth-${customerId}.chunks`);
+    // TODO: fix this if needed, like delete the folders if they still exist
+    // const db = this.getMongoDb();
+    // if (!db) {
+    //   console.error(
+    //     `[Customer: ${customerId}] MongoDB connection not found - Unable to disconnect client`
+    //   );
+    //   return;
+    // }
+    // await db.dropCollection(`whatsapp-RemoteAuth-${customerId}.files`);
+    // await db.dropCollection(`whatsapp-RemoteAuth-${customerId}.chunks`);
   }
 }
