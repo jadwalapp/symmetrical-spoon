@@ -2,6 +2,7 @@
 AFFAN
 ALKHALAF
 Asana
+calendarsvc
 Calendi
 Createwhatsapp
 dtend

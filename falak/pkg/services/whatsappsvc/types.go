@@ -1,7 +1,6 @@
 package whatsappsvc
 
-import "context"
-
-type whatsappsvc interface {
-	CreatewhatsappAccount(ctx context.Context, customerID string)
+type WhatsAppMessage struct {
+	From    string `json:"from"`
+	Message string `json:"message"`
 }
