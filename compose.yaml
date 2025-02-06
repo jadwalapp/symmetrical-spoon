@@ -115,7 +115,6 @@ services:
     build:
       context: ./wasapp
       dockerfile: Dockerfile
-    env_file: ./wasapp/.env
     networks:
       - internal
     volumes:
