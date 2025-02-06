@@ -1,6 +1,5 @@
 import fastify, { type RouteShorthandOptions } from "fastify";
 import { WasappService } from "./src/service";
-import mongoose from "mongoose";
 import { getConfig } from "./src/config";
 
 async function main() {
@@ -49,10 +48,6 @@ async function main() {
       console.log("Shutting down WhatsApp service...");
       await wasappService.gracefulShutdown();
       console.log("WhatsApp service shut down");
-
-      console.log("Closing MongoDB connection...");
-      await mongoose.disconnect();
-      console.log("MongoDB connection closed");
 
       console.log("Graceful shutdown completed");
       process.exit(0);
