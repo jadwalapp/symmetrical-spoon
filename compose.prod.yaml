@@ -73,5 +73,8 @@ services:
     image: ghcr.io/jadwalapp/symmetrical-spoon/wasapp:main
     restart: always
 
+  rabbitmq:
+    restart: always
+
 volumes:
   traefik-certificates:

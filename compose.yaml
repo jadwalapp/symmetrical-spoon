@@ -47,6 +47,8 @@ services:
       DB_NAME: ${POSTGRES_DB}
       DB_SSL_MODE: disable
       PORT: ${FALAK_PORT}
+      RABBITMQ_USER: ${RABBITMQ_USER}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
     depends_on:
       postgresdb:
         condition: service_healthy
@@ -121,14 +123,26 @@ services:
     # so it has time to shutdown all whatsapp stuff, so no data is corrupt
     stop_grace_period: 60s
 
+  rabbitmq:
+    image: rabbitmq:4-management
+    networks:
+      - internal
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+      - rabbitmq_logs:/var/log/rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD}
+
 volumes:
   postgres_data:
   grafana-storage:
   loki-storage:
   baikal-config:
   baikal-data:
-  mongodb-data:
   wasapp-wwebjs_auth:
+  rabbitmq_data:
+  rabbitmq_logs:
 
 networks:
   web:

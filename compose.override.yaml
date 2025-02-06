@@ -64,6 +64,11 @@ services:
     ports:
       - 3000:3000
 
+  rabbitmq:
+    ports:
+      - "5672:5672" # AMQP protocol port
+      - "15672:15672" # Management UI port
+
   # extra stuff - only local
   plantuml:
     image: plantuml/plantuml-server:jetty
