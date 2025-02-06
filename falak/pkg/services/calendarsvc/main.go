@@ -3,9 +3,9 @@ package calendarsvc
 import (
     "encoding/json"
     "net/http"
+    "my-whatsapp-event-extractor/whatsappsvc" // Importing WhatsApp package
 
     "github.com/gin-gonic/gin" // Importing Gin framework
-    "my-whatsapp-event-extractor/whatsappsvc" // Importing WhatsApp package
 )
 
 // StartServer initializes the HTTP server
@@ -39,7 +39,7 @@ func StartServer() error {
         }
     })
 
-    return router.Run(":8080") // Start server on port 8080
+    return router.Run(":50064") 
 }
 
 module my-whatsapp-event-extractor
