@@ -1,14 +1,10 @@
 import fastify, { type RouteShorthandOptions } from "fastify";
-import { WhatsappService } from "./src/services/whatsapp/whatsapp_service";
+import { WasappService } from "./src/service";
 import mongoose from "mongoose";
-import { getConfig } from "./src/config/config";
+import { getConfig } from "./src/config";
 
 async function main() {
   const cfg = getConfig();
-
-  const mongooseConn = await mongoose.connect(cfg.mongodb.uri, {
-    dbName: cfg.mongodb.database,
-  });
 
   const app = fastify({
     logger: {
@@ -23,7 +19,13 @@ async function main() {
     },
   });
 
-  const whatsappService = new WhatsappService(cfg.isHeadless);
+  const wasappService = new WasappService(
+    cfg.isHeadless,
+    cfg.puppeteerExecuablePath
+  );
+  console.log(`before initialize saved clients`);
+  await wasappService.initializeSavedClients();
+  console.log(`after initialize saved clients`);
 
   app.get("/health", (_, res) => {
     res.status(200).send("ok");
@@ -45,7 +47,7 @@ async function main() {
       console.log("HTTP server closed");
 
       console.log("Shutting down WhatsApp service...");
-      await whatsappService.gracefulShutdown();
+      await wasappService.gracefulShutdown();
       console.log("WhatsApp service shut down");
 
       console.log("Closing MongoDB connection...");
@@ -100,7 +102,7 @@ async function main() {
 
       console.log("before initialize");
 
-      const pairingCode = await whatsappService.initialize(
+      const pairingCode = await wasappService.initialize(
         customerId,
         phoneNumber
       );
@@ -139,7 +141,7 @@ async function main() {
   app.get("/wasapp/status/:customerId", wasappStatusOpts, (req, res) => {
     const { customerId } = req.params as { customerId: string };
 
-    const clientDetails = whatsappService.getClientDetails(customerId);
+    const clientDetails = wasappService.getClientDetails(customerId);
     if (!clientDetails) {
       res.status(404).send();
       return;
@@ -183,7 +185,7 @@ async function main() {
     try {
       const { customerId } = req.body as { customerId: string };
 
-      await whatsappService.deleteClient(customerId);
+      await wasappService.deleteClient(customerId);
 
       res.status(200).send();
     } catch (error) {
@@ -197,10 +199,6 @@ async function main() {
     host: "0.0.0.0",
   });
   app.log.info(`👂 listening on: ${listenUrl}`);
-
-  console.log(`before initialize saved clients`);
-  await whatsappService.initializeSavedClients();
-  console.log(`after initialize saved clients`);
 }
 
 try {

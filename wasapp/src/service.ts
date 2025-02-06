@@ -14,7 +14,7 @@ export interface ClientDetails {
   pairingCode: string | null;
 }
 
-export class WhatsappService {
+export class WasappService {
   private clientsDetails: Map<string, ClientDetails>;
   private makeHeadlessClients: boolean;
   private puppeteerExecutablePath?: string;
