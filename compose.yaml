@@ -35,22 +35,36 @@ services:
       - internal
 
   falak:
-    build:
-      context: ./falak
-      dockerfile: "Dockerfile"
-    env_file: ./falak/falak.env
     environment:
+      PORT: ${FALAK_PORT}
+      JWT_PUBLIC_KEY: ${JWT_PUBLIC_KEY}
+      JWT_PRIVATE_KEY: ${JWT_PRIVATE_KEY}
       DB_USER: ${POSTGRES_USER}
       DB_PASSWORD: ${POSTGRES_PASSWORD}
       DB_HOST: postgresdb
       DB_PORT: ${POSTGRES_PORT}
       DB_NAME: ${POSTGRES_DB}
       DB_SSL_MODE: disable
-      PORT: ${FALAK_PORT}
-      RABBITMQ_HOSTNAME: rabbitmq
-      RABBITMQ_PORT: 5672
+      EMAILER_NAME: ${EMAILER_NAME}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_USERNAME: ${SMTP_USERNAME}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+      DOMAIN: ${DOMAIN}
+      RESEND_API_KEY: ${RESEND_API_KEY}
+      GOOGLE_CLIENT_BASE_URL: ${GOOGLE_CLIENT_BASE_URL}
+      GOOGLE_OAUTH_CLIENT_ID: ${GOOGLE_OAUTH_CLIENT_ID}
+      LOKI_ENDPOINT: http://loki:3100
+      LOKI_PUSH_INTERVAL_SECONDS: ${LOKI_PUSH_INTERVAL_SECONDS}
+      LOKI_MAX_BATCH_SIZE: ${LOKI_MAX_BATCH_SIZE}
+      BAIKAL_HOST: http://baikal:3322
+      BAIKAL_PHPSESSID: ${BAIKAL_PHPSESSID}
+      CALDAV_PASSWORD_ENCRYPTION_KEY: ${CALDAV_PASSWORD_ENCRYPTION_KEY}
+      WASAPP_BASE_URL: http://wasapp:3000
       RABBITMQ_USERNAME: ${RABBITMQ_USERNAME}
       RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+      RABBITMQ_HOSTNAME: rabbitmq
+      RABBITMQ_PORT: ${RABBITMQ_PORT}
       WASAPP_MESSAGES_QUEUE_NAME: ${WASAPP_MESSAGES_QUEUE_NAME}
     depends_on:
       postgresdb:
@@ -146,7 +160,7 @@ services:
       - rabbitmq_data:/var/lib/rabbitmq
       - rabbitmq_logs:/var/log/rabbitmq
     environment:
-      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER}
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USERNAME}
       - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD}
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "check_port_connectivity"]

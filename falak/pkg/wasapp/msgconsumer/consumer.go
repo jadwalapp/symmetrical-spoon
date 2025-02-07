@@ -17,6 +17,15 @@ type consumer struct {
 }
 
 func (c *consumer) Start(ctx context.Context) error {
+	c.channel.QueueDeclare(
+		c.wasappMessagesQueueName,
+		true,  // durable
+		false, // delete when unused
+		false, // exclusive
+		false, // no-wait
+		nil,   // arguments
+	)
+
 	msgsChan, err := c.channel.Consume(
 		c.wasappMessagesQueueName, // queue
 		"falak",                   // consumer

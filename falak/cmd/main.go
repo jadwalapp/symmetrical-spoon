@@ -48,7 +48,7 @@ import (
 const dbDriverName = "pgx"
 
 func main() {
-	config, err := util.LoadFalakConfig(".")
+	config, err := util.LoadFalakConfig()
 	if err != nil {
 		log.Fatal().Msgf("cannot load config: %v", err)
 	}

@@ -1,6 +1,11 @@
 package util
 
-import "github.com/spf13/viper"
+import (
+	"fmt"
+	"reflect"
+
+	"github.com/spf13/viper"
+)
 
 // FalakConfig stores all configuration of the application.
 // The values are read by viper from a config file or environment variables.
@@ -38,17 +43,20 @@ type FalakConfig struct {
 }
 
 // LoadFalakConfig reads configuration from the provided path or environment variables.
-func LoadFalakConfig(path string) (config FalakConfig, err error) {
-	viper.AddConfigPath(path)
-	viper.SetConfigName("falak")
-	viper.SetConfigType("env")
-	viper.AutomaticEnv()
-
-	err = viper.ReadInConfig()
-	if err != nil {
-		return
+func LoadFalakConfig() (config FalakConfig, err error) {
+	t := reflect.TypeOf(FalakConfig{})
+	for i := 0; i < t.NumField(); i++ {
+		f := t.Field(i)
+		envVar := f.Tag.Get("mapstructure")
+		viper.BindEnv(envVar)
 	}
 
+	viper.AutomaticEnv()
+
 	err = viper.Unmarshal(&config)
-	return
+	if err != nil {
+		return config, fmt.Errorf("unable to decode config: %v", err)
+	}
+
+	return config, nil
 }

@@ -21,6 +21,10 @@ services:
       - ${POSTGRES_PORT}:${POSTGRES_PORT}
 
   falak:
+    build:
+      context: ./falak
+      dockerfile: "Dockerfile"
+      target: dev
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=symmetrical-spoon_web"
@@ -29,7 +33,13 @@ services:
       - "traefik.http.services.falak.loadbalancer.server.port=${FALAK_PORT}"
       - "traefik.http.services.falak.loadbalancer.server.scheme=h2c"
     ports:
-      - "9090:50064"
+      - "50064:50064"
+    volumes:
+      - ./falak:/falak
+    develop:
+      watch:
+        - path: ./falak/go.sum
+          action: rebuild
 
   website:
     labels:
