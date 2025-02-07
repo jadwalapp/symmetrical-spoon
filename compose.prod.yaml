@@ -76,5 +76,21 @@ services:
   rabbitmq:
     restart: always
 
+  # only in prod
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: always
+    scale: 1
+    command: tunnel --no-autoupdate run --token ${CLOUDFALRED_TUNNEL_TOKEN}
+    networks:
+      - web
+      - internal
+    healthcheck:
+      test: ["CMD", "cloudflared", "tunnel", "info"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+
 volumes:
   traefik-certificates:
