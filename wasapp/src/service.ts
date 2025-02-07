@@ -141,7 +141,7 @@ export class WasappService {
 
         const contact = await msg.getContact();
 
-        let quotedMessageData: WasappMessage | undefined;
+        let quotedMessageData: WasappMessage | null = null;
         if (msg.hasQuotedMsg) {
           const quotedMsg = await msg.getQuotedMessage();
           const quotedMsgChat = await quotedMsg.getChat();
@@ -154,6 +154,7 @@ export class WasappService {
             sender_number: quotedMsgContact.number,
             is_sender_me: quotedMsg.fromMe,
             body: quotedMsg.body,
+            quoted_message: null,
             timestamp: quotedMsg.timestamp,
           };
         }

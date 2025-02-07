@@ -30,6 +30,11 @@ type FalakConfig struct {
 	BaikalPhpSessionID          string `mapstructure:"BAIKAL_PHPSESSID"`
 	CalDAVPasswordEncryptionKey string `mapstructure:"CALDAV_PASSWORD_ENCRYPTION_KEY"`
 	WasappBaseUrl               string `mapstructure:"WASAPP_BASE_URL"`
+	RabbitMqUser                string `mapstructure:"RABBITMQ_USERNAME"`
+	RabbitMqPass                string `mapstructure:"RABBITMQ_PASSWORD"`
+	RabbitMqHost                string `mapstructure:"RABBITMQ_HOSTNAME"`
+	RabbitMqPort                string `mapstructure:"RABBITMQ_PORT"`
+	WasappMessagesQueueName     string `mapstructure:"WASAPP_MESSAGES_QUEUE_NAME"`
 }
 
 // LoadFalakConfig reads configuration from the provided path or environment variables.

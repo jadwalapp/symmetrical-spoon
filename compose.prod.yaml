@@ -24,8 +24,6 @@ services:
 
   postgresdb:
     restart: always
-    # ports:
-    #   - ${POSTGRES_PORT}:${POSTGRES_PORT}
 
   falak:
     image: ghcr.io/jadwalapp/symmetrical-spoon/falak:main

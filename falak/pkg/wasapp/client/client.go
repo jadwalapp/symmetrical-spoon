@@ -3,11 +3,16 @@ package wasappclient
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/httpclient"
 	"github.com/rs/zerolog/log"
+)
+
+var (
+	ErrNotFound = errors.New("not found")
 )
 
 type client struct {
@@ -49,6 +54,10 @@ func (c *client) GetStatus(ctx context.Context, r *GetStatusRequest) (*GetStatus
 	if err != nil {
 		log.Err(err).Msg("failed to initialize in wasapp")
 		return nil, err
+	}
+
+	if resp.StatusCode == http.StatusNotFound {
+		return nil, ErrNotFound
 	}
 
 	if resp.StatusCode != http.StatusOK {

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"net/http"
@@ -33,6 +34,8 @@ import (
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/tokens"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/util"
 	wasappclient "github.com/jadwalapp/symmetrical-spoon/falak/pkg/wasapp/client"
+	wasappmsgconsumer "github.com/jadwalapp/symmetrical-spoon/falak/pkg/wasapp/msgconsumer"
+	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/resendlabs/resend-go"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -98,6 +101,9 @@ func main() {
 	if err != nil {
 		log.Fatal().Msgf("cannot create store migration instance: %v", err)
 	}
+	defer migStore.Close()
+	defer dbDriver.Close()
+	defer dbConn.Close()
 
 	err = migStore.Up()
 	if err != nil && err != migrate.ErrNoChange {
@@ -163,6 +169,38 @@ func main() {
 	wasappHttpCli := httpclient.NewClient(&http.Client{})
 	wasappCli := wasappclient.NewClient(wasappHttpCli, config.WasappBaseUrl)
 	// ======== BAIKAL CLIENT ========
+
+	// ======== AMQP CHAN ========
+	amqpUrl := util.CreateAmqpSource(
+		config.RabbitMqUser,
+		config.RabbitMqPass,
+		config.RabbitMqHost,
+		config.RabbitMqPort,
+	)
+	amqpConn, err := amqp.Dial(amqpUrl)
+	if err != nil {
+		log.Fatal().Msgf("failed to dial amqp: %v", err)
+	}
+
+	amqpChan, err := amqpConn.Channel()
+	if err != nil {
+		log.Fatal().Msgf("failed to open an amqp channel: %v", err)
+	}
+	defer amqpChan.Close()
+	defer amqpConn.Close()
+	// ======== AMQP CHAN ========
+
+	// ======== WASAPP CONSUMER ========
+	wasappConsumerCtx := context.Background()
+	wasappConsumerCtx = log.Logger.WithContext(wasappConsumerCtx)
+
+	wasappConsumer := wasappmsgconsumer.NewConsumer(amqpChan, config.WasappMessagesQueueName, *dbStore)
+	err = wasappConsumer.Start(wasappConsumerCtx)
+	if err != nil {
+		log.Fatal().Msgf("failed to start wasapp consumer: %v", err)
+	}
+	defer wasappConsumer.Stop(wasappConsumerCtx)
+	// ======== WASAPP CONSUMER ========
 
 	// ======== PROTOVALIDATE ========
 	pv, err := protovalidate.New()

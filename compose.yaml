@@ -47,13 +47,18 @@ services:
       DB_NAME: ${POSTGRES_DB}
       DB_SSL_MODE: disable
       PORT: ${FALAK_PORT}
-      RABBITMQ_USERNAME: ${RABBITMQ_USER}
+      RABBITMQ_HOSTNAME: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USERNAME: ${RABBITMQ_USERNAME}
       RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+      WASAPP_MESSAGES_QUEUE_NAME: ${WASAPP_MESSAGES_QUEUE_NAME}
     depends_on:
       postgresdb:
         condition: service_healthy
       loki:
         condition: service_started
+      rabbitmq:
+        condition: service_healthy
     networks:
       - web
       - internal
@@ -126,7 +131,7 @@ services:
       IS_HEADLESS: "true"
       RABBITMQ_HOSTNAME: rabbitmq
       RABBITMQ_PORT: 5672
-      RABBITMQ_USERNAME: ${RABBITMQ_USER}
+      RABBITMQ_USERNAME: ${RABBITMQ_USERNAME}
       RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
       WASAPP_MESSAGES_QUEUE_NAME: ${WASAPP_MESSAGES_QUEUE_NAME}
     depends_on:

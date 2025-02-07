@@ -92,6 +92,11 @@ func (s *service) GetWhatsappAccount(ctx context.Context, r *connect.Request[wha
 		CustomerId: tokenClaims.Payload.CustomerId.String(),
 	})
 	if err != nil {
+		if err == wasappclient.ErrNotFound {
+			log.Ctx(ctx).Err(err).Msg("nothing found running wasappCli.GetStatus")
+			return nil, connect.NewError(connect.CodeNotFound, nil)
+		}
+
 		log.Ctx(ctx).Err(err).Msg("failed running wasappCli.GetStatus")
 		return nil, internalError
 	}
