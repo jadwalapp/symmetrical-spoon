@@ -82,7 +82,7 @@ services:
     container_name: cloudflared
     restart: always
     scale: 1
-    command: tunnel --no-autoupdate run --token ${CLOUDFALRED_TUNNEL_TOKEN}
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARED_TUNNEL_TOKEN}
     networks:
       - web
       - internal
