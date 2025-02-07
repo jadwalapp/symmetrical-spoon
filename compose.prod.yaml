@@ -94,3 +94,13 @@ services:
 
 volumes:
   traefik-certificates:
+
+networks:
+  web:
+    ipam:
+      config:
+        - subnet: 10.98.0.0/16
+  internal:
+    ipam:
+      config:
+        - subnet: 10.99.0.0/16
