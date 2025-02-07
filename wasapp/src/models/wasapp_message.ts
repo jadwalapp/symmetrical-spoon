@@ -1,0 +1,10 @@
+export interface WasappMessage {
+  id: string;
+  chat_id: string;
+  sender_name: string;
+  sender_number: string;
+  is_sender_me: boolean;
+  body: string;
+  quoted_message?: WasappMessage;
+  timestamp: number;
+}

@@ -47,7 +47,7 @@ services:
       DB_NAME: ${POSTGRES_DB}
       DB_SSL_MODE: disable
       PORT: ${FALAK_PORT}
-      RABBITMQ_USER: ${RABBITMQ_USER}
+      RABBITMQ_USERNAME: ${RABBITMQ_USER}
       RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
     depends_on:
       postgresdb:
@@ -124,6 +124,14 @@ services:
     environment:
       PORT: 3000
       IS_HEADLESS: "true"
+      RABBITMQ_HOSTNAME: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USERNAME: ${RABBITMQ_USER}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+      WASAPP_MESSAGES_QUEUE_NAME: ${WASAPP_MESSAGES_QUEUE_NAME}
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
 
   rabbitmq:
     image: rabbitmq:4-management
@@ -135,6 +143,11 @@ services:
     environment:
       - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER}
       - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD}
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_port_connectivity"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 volumes:
   postgres_data:

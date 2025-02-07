@@ -1,5 +1,7 @@
 import { Client, LocalAuth } from "whatsapp-web.js";
 import { readdir } from "node:fs/promises";
+import amqp from "amqplib";
+import { type WasappMessage } from "./models/wasapp_message";
 
 export interface ClientDetails {
   client: Client;
@@ -17,11 +19,20 @@ export interface ClientDetails {
 export class WasappService {
   private clientsDetails: Map<string, ClientDetails>;
   private makeHeadlessClients: boolean;
+  private amqpChannel: amqp.Channel;
+  private wasappMessagesQueueName: string;
   private puppeteerExecutablePath?: string;
 
-  constructor(makeHeadlessClients: boolean, puppeteerExecutablePath?: string) {
+  constructor(
+    makeHeadlessClients: boolean,
+    amqpChannel: amqp.Channel,
+    wasappMessagesQueueName: string,
+    puppeteerExecutablePath?: string
+  ) {
     this.clientsDetails = new Map<string, ClientDetails>();
     this.makeHeadlessClients = makeHeadlessClients;
+    this.amqpChannel = amqpChannel;
+    this.wasappMessagesQueueName = wasappMessagesQueueName;
     this.puppeteerExecutablePath = puppeteerExecutablePath;
   }
 
@@ -61,7 +72,7 @@ export class WasappService {
       `[DEBUG - wasapp service] set the client in the clientsDetails`
     );
 
-    this.setupClientEvents(client, customerId, phoneNumber);
+    this.setupClientEvents(client, customerId);
     console.log(`[DEBUG - wasapp service] finished setupClientEvents`);
     await client.initialize();
     console.log(`[DEBUG - wasapp service] finished client.initialize`);
@@ -96,11 +107,7 @@ export class WasappService {
     return null;
   }
 
-  private setupClientEvents(
-    client: Client,
-    customerId: string,
-    phoneNumber: string | null
-  ) {
+  private setupClientEvents(client: Client, customerId: string) {
     client.on("change_state", (state) => {
       console.log(
         `[Customer: ${customerId}] WhatsApp state changed to ${state}`
@@ -116,17 +123,66 @@ export class WasappService {
       });
     });
 
-    client.on("authenticated", (session) => {
+    client.on("authenticated", (_) => {
       console.log(
         `[Customer: ${customerId}] WhatsApp client authenticated successfully`
       );
       this.updateClientDetails(customerId, { status: "AUTHENTICATED" });
     });
 
-    client.on("message_create", (msg) => {
-      console.log(
-        `[Customer: ${customerId}] New WhatsApp message | From: ${msg.from} | Type: ${msg.type} | Body: ${msg.body}`
-      );
+    client.on("message_create", async (msg) => {
+      try {
+        console.log(
+          `[Customer: ${customerId}] New WhatsApp message | From: ${msg.from} | Type: ${msg.type} | Body: ${msg.body}`
+        );
+
+        const chat = await msg.getChat();
+        if (chat.isGroup) return;
+
+        const contact = await msg.getContact();
+
+        let quotedMessageData: WasappMessage | undefined;
+        if (msg.hasQuotedMsg) {
+          const quotedMsg = await msg.getQuotedMessage();
+          const quotedMsgChat = await quotedMsg.getChat();
+          const quotedMsgContact = await quotedMsg.getContact();
+
+          quotedMessageData = {
+            id: quotedMsg.id._serialized,
+            chat_id: quotedMsgChat.id._serialized,
+            sender_name: quotedMsgContact.name ?? quotedMsgContact.pushname,
+            sender_number: quotedMsgContact.number,
+            is_sender_me: quotedMsg.fromMe,
+            body: quotedMsg.body,
+            timestamp: quotedMsg.timestamp,
+          };
+        }
+
+        const wasappMessage: WasappMessage = {
+          id: msg.id._serialized,
+          chat_id: chat.id._serialized,
+          sender_name: contact.name ?? contact.pushname,
+          sender_number: contact.number,
+          is_sender_me: contact.isMe,
+          body: msg.body,
+          quoted_message: quotedMessageData,
+          timestamp: msg.timestamp,
+        };
+
+        await this.amqpChannel.assertQueue(this.wasappMessagesQueueName, {
+          durable: true,
+        });
+        this.amqpChannel.sendToQueue(
+          this.wasappMessagesQueueName,
+          Buffer.from(JSON.stringify(wasappMessage)),
+          {
+            persistent: true,
+            messageId: msg.id._serialized,
+          }
+        );
+      } catch (error) {
+        console.error("Error handling message:", error);
+      }
     });
 
     client.on("auth_failure", async (msg) => {

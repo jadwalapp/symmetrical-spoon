@@ -1,6 +1,7 @@
 import fastify, { type RouteShorthandOptions } from "fastify";
 import { WasappService } from "./src/service";
 import { getConfig } from "./src/config";
+import amqp from "amqplib";
 
 async function main() {
   const cfg = getConfig();
@@ -18,8 +19,19 @@ async function main() {
     },
   });
 
+  const amqpConn = await amqp.connect({
+    protocol: "amqp",
+    hostname: cfg.rabbitmq.hostname,
+    port: cfg.rabbitmq.port,
+    username: cfg.rabbitmq.username,
+    password: cfg.rabbitmq.password,
+  });
+  const amqpChannel = await amqpConn.createChannel();
+
   const wasappService = new WasappService(
     cfg.isHeadless,
+    amqpChannel,
+    cfg.wasappMessagesQueueName,
     cfg.puppeteerExecuablePath
   );
   console.log(`before initialize saved clients`);
