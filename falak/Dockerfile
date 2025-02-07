@@ -19,6 +19,5 @@ RUN apk --update add ca-certificates
 
 FROM scratch
 COPY --from=builder /falak/main /main
-COPY ./falak.env.example /falak.env
 COPY --from=certs /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 CMD [ "/main" ]
