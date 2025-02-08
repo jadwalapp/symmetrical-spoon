@@ -34,7 +34,10 @@ import (
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/tokens"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/util"
 	wasappclient "github.com/jadwalapp/symmetrical-spoon/falak/pkg/wasapp/client"
+	wasappmsganalyzer "github.com/jadwalapp/symmetrical-spoon/falak/pkg/wasapp/msganalyzer"
 	wasappmsgconsumer "github.com/jadwalapp/symmetrical-spoon/falak/pkg/wasapp/msgconsumer"
+	"github.com/openai/openai-go"
+	openaioption "github.com/openai/openai-go/option"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/resendlabs/resend-go"
 	"github.com/rs/zerolog"
@@ -190,11 +193,22 @@ func main() {
 	defer amqpConn.Close()
 	// ======== AMQP CHAN ========
 
+	// ======== LLM CLI ========
+	llmCli := openai.NewClient(
+		openaioption.WithBaseURL(config.OpenAiBaseUrl),
+		openaioption.WithAPIKey(config.OpenAiApiKey),
+	)
+	// ======== LLM CLI ========
+
+	// ======== MSG ANALYZER ========
+	msgAnalyzer := wasappmsganalyzer.NewAnalyzer(llmCli, config.OpenAiModelName)
+	// ======== MSG ANALYZER ========
+
 	// ======== WASAPP CONSUMER ========
 	wasappConsumerCtx := context.Background()
 	wasappConsumerCtx = log.Logger.WithContext(wasappConsumerCtx)
 
-	wasappConsumer := wasappmsgconsumer.NewConsumer(amqpChan, config.WasappMessagesQueueName, *dbStore)
+	wasappConsumer := wasappmsgconsumer.NewConsumer(amqpChan, config.WasappMessagesQueueName, *dbStore, msgAnalyzer)
 	err = wasappConsumer.Start(wasappConsumerCtx)
 	if err != nil {
 		log.Fatal().Msgf("failed to start wasapp consumer: %v", err)

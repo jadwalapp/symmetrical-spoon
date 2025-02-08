@@ -46,3 +46,24 @@ type MagicLink struct {
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
 }
+
+type WasappChat struct {
+	ID         uuid.UUID
+	CustomerID uuid.UUID
+	ChatID     string
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
+}
+
+type WasappMessage struct {
+	ID           uuid.UUID
+	WasappChatID uuid.UUID
+	MessageID    string
+	SenderName   string
+	SenderNumber string
+	IsSenderMe   bool
+	Body         string
+	Timestamp    int64
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
+}

@@ -1,4 +1,5 @@
 export interface WasappMessage {
+  customer_id: string;
   id: string;
   chat_id: string;
   sender_name: string;

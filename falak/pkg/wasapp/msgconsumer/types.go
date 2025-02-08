@@ -1,8 +1,13 @@
 package wasappmsgconsumer
 
-import "context"
+import (
+	"context"
+
+	"github.com/google/uuid"
+)
 
 type WasappMessage struct {
+	CustomerID    uuid.UUID      `json:"customer_id"`
 	ID            string         `json:"id"`
 	ChatID        string         `json:"chat_id"`
 	SenderName    string         `json:"sender_name"`

@@ -66,6 +66,9 @@ services:
       RABBITMQ_HOSTNAME: rabbitmq
       RABBITMQ_PORT: ${RABBITMQ_PORT}
       WASAPP_MESSAGES_QUEUE_NAME: ${WASAPP_MESSAGES_QUEUE_NAME}
+      OPEN_AI_BASE_URL: ${OPEN_AI_BASE_URL}
+      OPEN_AI_API_KEY: ${OPEN_AI_API_KEY}
+      OPEN_AI_MODEL_NAME: ${OPEN_AI_MODEL_NAME}
     depends_on:
       postgresdb:
         condition: service_healthy

@@ -148,6 +148,7 @@ export class WasappService {
           const quotedMsgContact = await quotedMsg.getContact();
 
           quotedMessageData = {
+            customer_id: customerId,
             id: quotedMsg.id._serialized,
             chat_id: quotedMsgChat.id._serialized,
             sender_name: quotedMsgContact.name ?? quotedMsgContact.pushname,
@@ -160,6 +161,7 @@ export class WasappService {
         }
 
         const wasappMessage: WasappMessage = {
+          customer_id: customerId,
           id: msg.id._serialized,
           chat_id: chat.id._serialized,
           sender_name: contact.name ?? contact.pushname,

@@ -1,5 +1,7 @@
 package wasappmsganalyzer
 
+import "fmt"
+
 const analyzeMessagePrompt = `You are dabdoob, you are the best message threads analyzer for extracting events that can be added to a calendar. You will be presented with a conversation between two people and you will analyze it and decide its current state.
 
 <system_constraints>
@@ -16,3 +18,20 @@ const analyzeMessagePrompt = `You are dabdoob, you are the best message threads 
 - The current date will be provided in the in a <date></date> tag.
 - The current time will be provided in the in a <time></time> tag.
 </system_constraints>`
+
+func CreateMessagesTag(messages []MessageForAnalysis) string {
+	var formattedMsgs string
+	for _, msg := range messages {
+		formattedMsgs += fmt.Sprintf("%s(%d): %s\n", msg.SenderName, msg.Timestamp, msg.Body)
+	}
+	return fmt.Sprintf(`<messages>
+%s</messages>`, formattedMsgs)
+}
+
+func CreateDateTag(date string) string {
+	return fmt.Sprintf("<date>%s</date>", date)
+}
+
+func CreateTimeTag(time string) string {
+	return fmt.Sprintf("<time>%s</time>", time)
+}

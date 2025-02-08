@@ -40,6 +40,9 @@ type FalakConfig struct {
 	RabbitMqHost                string `mapstructure:"RABBITMQ_HOSTNAME"`
 	RabbitMqPort                string `mapstructure:"RABBITMQ_PORT"`
 	WasappMessagesQueueName     string `mapstructure:"WASAPP_MESSAGES_QUEUE_NAME"`
+	OpenAiBaseUrl               string `mapstructure:"OPEN_AI_BASE_URL"`
+	OpenAiApiKey                string `mapstructure:"OPEN_AI_API_KEY"`
+	OpenAiModelName             string `mapstructure:"OPEN_AI_MODEL_NAME"`
 }
 
 // LoadFalakConfig reads configuration from the provided path or environment variables.

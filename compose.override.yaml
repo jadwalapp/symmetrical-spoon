@@ -34,10 +34,13 @@ services:
       - "traefik.http.services.falak.loadbalancer.server.scheme=h2c"
     ports:
       - "50064:50064"
-    volumes:
-      - ./falak:/falak
     develop:
       watch:
+        - path: ./falak
+          target: /falak
+          action: sync+restart
+          ignore:
+            - go.sum
         - path: ./falak/go.sum
           action: rebuild
 
