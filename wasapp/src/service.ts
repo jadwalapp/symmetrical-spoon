@@ -132,10 +132,6 @@ export class WasappService {
 
     client.on("message_create", async (msg) => {
       try {
-        console.log(
-          `[Customer: ${customerId}] New WhatsApp message | From: ${msg.from} | Type: ${msg.type} | Body: ${msg.body}`
-        );
-
         const chat = await msg.getChat();
         if (chat.isGroup) return;
 
