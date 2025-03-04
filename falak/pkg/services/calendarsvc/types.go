@@ -2,6 +2,9 @@ package calendarsvc
 
 import "context"
 
-type CalendarSvc interface {
-	CreateCalendarAccount(ctx context.Context, customerID string)
+type AddEventRequest struct {
+}
+
+type Svc interface {
+	AddEvent(ctx context.Context, r *AddEventRequest) error
 }
