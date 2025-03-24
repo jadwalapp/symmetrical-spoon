@@ -30,9 +30,11 @@ import (
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/httpclient"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/interceptors"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/lokilogger"
+	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/services/calendarsvc"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/store"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/tokens"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/util"
+	wasappcalendar "github.com/jadwalapp/symmetrical-spoon/falak/pkg/wasapp/calendar"
 	wasappclient "github.com/jadwalapp/symmetrical-spoon/falak/pkg/wasapp/client"
 	wasappmsganalyzer "github.com/jadwalapp/symmetrical-spoon/falak/pkg/wasapp/msganalyzer"
 	wasappmsgconsumer "github.com/jadwalapp/symmetrical-spoon/falak/pkg/wasapp/msgconsumer"
@@ -204,11 +206,37 @@ func main() {
 	msgAnalyzer := wasappmsganalyzer.NewAnalyzer(llmCli, config.OpenAiModelName)
 	// ======== MSG ANALYZER ========
 
+	// ======== CALENDAR SERVICE ========
+	calendarService := calendarsvc.NewSvc(config.BaikalHost, *dbStore)
+	// ======== CALENDAR SERVICE ========
+
+	// ======== WASAPP CALENDAR PRODUCER ========
+	wasappCalendarProducer := wasappcalendar.NewProducer(amqpChan, config.WasappCalendarEventsQueueName)
+	// ======== WASAPP CALENDAR PRODUCER ========
+
+	// ======== CALENDAR CONSUMER ========
+	calendarConsumerCtx := context.Background()
+	calendarConsumerCtx = log.Logger.WithContext(calendarConsumerCtx)
+
+	calendarConsumer := wasappcalendar.NewConsumer(amqpChan, config.WasappCalendarEventsQueueName, *dbStore, calendarService, config.CalDAVPasswordEncryptionKey)
+	err = calendarConsumer.Start(calendarConsumerCtx)
+	if err != nil {
+		log.Fatal().Msgf("failed to start calendar consumer: %v", err)
+	}
+	defer calendarConsumer.Stop(calendarConsumerCtx)
+	// ======== CALENDAR CONSUMER ========
+
 	// ======== WASAPP CONSUMER ========
 	wasappConsumerCtx := context.Background()
 	wasappConsumerCtx = log.Logger.WithContext(wasappConsumerCtx)
 
-	wasappConsumer := wasappmsgconsumer.NewConsumer(amqpChan, config.WasappMessagesQueueName, *dbStore, msgAnalyzer)
+	wasappConsumer := wasappmsgconsumer.NewConsumer(
+		amqpChan,
+		config.WasappMessagesQueueName,
+		*dbStore,
+		msgAnalyzer,
+		wasappCalendarProducer,
+	)
 	err = wasappConsumer.Start(wasappConsumerCtx)
 	if err != nil {
 		log.Fatal().Msgf("failed to start wasapp consumer: %v", err)

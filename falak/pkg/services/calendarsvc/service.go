@@ -2,40 +2,79 @@ package calendarsvc
 
 import (
 	"context"
-	"net/http"
+	"fmt"
+	"sync"
 
-	"github.com/emersion/go-webdav/caldav"
 	"github.com/google/uuid"
+	caldavclient "github.com/jadwalapp/symmetrical-spoon/falak/pkg/caldav/client"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/store"
-	"github.com/rs/zerolog/log"
 )
 
 type svc struct {
-	caldavClients map[uuid.UUID]*caldav.Client
+	mu            sync.RWMutex
+	caldavClients map[uuid.UUID]caldavclient.Client
 	store         store.Queries
+	calDavBaseUrl string
+}
+
+func (s *svc) InitCalendar(ctx context.Context, r *InitCalendarRequest) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	calClient, err := s.createCalendarClient(s.calDavBaseUrl, r.Username, r.Password)
+	if err != nil {
+		return err
+	}
+
+	// Create calendar with provided properties
+	calProps := caldavclient.CalendarProperties{
+		PathSuffix:  r.PathSuffix,
+		DisplayName: r.DisplayName,
+		Color:       r.Color,
+	}
+
+	if err := calClient.InitCalendar(ctx, calProps); err != nil {
+		return err
+	}
+
+	s.caldavClients[r.CustomerID] = calClient
+	return nil
 }
 
 func (s *svc) AddEvent(ctx context.Context, r *AddEventRequest) error {
-	panic("unimplemented")
-}
+	s.mu.RLock()
+	calendar, exists := s.caldavClients[r.CustomerID]
+	s.mu.RUnlock()
 
-func (s *svc) getOrCreateClientForCustomer(ctx context.Context, customerID uuid.UUID) (*caldav.Client, error) {
-	if caldavCli, exists := s.caldavClients[customerID]; exists {
-		return caldavCli, nil
+	if !exists {
+		return fmt.Errorf("calendar not initialized for customer %s", r.CustomerID)
 	}
 
-	caldavCli, err := caldav.NewClient(&http.Client{}, "https://baikal.jadwal.app/dav.php")
-	if err != nil {
-		log.Ctx(ctx).Err(err).Str("customer_id", customerID.String()).Msg("failed to create caldav client")
-		return nil, err
+	eventData := caldavclient.EventData{
+		Summary:     r.Summary,
+		Description: r.Description,
+		StartTime:   r.StartTime,
+		EndTime:     r.EndTime,
+		UID:         r.UID,
 	}
 
-	return caldavCli, nil
+	return calendar.AddEvent(ctx, eventData)
 }
 
-func NewSvc(store store.Queries) Svc {
+func (s *svc) createCalendarClient(baseUrl, username, password string) (caldavclient.Client, error) {
+	config := caldavclient.Config{
+		BaseURL:  fmt.Sprintf("%s/dav.php", baseUrl),
+		Username: username,
+		Password: password,
+	}
+
+	return caldavclient.NewCalDAVClient(config)
+}
+
+func NewSvc(calDavBaseUrl string, store store.Queries) Svc {
 	return &svc{
-		caldavClients: make(map[uuid.UUID]*caldav.Client),
+		caldavClients: make(map[uuid.UUID]caldavclient.Client),
 		store:         store,
+		calDavBaseUrl: calDavBaseUrl,
 	}
 }
