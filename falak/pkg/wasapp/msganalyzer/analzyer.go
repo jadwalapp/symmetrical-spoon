@@ -26,7 +26,6 @@ func (a *analyzer) AnalyzeMessages(ctx context.Context, r *AnalyzeMessagesReques
 	}
 
 	logger.Debug().
-		Interface("messages", msgs).
 		Str("model", a.modelName).
 		Msg("analyzing messages with LLM")
 
