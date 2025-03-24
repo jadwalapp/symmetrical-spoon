@@ -44,10 +44,6 @@ func (a *analyzer) AnalyzeMessages(ctx context.Context, r *AnalyzeMessagesReques
 	body = strings.TrimPrefix(body, "json")
 	body = strings.TrimSuffix(body, "```")
 
-	logger.Debug().
-		Str("raw_response", body).
-		Msg("received response from LLM")
-
 	var resp AnalyzeMessagesResponse
 	if err := json.Unmarshal([]byte(body), &resp); err != nil {
 		logger.Error().
