@@ -82,14 +82,15 @@ services:
       - "5672:5672" # AMQP protocol port
       - "15672:15672" # Management UI port
 
+
   # extra stuff - only local
-  plantuml:
-    image: plantuml/plantuml-server:jetty
-    labels:
-      - "traefik.enable=true"
-      - "traefik.docker.network=symmetrical-spoon_web"
-      - "traefik.http.routers.plantuml.rule=Host(`plantuml.localhost`)"
-      - "traefik.http.routers.plantuml.entrypoints=web"
-      - "traefik.http.services.plantuml.loadbalancer.server.port=8080"
-    networks:
-      - web
+  # plantuml:
+  #   image: plantuml/plantuml-server:jetty
+  #   labels:
+  #     - "traefik.enable=true"
+  #     - "traefik.docker.network=symmetrical-spoon_web"
+  #     - "traefik.http.routers.plantuml.rule=Host(`plantuml.localhost`)"
+  #     - "traefik.http.routers.plantuml.entrypoints=web"
+  #     - "traefik.http.services.plantuml.loadbalancer.server.port=8080"
+  #   networks:
+  #     - web

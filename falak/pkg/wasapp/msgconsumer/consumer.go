@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/store"
+	wasappcalendar "github.com/jadwalapp/symmetrical-spoon/falak/pkg/wasapp/calendar"
 	wasappmsganalyzer "github.com/jadwalapp/symmetrical-spoon/falak/pkg/wasapp/msganalyzer"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/rs/zerolog/log"
@@ -15,6 +16,7 @@ type consumer struct {
 	wasappMessagesQueueName string
 	store                   store.Queries
 	msgAnalyzer             wasappmsganalyzer.Analyzer
+	calendarProducer        wasappcalendar.Producer
 }
 
 func (c *consumer) Start(ctx context.Context) error {
@@ -124,8 +126,25 @@ func (c *consumer) Start(ctx context.Context) error {
 					case wasappmsganalyzer.AnalyzeMessagesStatus_HasEventAgreed:
 						log.Ctx(ctx).Info().
 							Str("chat_id", chatID).
-							Msg("event agreed, proceeding to delete chat")
-						// TODO: add the event to wasapp.events queue
+							Msg("event agreed, proceeding to add to calendar queue")
+
+						eventData := mapAnalysisResponseToCalendarEvent(
+							ctx,
+							wasappMsg.CustomerID,
+							chatID,
+							analysisResp,
+						)
+
+						err = c.calendarProducer.PublishEvent(ctx, eventData)
+						if err != nil {
+							log.Ctx(ctx).Err(err).
+								Str("chat_id", chatID).
+								Msg("failed to publish event to calendar queue")
+						} else {
+							log.Ctx(ctx).Info().
+								Str("chat_id", chatID).
+								Msg("successfully published event to calendar queue")
+						}
 
 						err = c.store.DeleteChat(ctx, chatID)
 						if err != nil {
@@ -196,11 +215,12 @@ func (c *consumer) Stop(ctx context.Context) error {
 	return nil
 }
 
-func NewConsumer(channel *amqp.Channel, wasappMessagesQueueName string, store store.Queries, msgAnalyzer wasappmsganalyzer.Analyzer) Consumer {
+func NewConsumer(channel *amqp.Channel, wasappMessagesQueueName string, store store.Queries, msgAnalyzer wasappmsganalyzer.Analyzer, calendarProducer wasappcalendar.Producer) Consumer {
 	return &consumer{
 		channel:                 channel,
 		wasappMessagesQueueName: wasappMessagesQueueName,
 		store:                   store,
 		msgAnalyzer:             msgAnalyzer,
+		calendarProducer:        calendarProducer,
 	}
 }
