@@ -1,6 +1,6 @@
 -- name: CreateCalDavAccount :one
 INSERT INTO caldav_account (customer_id, email, username, password)
-VALUES ($1, $2, $3, pgp_sym_encrypt(@password::text, @encryption_key::text))
+VALUES ($1, $2, $3, pgp_sym_encrypt(@password::text, @encryption_key::text, 'cipher-algo=aes256'))
 RETURNING *;
 
 -- name: GetCalDavAccountByCustomerId :one
