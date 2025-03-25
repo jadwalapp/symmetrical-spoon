@@ -12,11 +12,12 @@ import (
 )
 
 type consumer struct {
-	channel                 *amqp.Channel
-	wasappMessagesQueueName string
-	store                   store.Queries
-	msgAnalyzer             wasappmsganalyzer.Analyzer
-	calendarProducer        wasappcalendar.Producer
+	channel                       *amqp.Channel
+	wasappMessagesQueueName       string
+	store                         store.Queries
+	msgAnalyzer                   wasappmsganalyzer.Analyzer
+	calendarProducer              wasappcalendar.Producer
+	whatsappMessagesEncryptionKey string
 }
 
 func (c *consumer) Start(ctx context.Context) error {
@@ -79,14 +80,15 @@ func (c *consumer) Start(ctx context.Context) error {
 					Msg("processing new message")
 
 				msgs, err := c.store.AddMessageToChatReturningMessages(ctx, store.AddMessageToChatReturningMessagesParams{
-					CustomerID:   wasappMsg.CustomerID,
-					ChatID:       wasappMsg.ChatID,
-					MessageID:    wasappMsg.ID,
-					SenderName:   wasappMsg.SenderName,
-					SenderNumber: wasappMsg.SenderNumber,
-					IsSenderMe:   wasappMsg.IsSenderMe,
-					Body:         wasappMsg.Body,
-					Timestamp:    wasappMsg.Timestamp,
+					CustomerID:    wasappMsg.CustomerID,
+					ChatID:        wasappMsg.ChatID,
+					MessageID:     wasappMsg.ID,
+					SenderName:    wasappMsg.SenderName,
+					SenderNumber:  wasappMsg.SenderNumber,
+					IsSenderMe:    wasappMsg.IsSenderMe,
+					Body:          wasappMsg.Body,
+					Timestamp:     wasappMsg.Timestamp,
+					EncryptionKey: c.whatsappMessagesEncryptionKey,
 				})
 				if err != nil {
 					log.Ctx(ctx).Err(err).
@@ -215,12 +217,13 @@ func (c *consumer) Stop(ctx context.Context) error {
 	return nil
 }
 
-func NewConsumer(channel *amqp.Channel, wasappMessagesQueueName string, store store.Queries, msgAnalyzer wasappmsganalyzer.Analyzer, calendarProducer wasappcalendar.Producer) Consumer {
+func NewConsumer(channel *amqp.Channel, wasappMessagesQueueName string, store store.Queries, msgAnalyzer wasappmsganalyzer.Analyzer, calendarProducer wasappcalendar.Producer, whatsappMessagesEncryptionKey string) Consumer {
 	return &consumer{
-		channel:                 channel,
-		wasappMessagesQueueName: wasappMessagesQueueName,
-		store:                   store,
-		msgAnalyzer:             msgAnalyzer,
-		calendarProducer:        calendarProducer,
+		channel:                       channel,
+		wasappMessagesQueueName:       wasappMessagesQueueName,
+		store:                         store,
+		msgAnalyzer:                   msgAnalyzer,
+		calendarProducer:              calendarProducer,
+		whatsappMessagesEncryptionKey: whatsappMessagesEncryptionKey,
 	}
 }

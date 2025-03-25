@@ -21,13 +21,14 @@ inserted_message AS (
     $4,
     $5,
     $6,
-    $7,
-    $8
+    pgp_sym_encrypt(@body::text, @encryption_key::text, 'cipher-algo=aes256'),
+    $7
   ON CONFLICT (message_id) DO NOTHING
   RETURNING *
 )
 SELECT 
   m.*,
+  pgp_sym_decrypt(m.body::bytea, @encryption_key::text) AS decrypted_body,
   c.chat_id,
   c.customer_id
 FROM wasapp_message m

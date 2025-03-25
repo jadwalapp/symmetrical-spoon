@@ -17,7 +17,7 @@ import (
 func mapAddMessageToChatReturningMessagesRowToMessageForAnalysis(row store.AddMessageToChatReturningMessagesRow) wasappmsganalyzer.MessageForAnalysis {
 	return wasappmsganalyzer.MessageForAnalysis{
 		SenderName: row.SenderName,
-		Body:       row.Body,
+		Body:       row.DecryptedBody,
 		Timestamp:  row.Timestamp,
 	}
 }

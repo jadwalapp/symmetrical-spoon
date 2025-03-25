@@ -35,13 +35,14 @@ inserted_message AS (
     $4,
     $5,
     $6,
-    $7,
-    $8
+    pgp_sym_encrypt($9::text, $8::text, 'cipher-algo=aes256'),
+    $7
   ON CONFLICT (message_id) DO NOTHING
   RETURNING id, wasapp_chat_id, message_id, sender_name, sender_number, is_sender_me, body, timestamp, created_at, updated_at
 )
 SELECT 
   m.id, m.wasapp_chat_id, m.message_id, m.sender_name, m.sender_number, m.is_sender_me, m.body, m.timestamp, m.created_at, m.updated_at,
+  pgp_sym_decrypt(m.body::bytea, $8::text) AS decrypted_body,
   c.chat_id,
   c.customer_id
 FROM wasapp_message m
@@ -50,29 +51,31 @@ WHERE c.chat_id = $2
 `
 
 type AddMessageToChatReturningMessagesParams struct {
-	CustomerID   uuid.UUID
-	ChatID       string
-	MessageID    string
-	SenderName   string
-	SenderNumber string
-	IsSenderMe   bool
-	Body         string
-	Timestamp    int64
+	CustomerID    uuid.UUID
+	ChatID        string
+	MessageID     string
+	SenderName    string
+	SenderNumber  string
+	IsSenderMe    bool
+	Timestamp     int64
+	EncryptionKey string
+	Body          string
 }
 
 type AddMessageToChatReturningMessagesRow struct {
-	ID           uuid.UUID
-	WasappChatID uuid.UUID
-	MessageID    string
-	SenderName   string
-	SenderNumber string
-	IsSenderMe   bool
-	Body         string
-	Timestamp    int64
-	CreatedAt    time.Time
-	UpdatedAt    time.Time
-	ChatID       string
-	CustomerID   uuid.UUID
+	ID            uuid.UUID
+	WasappChatID  uuid.UUID
+	MessageID     string
+	SenderName    string
+	SenderNumber  string
+	IsSenderMe    bool
+	Body          string
+	Timestamp     int64
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
+	DecryptedBody string
+	ChatID        string
+	CustomerID    uuid.UUID
 }
 
 func (q *Queries) AddMessageToChatReturningMessages(ctx context.Context, arg AddMessageToChatReturningMessagesParams) ([]AddMessageToChatReturningMessagesRow, error) {
@@ -83,8 +86,9 @@ func (q *Queries) AddMessageToChatReturningMessages(ctx context.Context, arg Add
 		arg.SenderName,
 		arg.SenderNumber,
 		arg.IsSenderMe,
-		arg.Body,
 		arg.Timestamp,
+		arg.EncryptionKey,
+		arg.Body,
 	)
 	if err != nil {
 		return nil, err
@@ -104,6 +108,7 @@ func (q *Queries) AddMessageToChatReturningMessages(ctx context.Context, arg Add
 			&i.Timestamp,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.DecryptedBody,
 			&i.ChatID,
 			&i.CustomerID,
 		); err != nil {

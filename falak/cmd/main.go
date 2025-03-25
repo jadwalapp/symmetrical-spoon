@@ -236,6 +236,7 @@ func main() {
 		*dbStore,
 		msgAnalyzer,
 		wasappCalendarProducer,
+		config.WhatsappMessagesEncryptionKey,
 	)
 	err = wasappConsumer.Start(wasappConsumerCtx)
 	if err != nil {
