@@ -11,7 +11,19 @@ class ProfileViewModel: ObservableObject {
     @Published private(set) var profileState: AsyncValue<Profile_V1_GetProfileResponse> = .idle
     @Published private(set) var calDavAccountState: AsyncValue<Calendar_V1_GetCalDavAccountResponse> = .idle
     @Published private(set) var whatsappAccountState: AsyncValue<Whatsapp_V1_GetWhatsappAccountResponse> = .idle
-    @Published var showWhatsappSheet = false
+    @Published var showWhatsappSheet = false {
+        didSet {
+            if showWhatsappSheet {
+                // Only disconnect if we're not in WAITING_FOR_PAIRING state
+                Task {
+                    let response = try? await whatsappRepository.getWhatsappAccount()
+                    if response?.status != "WAITING_FOR_PAIRING" {
+                        _ = try? await whatsappRepository.disconnectWhatsappAccount()
+                    }
+                }
+            }
+        }
+    }
     
     private let profileRepository: ProfileRepository
     private let calendarRepository: CalendarRepository

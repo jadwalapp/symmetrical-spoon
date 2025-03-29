@@ -33,21 +33,74 @@ struct SettingsView: View {
                     response: profileViewModel.whatsappAccountState
                 ) { whatsappAccount in
                     if whatsappAccount.isReady {
-                        HStack {
-                            Image(systemName: "message.fill")
-                            VStack(alignment: .leading) {
-                                Text("WhatsApp Connected")
-                                Text(whatsappAccount.phoneNumber)
-                                    .font(.caption)
+                        VStack(spacing: 16) {
+                            HStack {
+                                Image(systemName: "message.fill")
+                                    .foregroundStyle(.green)
+                                    .font(.title3)
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("WhatsApp Connected")
+                                        .font(.headline)
+                                    Text(whatsappAccount.phoneNumber)
+                                        .font(.subheadline)
+                                        .foregroundStyle(.secondary)
+                                }
+                                Spacer()
+                                Menu {
+                                    Button(role: .destructive) {
+                                        profileViewModel.disconnectWhatsapp()
+                                    } label: {
+                                        Label("Disconnect", systemImage: "xmark.circle")
+                                    }
+                                } label: {
+                                    Image(systemName: "ellipsis.circle")
+                                        .foregroundStyle(.secondary)
+                                        .font(.title3)
+                                }
+                            }
+                            
+                            if !whatsappAccount.name.isEmpty {
+                                HStack {
+                                    Image(systemName: "person.fill")
+                                        .foregroundStyle(.secondary)
+                                    Text(whatsappAccount.name)
+                                        .font(.subheadline)
+                                        .foregroundStyle(.secondary)
+                                    Spacer()
+                                }
+                            }
+                            
+                            HStack {
+                                Image(systemName: "checkmark.seal.fill")
+                                    .foregroundStyle(.green)
+                                Text("Scanning messages for events")
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                                Spacer()
+                            }
+                        }
+                        .padding(.vertical, 4)
+                    } else if whatsappAccount.status == "WAITING_FOR_PAIRING" {
+                        Button {
+                            profileViewModel.showWhatsappSheet = true
+                        } label: {
+                            HStack {
+                                Image(systemName: "message.badge.circle.fill")
+                                    .font(.title3)
+                                    .foregroundStyle(.orange)
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("Complete WhatsApp Setup")
+                                        .font(.headline)
+                                    Text("Waiting for pairing code")
+                                        .font(.subheadline)
+                                        .foregroundStyle(.secondary)
+                                }
+                                Spacer()
+                                Image(systemName: "chevron.right")
+                                    .font(.subheadline)
                                     .foregroundStyle(.secondary)
                             }
-                            Spacer()
-                            Button {
-                                profileViewModel.disconnectWhatsapp()
-                            } label: {
-                                Image(systemName: "xmark.circle.fill")
-                                    .foregroundStyle(.red)
-                            }
+                            .padding(.vertical, 4)
                         }
                     } else {
                         Button {
@@ -55,8 +108,21 @@ struct SettingsView: View {
                         } label: {
                             HStack {
                                 Image(systemName: "message.fill")
-                                Text("Connect WhatsApp")
+                                    .font(.title3)
+                                    .foregroundStyle(.green)
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("Connect WhatsApp")
+                                        .font(.headline)
+                                    Text("Sync your events from chats")
+                                        .font(.subheadline)
+                                        .foregroundStyle(.secondary)
+                                }
+                                Spacer()
+                                Image(systemName: "chevron.right")
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
                             }
+                            .padding(.vertical, 4)
                         }
                     }
                 }
@@ -89,6 +155,11 @@ struct SettingsView: View {
         }
         .sheet(isPresented: $profileViewModel.showWhatsappSheet) {
             WhatsappConnectionSheet(whatsappRepository: DependencyContainer.shared.whatsappRepository)
+                .presentationDragIndicator(.visible)
+                .presentationDetents([.large])
+                .onDisappear {
+                    profileViewModel.getWhatsappAccount()
+                }
         }
     }
 }
