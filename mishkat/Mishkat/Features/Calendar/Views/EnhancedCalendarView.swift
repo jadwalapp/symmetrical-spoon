@@ -18,10 +18,14 @@ struct EnhancedCalendarView: View {
             if isMonthView {
                 MonthView(selectedDate: $viewModel.selectedDate, viewModel: viewModel, isMonthView: $isMonthView, animation: animation)
                     .onChange(of: currentMonth) { newMonth in
-                        viewModel.fetchMonthlyEvents(for: newMonth)
+                        viewModel.fetchMonthlyEvents(for: newMonth, forceRefresh: true)
+                    }
+                    .onChange(of: viewModel.monthlyEvents) { _ in
+                        // Trigger a notification to update decorations when events change
+                        NotificationCenter.default.post(name: NSNotification.Name("MonthlyEventsUpdated"), object: nil)
                     }
                     .onAppear {
-                        viewModel.fetchMonthlyEvents(for: currentMonth)
+                        viewModel.fetchMonthlyEvents(for: currentMonth, forceRefresh: true)
                     }
                     .transition(.opacity)
             } else {

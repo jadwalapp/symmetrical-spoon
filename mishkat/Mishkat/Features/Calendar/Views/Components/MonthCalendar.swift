@@ -26,6 +26,9 @@ struct MonthCalendar: UIViewRepresentable {
         let dateSelection = UICalendarSelectionSingleDate(delegate: context.coordinator)
         view.selectionBehavior = dateSelection
         
+        // Initial decoration update
+        context.coordinator.updateDecorations(for: view)
+        
         return view
     }
     
@@ -46,36 +49,82 @@ struct MonthCalendar: UIViewRepresentable {
     class Coordinator: NSObject, UICalendarViewDelegate, UICalendarSelectionSingleDateDelegate {
         var parent: MonthCalendar
         private var decoratedDates: Set<DateComponents> = []
+        private var calendarReference: UICalendarView?
         
         init(_ parent: MonthCalendar) {
             self.parent = parent
+            super.init()
+            
+            // Listen for event updates
+            NotificationCenter.default.addObserver(
+                self,
+                selector: #selector(handleEventsUpdated),
+                name: NSNotification.Name("MonthlyEventsUpdated"),
+                object: nil
+            )
         }
         
-        func calendarView(_ calendarView: UICalendarView, decorationFor dateComponents: DateComponents) -> UICalendarView.Decoration? {
-            guard decoratedDates.contains(dateComponents) else { return nil }
-            
-            // Create a custom view decoration
-            return .customView { [weak self] in
-                let view = UIView(frame: CGRect(x: 0, y: 0, width: 4, height: 4))
-                view.backgroundColor = .systemGreen
-                view.layer.cornerRadius = 2
-                return view
+        deinit {
+            NotificationCenter.default.removeObserver(self)
+        }
+        
+        @objc func handleEventsUpdated() {
+            if let calendarView = calendarReference {
+                updateDecorations(for: calendarView)
             }
         }
         
+        func calendarView(_ calendarView: UICalendarView, decorationFor dateComponents: DateComponents) -> UICalendarView.Decoration? {
+            // Check if there's an event on this date by comparing only year, month, day components
+            let exists = decoratedDates.contains { components in
+                return components.year == dateComponents.year &&
+                       components.month == dateComponents.month &&
+                       components.day == dateComponents.day
+            }
+            
+            if exists {
+                return .customView {
+                    let view = UILabel()
+                    view.text = "🟢"
+                    return view
+                }
+            }
+            
+            return nil
+        }
+        
         func updateDecorations(for calendarView: UICalendarView) {
+            // Store reference to calendar view for later updates
+            calendarReference = calendarView
+            
             let calendar = Calendar.current
             guard let visibleMonth = calendar.date(from: calendarView.visibleDateComponents),
                   let startOfMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: visibleMonth)),
                   let endOfMonth = calendar.date(byAdding: DateComponents(month: 1, day: -1), to: startOfMonth) else {
+                print("⚠️ Calendar: Failed to calculate month range")
                 return
             }
             
             // Get all dates with events
             let datesWithEvents = parent.viewModel.monthlyEvents.compactMap { event -> DateComponents? in
-                let date = event.startDate ?? Date()
-                guard date >= startOfMonth && date <= endOfMonth else { return nil }
-                return calendar.dateComponents([.year, .month, .day], from: date)
+                guard let startDate = event.startDate else {
+                    print("⚠️ Calendar: Event without start date:", event.title ?? "Untitled")
+                    return nil
+                }
+                
+                guard startDate >= startOfMonth && startDate <= endOfMonth else { return nil }
+                // Only include year, month, day components for consistent comparison
+                return calendar.dateComponents([.year, .month, .day], from: startDate)
+            }
+            
+            if datesWithEvents.isEmpty {
+                print("ℹ️ Calendar: No events found for month:", calendar.component(.month, from: visibleMonth))
+            } else {
+                print("✅ Calendar: Found \(datesWithEvents.count) events for month:", calendar.component(.month, from: visibleMonth))
+                // Debug to make sure we're getting proper components
+                datesWithEvents.forEach { components in
+                    print("📆 Event on: \(components.year ?? 0)-\(components.month ?? 0)-\(components.day ?? 0)")
+                }
             }
             
             decoratedDates = Set(datesWithEvents)
@@ -96,7 +145,25 @@ struct MonthCalendar: UIViewRepresentable {
         // UICalendarViewDelegate
         func calendarView(_ calendarView: UICalendarView, didChangeVisibleDateComponentsFrom previousDateComponents: DateComponents) {
             guard let date = Calendar.current.date(from: calendarView.visibleDateComponents) else { return }
-            parent.viewModel.fetchMonthlyEvents(for: date)
+            
+            // Update the selectedDate to the first day of the newly visible month
+            let calendar = Calendar.current
+            if let firstDayOfMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: date)) {
+                // Only update if we're actually changing months to avoid disrupting day selection
+                if !calendar.isDate(parent.selectedDate, equalTo: date, toGranularity: .month) {
+                    withAnimation {
+                        parent.selectedDate = firstDayOfMonth
+                    }
+                }
+            }
+            
+            // Force refresh when changing months
+            parent.viewModel.fetchMonthlyEvents(for: date, forceRefresh: true)
+            
+            // Update decorations after a short delay to ensure events have been fetched
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                self.updateDecorations(for: calendarView)
+            }
         }
     }
 }

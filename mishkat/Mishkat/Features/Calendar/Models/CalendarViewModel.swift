@@ -73,12 +73,14 @@ class CalendarViewModel: NSObject, ObservableObject, EKEventEditViewDelegate {
         }
     }
     
-    func fetchMonthlyEvents(for date: Date) {
+    func fetchMonthlyEvents(for date: Date, forceRefresh: Bool = false) {
         let key = cacheKey(for: date)
         
-        // Check cache first
-        if !shouldRefetchCache(for: date), let cachedEvents = eventCache[key] {
+        // Check cache first (unless force refresh is requested)
+        if !forceRefresh && !shouldRefetchCache(for: date), let cachedEvents = eventCache[key] {
             self.monthlyEvents = cachedEvents
+            // Notify about event update even when using cache
+            NotificationCenter.default.post(name: NSNotification.Name("MonthlyEventsUpdated"), object: nil)
             return
         }
         
@@ -99,13 +101,16 @@ class CalendarViewModel: NSObject, ObservableObject, EKEventEditViewDelegate {
                 self?.eventCache[key] = sortedEvents
                 self?.lastFetchDates[key] = Date()
                 self?.isLoading = false
+                
+                // Notify observers that events have been updated
+                NotificationCenter.default.post(name: NSNotification.Name("MonthlyEventsUpdated"), object: nil)
             }
         }
     }
     
     func fetchEvents(for date: Date) {
         if isMonthView {
-            fetchMonthlyEvents(for: date)
+            fetchMonthlyEvents(for: date, forceRefresh: true)
         } else {
             fetchDailyEvents(for: date)
         }
@@ -129,6 +134,7 @@ class CalendarViewModel: NSObject, ObservableObject, EKEventEditViewDelegate {
         
         if action == .saved {
             fetchDailyEvents(for: selectedDate)
+            fetchMonthlyEvents(for: selectedDate, forceRefresh: true)
         }
     }
     
