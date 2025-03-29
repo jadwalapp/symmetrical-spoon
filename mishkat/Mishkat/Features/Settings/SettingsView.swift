@@ -60,15 +60,6 @@ struct SettingsView: View {
                         }
                     }
                 }
-                
-                Button {
-                    print("connect caldav")
-                } label: {
-                    HStack {
-                        Image(systemName: "calendar")
-                        Text("Connect CalDAV")
-                    }
-                }
             }
             Section {
                 HStack {
