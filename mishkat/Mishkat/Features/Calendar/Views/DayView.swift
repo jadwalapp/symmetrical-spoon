@@ -55,6 +55,7 @@ struct DayView: View {
                             
                             Button {
                                 showingEventEditor = true
+                                selectedEvent = nil  // Ensure we're creating a new event, not editing
                             } label: {
                                 Text("Add Event")
                                     .padding(.horizontal, 16)
@@ -100,6 +101,9 @@ struct DayView: View {
         .sheet(isPresented: $showingEventEditor) {
             if let event = selectedEvent {
                 AddEventView(isPresented: $showingEventEditor, event: event)
+                    .edgesIgnoringSafeArea(.all)
+            } else {
+                AddEventView(isPresented: $showingEventEditor)
                     .edgesIgnoringSafeArea(.all)
             }
         }
