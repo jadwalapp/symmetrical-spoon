@@ -7,13 +7,11 @@
 
 import Foundation
 
-enum WhatsappRepositoryError: Error {
+enum WhatsappRepositoryError: LocalizedError {
     case unknown
     case notFound
     case timeout
-}
-
-extension WhatsappRepositoryError: LocalizedError {
+    
     var errorDescription: String? {
         switch self {
         case .unknown:
