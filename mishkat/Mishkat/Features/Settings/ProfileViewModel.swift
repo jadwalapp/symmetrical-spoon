@@ -10,13 +10,17 @@ import Foundation
 class ProfileViewModel: ObservableObject {
     @Published private(set) var profileState: AsyncValue<Profile_V1_GetProfileResponse> = .idle
     @Published private(set) var calDavAccountState: AsyncValue<Calendar_V1_GetCalDavAccountResponse> = .idle
+    @Published private(set) var whatsappAccountState: AsyncValue<Whatsapp_V1_GetWhatsappAccountResponse> = .idle
+    @Published var showWhatsappSheet = false
     
     private let profileRepository: ProfileRepository
     private let calendarRepository: CalendarRepository
+    private let whatsappRepository: WhatsappRepository
     
-    init(profileRepository: ProfileRepository, calendarRepository: CalendarRepository) {
+    init(profileRepository: ProfileRepository, calendarRepository: CalendarRepository, whatsappRepository: WhatsappRepository) {
         self.profileRepository = profileRepository
         self.calendarRepository = calendarRepository
+        self.whatsappRepository = whatsappRepository
     }
     
     func getProfile() {
@@ -57,6 +61,48 @@ class ProfileViewModel: ObservableObject {
                 await MainActor.run {
                     self.calDavAccountState = .failed(error)
                 }
+            }
+        }
+    }
+    
+    func getWhatsappAccount() {
+        if case .loading = self.whatsappAccountState { return }
+        
+        Task {
+            await MainActor.run {
+                self.whatsappAccountState = .loading
+            }
+            
+            do {
+                let whatsappAccount = try await whatsappRepository.getWhatsappAccount()
+                await MainActor.run {
+                    self.whatsappAccountState = .loaded(whatsappAccount)
+                }
+            } catch WhatsappRepositoryError.notFound {
+                await MainActor.run {
+                    var emptyResponse = Whatsapp_V1_GetWhatsappAccountResponse()
+                    emptyResponse.isReady = false
+                    emptyResponse.isAuthenticated = false
+                    self.whatsappAccountState = .loaded(emptyResponse)
+                }
+            } catch {
+                await MainActor.run {
+                    self.whatsappAccountState = .failed(error)
+                }
+            }
+        }
+    }
+    
+    func disconnectWhatsapp() {
+        Task {
+            do {
+                _ = try await whatsappRepository.disconnectWhatsappAccount()
+                await MainActor.run {
+                    self.whatsappAccountState = .idle
+                    self.getWhatsappAccount()
+                }
+            } catch {
+                debugPrint("Failed to disconnect WhatsApp: \(error)")
             }
         }
     }

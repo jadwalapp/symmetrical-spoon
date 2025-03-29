@@ -29,12 +29,35 @@ struct SettingsView: View {
                     .listRowBackground(Color.clear)
             }
             Section {
-                Button {
-                    print("connect whatsapp")
-                } label: {
-                    HStack {
-                        Image(systemName: "message.fill")
-                        Text("Connect WhatsApp")
+                AsyncView(
+                    response: profileViewModel.whatsappAccountState
+                ) { whatsappAccount in
+                    if whatsappAccount.isReady {
+                        HStack {
+                            Image(systemName: "message.fill")
+                            VStack(alignment: .leading) {
+                                Text("WhatsApp Connected")
+                                Text(whatsappAccount.phoneNumber)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                            Spacer()
+                            Button {
+                                profileViewModel.disconnectWhatsapp()
+                            } label: {
+                                Image(systemName: "xmark.circle.fill")
+                                    .foregroundStyle(.red)
+                            }
+                        }
+                    } else {
+                        Button {
+                            profileViewModel.showWhatsappSheet = true
+                        } label: {
+                            HStack {
+                                Image(systemName: "message.fill")
+                                Text("Connect WhatsApp")
+                            }
+                        }
                     }
                 }
                 
@@ -66,10 +89,15 @@ struct SettingsView: View {
         .onFirstAppear {
             profileViewModel.getProfile()
             profileViewModel.getCalDavAccount()
+            profileViewModel.getWhatsappAccount()
         }
         .refreshable {
             profileViewModel.getProfile()
             profileViewModel.getCalDavAccount()
+            profileViewModel.getWhatsappAccount()
+        }
+        .sheet(isPresented: $profileViewModel.showWhatsappSheet) {
+            WhatsappConnectionSheet(whatsappRepository: DependencyContainer.shared.whatsappRepository)
         }
     }
 }
@@ -79,7 +107,7 @@ struct SettingsView: View {
         .environmentObject(
             ProfileViewModel(
                 profileRepository: DependencyContainer.shared.profileRepository,
-                calendarRepository: DependencyContainer.shared.calendarRepository
+                calendarRepository: DependencyContainer.shared.calendarRepository, whatsappRepository: DependencyContainer.shared.whatsappRepository
             )
         )
 }
