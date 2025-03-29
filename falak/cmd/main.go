@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"database/sql"
+	"encoding/base64"
 	"fmt"
 	"net/http"
 	"os"
@@ -18,6 +19,7 @@ import (
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/api/profile"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/api/whatsapp"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/apimetadata"
+	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/apple/apns"
 	baikalclient "github.com/jadwalapp/symmetrical-spoon/falak/pkg/baikal/client"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/email/emailer"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/email/template"
@@ -31,6 +33,7 @@ import (
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/interceptors"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/lokilogger"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/services/calendarsvc"
+	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/services/notificationsvc"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/store"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/tokens"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/util"
@@ -44,6 +47,8 @@ import (
 	"github.com/resendlabs/resend-go"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+	"github.com/sideshow/apns2"
+	apns2token "github.com/sideshow/apns2/token"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 
@@ -214,11 +219,35 @@ func main() {
 	wasappCalendarProducer := wasappcalendar.NewProducer(amqpChan, config.WasappCalendarEventsQueueName)
 	// ======== WASAPP CALENDAR PRODUCER ========
 
+	// ======== APNS ========
+	apnsAuthKeyBytes, err := base64.StdEncoding.DecodeString(config.ApnsAuthKey)
+	if err != nil {
+		log.Fatal().Msgf("failed to decode base64 APNS auth key: %v", err)
+	}
+
+	apns2AuthKey, err := apns2token.AuthKeyFromBytes(apnsAuthKeyBytes)
+	if err != nil {
+		log.Fatal().Msgf("failed to parse apns auth key from bytes: %v", err)
+	}
+
+	apns2ClientToken := &apns2token.Token{
+		AuthKey: apns2AuthKey,
+		KeyID:   config.ApnsKeyID,
+		TeamID:  config.ApnsTeamID,
+	}
+	apns2Client := apns2.NewTokenClient(apns2ClientToken)
+	apns := apns.NewApns(*apns2Client)
+	// ======== APNS ========
+
+	// ======== NOTIFICATION SERVICE ========
+	notificationSvc := notificationsvc.NewSvc(*dbStore, apns)
+	// ======== NOTIFICATION SERVICE ========
+
 	// ======== CALENDAR CONSUMER ========
 	calendarConsumerCtx := context.Background()
 	calendarConsumerCtx = log.Logger.WithContext(calendarConsumerCtx)
 
-	calendarConsumer := wasappcalendar.NewConsumer(amqpChan, config.WasappCalendarEventsQueueName, *dbStore, calendarService, config.CalDAVPasswordEncryptionKey)
+	calendarConsumer := wasappcalendar.NewConsumer(amqpChan, config.WasappCalendarEventsQueueName, *dbStore, calendarService, config.CalDAVPasswordEncryptionKey, notificationSvc)
 	err = calendarConsumer.Start(calendarConsumerCtx)
 	if err != nil {
 		log.Fatal().Msgf("failed to start calendar consumer: %v", err)

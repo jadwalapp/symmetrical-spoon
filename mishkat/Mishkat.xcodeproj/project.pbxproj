@@ -285,6 +285,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Mishkat/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Jadwal;
+				INFOPLIST_KEY_NSCalendarsUsageDescription = "Jadwal needs access to your calendars to allow you to manage them through Jadwal's app. No data will be transmitted, we just show it in the app.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -319,6 +320,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Mishkat/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Jadwal;
+				INFOPLIST_KEY_NSCalendarsUsageDescription = "Jadwal needs access to your calendars to allow you to manage them through Jadwal's app. No data will be transmitted, we just show it in the app.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

@@ -29,3 +29,25 @@ buf generate
 ```bash
 docker run --rm -p 8094:8080 plantuml/plantuml-server:jetty
 ```
+
+## Setting up APNS Certificate
+
+To use APNS (Apple Push Notification Service), you'll need to convert your .p8 certificate file to base64 and set it as an environment variable:
+
+1. Convert your .p8 file to base64:
+
+```bash
+base64 -i AuthKey_XXXXX.p8
+```
+
+2. Set the base64 string as an environment variable:
+
+```bash
+export APNS_AUTH_KEY="YOUR_BASE64_STRING_HERE"
+```
+
+Or add it to your `.env` file:
+
+```
+APNS_AUTH_KEY=YOUR_BASE64_STRING_HERE
+```

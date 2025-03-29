@@ -6,25 +6,24 @@ import (
 	"fmt"
 
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/services/calendarsvc"
+	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/services/notificationsvc"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/store"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/rs/zerolog/log"
 )
 
-// consumer implements the Consumer interface
 type consumer struct {
 	channel                     *amqp.Channel
 	calendarEventsQueueName     string
 	store                       store.Queries
 	calendarSvc                 calendarsvc.Svc
 	calDAVPasswordEncryptionKey string
+	notificationSvc             notificationsvc.Svc
 }
 
-// Start begins consuming messages from the calendar events queue
 func (c *consumer) Start(ctx context.Context) error {
 	log.Ctx(ctx).Info().Msgf("starting calendar consumer for queue: %s", c.calendarEventsQueueName)
 
-	// Ensure queue exists
 	_, err := c.channel.QueueDeclare(
 		c.calendarEventsQueueName,
 		true,  // durable
@@ -37,7 +36,6 @@ func (c *consumer) Start(ctx context.Context) error {
 		return fmt.Errorf("failed to declare queue: %w", err)
 	}
 
-	// Start consuming messages
 	msgsChan, err := c.channel.Consume(
 		c.calendarEventsQueueName, // queue
 		"falak-calendar",          // consumer
@@ -74,36 +72,42 @@ func (c *consumer) Start(ctx context.Context) error {
 	return nil
 }
 
-// processMessage handles an individual message from the queue
 func (c *consumer) processMessage(ctx context.Context, msg amqp.Delivery) {
-	// Parse the calendar event
 	var eventData CalendarEventData
 	if err := json.Unmarshal(msg.Body, &eventData); err != nil {
 		log.Ctx(ctx).Err(err).Msg("failed to unmarshal calendar event")
-		_ = msg.Nack(false, true) // requeue for retry
+		_ = msg.Nack(
+			false, // multiple
+			true,  // requeue for retry
+		)
 		return
 	}
 
-	log.Ctx(ctx).Info().
+	logger := log.Ctx(ctx).With().
 		Str("customer_id", eventData.CustomerID.String()).
 		Str("chat_id", eventData.ChatID).
-		Msg("processing calendar event")
+		Str("event_summary", eventData.Summary).
+		Time("event_start", eventData.StartTime).
+		Time("event_end", eventData.EndTime).
+		Logger()
+
+	logger.Info().Msg("processing calendar event")
 
 	credentials, err := c.store.GetCalDavAccountByCustomerId(ctx, store.GetCalDavAccountByCustomerIdParams{
 		CustomerID:    eventData.CustomerID,
 		EncryptionKey: c.calDAVPasswordEncryptionKey,
 	})
 	if err != nil {
-		log.Ctx(ctx).Err(err).Str("customer_id", eventData.CustomerID.String()).
-			Msg("failed to get customer credentials")
-		_ = msg.Nack(false, true) // requeue
+		logger.Err(err).Msg("failed to get customer credentials")
+		_ = msg.Nack(
+			false, // multiple
+			true,  // requeue for retry
+		)
 		return
 	}
 
-	// Create unique UID based on chat ID
 	uid := fmt.Sprintf("chat-%s@jadwal.app", eventData.ChatID)
 
-	// First initialize calendar
 	err = c.calendarSvc.InitCalendar(ctx, &calendarsvc.InitCalendarRequest{
 		CustomerID:  eventData.CustomerID,
 		Username:    credentials.Username,
@@ -113,12 +117,15 @@ func (c *consumer) processMessage(ctx context.Context, msg amqp.Delivery) {
 		Color:       "#2ECC71", // Green color
 	})
 	if err != nil {
-		log.Ctx(ctx).Err(err).
-			Str("customer_id", eventData.CustomerID.String()).
-			Msg("failed to initialize WhatsApp calendar")
-		_ = msg.Nack(false, true) // requeue
+		logger.Err(err).Msg("failed to initialize WhatsApp calendar")
+		_ = msg.Nack(
+			false, // multiple
+			true,  // requeue for retry
+		)
 		return
 	}
+
+	logger.Debug().Msg("initialized WhatsApp calendar")
 
 	err = c.calendarSvc.AddEvent(ctx, &calendarsvc.AddEventRequest{
 		CustomerID:  eventData.CustomerID,
@@ -129,25 +136,35 @@ func (c *consumer) processMessage(ctx context.Context, msg amqp.Delivery) {
 		UID:         uid,
 	})
 	if err != nil {
-		log.Ctx(ctx).Err(err).
-			Str("chat_id", eventData.ChatID).
-			Msg("failed to add event to calendar")
-		_ = msg.Nack(false, true) // requeue
+		logger.Err(err).Msg("failed to add event to calendar")
+		_ = msg.Nack(
+			false, // multiple
+			true,  // requeue for retry
+		)
 		return
 	}
 
-	log.Ctx(ctx).Info().
-		Str("customer_id", eventData.CustomerID.String()).
-		Str("chat_id", eventData.ChatID).
-		Msg("successfully added event to WhatsApp calendar")
+	logger.Info().Msg("successfully added event to WhatsApp calendar")
 
-	// Acknowledge message
+	// TODO: translate the notification :D
+	err = c.notificationSvc.SendNotificationToCustomerDevices(ctx, &notificationsvc.SendNotificationToCustomerDevicesRequest{
+		CustomerId: eventData.CustomerID,
+		Title:      "📅 New WhatsApp Event Added",
+		Body:       fmt.Sprintf("Event '%s' was added to your WhatsApp calendar", eventData.Summary),
+	})
+	if err != nil {
+		logger.Err(err).Msg("failed to send push notification")
+	} else {
+		logger.Debug().Msg("sent push notification successfully")
+	}
+
 	if err := msg.Ack(false); err != nil {
-		log.Ctx(ctx).Err(err).Msg("failed to acknowledge message")
+		logger.Err(err).Msg("failed to acknowledge message")
+	} else {
+		logger.Debug().Msg("acknowledged message successfully")
 	}
 }
 
-// Stop gracefully shuts down the consumer
 func (c *consumer) Stop(ctx context.Context) error {
 	log.Ctx(ctx).Info().Msg("stopping calendar consumer")
 	if err := c.channel.Close(); err != nil {
@@ -157,14 +174,14 @@ func (c *consumer) Stop(ctx context.Context) error {
 	return nil
 }
 
-// NewConsumer creates a new calendar event consumer
 func NewConsumer(channel *amqp.Channel, calendarEventsQueueName string, store store.Queries, calendarSvc calendarsvc.Svc,
-	calDAVPasswordEncryptionKey string) Consumer {
+	calDAVPasswordEncryptionKey string, notificationSvc notificationsvc.Svc) Consumer {
 	return &consumer{
 		channel:                     channel,
 		calendarEventsQueueName:     calendarEventsQueueName,
 		store:                       store,
 		calendarSvc:                 calendarSvc,
 		calDAVPasswordEncryptionKey: calDAVPasswordEncryptionKey,
+		notificationSvc:             notificationSvc,
 	}
 }

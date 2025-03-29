@@ -36,17 +36,22 @@ const (
 	// ProfileServiceGetProfileProcedure is the fully-qualified name of the ProfileService's GetProfile
 	// RPC.
 	ProfileServiceGetProfileProcedure = "/profile.v1.ProfileService/GetProfile"
+	// ProfileServiceAddDeviceProcedure is the fully-qualified name of the ProfileService's AddDevice
+	// RPC.
+	ProfileServiceAddDeviceProcedure = "/profile.v1.ProfileService/AddDevice"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
 var (
 	profileServiceServiceDescriptor          = v1.File_profile_v1_profile_proto.Services().ByName("ProfileService")
 	profileServiceGetProfileMethodDescriptor = profileServiceServiceDescriptor.Methods().ByName("GetProfile")
+	profileServiceAddDeviceMethodDescriptor  = profileServiceServiceDescriptor.Methods().ByName("AddDevice")
 )
 
 // ProfileServiceClient is a client for the profile.v1.ProfileService service.
 type ProfileServiceClient interface {
 	GetProfile(context.Context, *connect.Request[v1.GetProfileRequest]) (*connect.Response[v1.GetProfileResponse], error)
+	AddDevice(context.Context, *connect.Request[v1.AddDeviceRequest]) (*connect.Response[v1.AddDeviceResponse], error)
 }
 
 // NewProfileServiceClient constructs a client for the profile.v1.ProfileService service. By
@@ -65,12 +70,19 @@ func NewProfileServiceClient(httpClient connect.HTTPClient, baseURL string, opts
 			connect.WithSchema(profileServiceGetProfileMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
+		addDevice: connect.NewClient[v1.AddDeviceRequest, v1.AddDeviceResponse](
+			httpClient,
+			baseURL+ProfileServiceAddDeviceProcedure,
+			connect.WithSchema(profileServiceAddDeviceMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // profileServiceClient implements ProfileServiceClient.
 type profileServiceClient struct {
 	getProfile *connect.Client[v1.GetProfileRequest, v1.GetProfileResponse]
+	addDevice  *connect.Client[v1.AddDeviceRequest, v1.AddDeviceResponse]
 }
 
 // GetProfile calls profile.v1.ProfileService.GetProfile.
@@ -78,9 +90,15 @@ func (c *profileServiceClient) GetProfile(ctx context.Context, req *connect.Requ
 	return c.getProfile.CallUnary(ctx, req)
 }
 
+// AddDevice calls profile.v1.ProfileService.AddDevice.
+func (c *profileServiceClient) AddDevice(ctx context.Context, req *connect.Request[v1.AddDeviceRequest]) (*connect.Response[v1.AddDeviceResponse], error) {
+	return c.addDevice.CallUnary(ctx, req)
+}
+
 // ProfileServiceHandler is an implementation of the profile.v1.ProfileService service.
 type ProfileServiceHandler interface {
 	GetProfile(context.Context, *connect.Request[v1.GetProfileRequest]) (*connect.Response[v1.GetProfileResponse], error)
+	AddDevice(context.Context, *connect.Request[v1.AddDeviceRequest]) (*connect.Response[v1.AddDeviceResponse], error)
 }
 
 // NewProfileServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -95,10 +113,18 @@ func NewProfileServiceHandler(svc ProfileServiceHandler, opts ...connect.Handler
 		connect.WithSchema(profileServiceGetProfileMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
+	profileServiceAddDeviceHandler := connect.NewUnaryHandler(
+		ProfileServiceAddDeviceProcedure,
+		svc.AddDevice,
+		connect.WithSchema(profileServiceAddDeviceMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/profile.v1.ProfileService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case ProfileServiceGetProfileProcedure:
 			profileServiceGetProfileHandler.ServeHTTP(w, r)
+		case ProfileServiceAddDeviceProcedure:
+			profileServiceAddDeviceHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -110,4 +136,8 @@ type UnimplementedProfileServiceHandler struct{}
 
 func (UnimplementedProfileServiceHandler) GetProfile(context.Context, *connect.Request[v1.GetProfileRequest]) (*connect.Response[v1.GetProfileResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("profile.v1.ProfileService.GetProfile is not implemented"))
+}
+
+func (UnimplementedProfileServiceHandler) AddDevice(context.Context, *connect.Request[v1.AddDeviceRequest]) (*connect.Response[v1.AddDeviceResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("profile.v1.ProfileService.AddDevice is not implemented"))
 }

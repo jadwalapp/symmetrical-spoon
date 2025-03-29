@@ -10,13 +10,14 @@ import PostHog
 
 @main
 struct MishkatApp: App {
-    @StateObject private var authViewModel: AuthViewModel
+    @StateObject public var authViewModel: AuthViewModel
+    @UIApplicationDelegateAdaptor private var appDelegate: MishkatAppDelegate
     
     init() {
         let POSTHOG_API_KEY = "phc_E20fM1IG9toCEsc5sLuXrY6GBeBioLXyx8LSIQorf3s"
         let POSTHOG_HOST = "https://us.i.posthog.com"
-                
-                
+        
+        
         let config = PostHogConfig(apiKey: POSTHOG_API_KEY, host: POSTHOG_HOST)
         config.sessionReplay = true
         config.sessionReplayConfig.maskAllImages = false
@@ -37,6 +38,11 @@ struct MishkatApp: App {
                 .onOpenURL { url in
                     handleDeepLink(url)
                 }
+                .onAppear {
+                    appDelegate.app = self
+                    
+                    askForNotificationsPermission()
+                }
         }
     }
     
@@ -49,5 +55,21 @@ struct MishkatApp: App {
         }
         
         authViewModel.completeEmail(token: token)
+        registerDeviceTokenIfNeeded()
+    }
+    
+    private func askForNotificationsPermission() {
+        let notifCenter = UNUserNotificationCenter.current()
+        notifCenter.requestAuthorization(options: [.alert, .badge, .sound]) { _, _ in }
+    }
+    
+    private func registerDeviceTokenIfNeeded() {
+        if let deviceToken = appDelegate.currentDeviceToken {
+            Task {
+                try? await DependencyContainer.shared.profileRepository.addDevice(deviceToken: deviceToken)
+            }
+        } else {
+            UIApplication.shared.registerForRemoteNotifications()
+        }
     }
 }

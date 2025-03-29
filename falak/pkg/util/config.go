@@ -45,6 +45,9 @@ type FalakConfig struct {
 	OpenAiModelName               string `mapstructure:"OPEN_AI_MODEL_NAME"`
 	WasappCalendarEventsQueueName string `mapstructure:"WASAPP_CALENDAR_EVENTS_QUEUE_NAME"`
 	WhatsappMessagesEncryptionKey string `mapstructure:"WHATSAPP_MESSAGES_ENCRYPTION_KEY"`
+	ApnsAuthKey                   string `mapstructure:"APNS_AUTH_KEY"`
+	ApnsKeyID                     string `mapstructure:"APNS_KEY_ID"`
+	ApnsTeamID                    string `mapstructure:"APNS_TEAM_ID"`
 }
 
 // LoadFalakConfig reads configuration from the provided path or environment variables.

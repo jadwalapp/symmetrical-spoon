@@ -14,6 +14,12 @@ public protocol Profile_V1_ProfileServiceClientInterface: Sendable {
 
     @available(iOS 13, *)
     func `getProfile`(request: Profile_V1_GetProfileRequest, headers: Connect.Headers) async -> ResponseMessage<Profile_V1_GetProfileResponse>
+
+    @discardableResult
+    func `addDevice`(request: Profile_V1_AddDeviceRequest, headers: Connect.Headers, completion: @escaping @Sendable (ResponseMessage<Profile_V1_AddDeviceResponse>) -> Void) -> Connect.Cancelable
+
+    @available(iOS 13, *)
+    func `addDevice`(request: Profile_V1_AddDeviceRequest, headers: Connect.Headers) async -> ResponseMessage<Profile_V1_AddDeviceResponse>
 }
 
 /// Concrete implementation of `Profile_V1_ProfileServiceClientInterface`.
@@ -34,9 +40,20 @@ public final class Profile_V1_ProfileServiceClient: Profile_V1_ProfileServiceCli
         return await self.client.unary(path: "/profile.v1.ProfileService/GetProfile", idempotencyLevel: .unknown, request: request, headers: headers)
     }
 
+    @discardableResult
+    public func `addDevice`(request: Profile_V1_AddDeviceRequest, headers: Connect.Headers = [:], completion: @escaping @Sendable (ResponseMessage<Profile_V1_AddDeviceResponse>) -> Void) -> Connect.Cancelable {
+        return self.client.unary(path: "/profile.v1.ProfileService/AddDevice", idempotencyLevel: .unknown, request: request, headers: headers, completion: completion)
+    }
+
+    @available(iOS 13, *)
+    public func `addDevice`(request: Profile_V1_AddDeviceRequest, headers: Connect.Headers = [:]) async -> ResponseMessage<Profile_V1_AddDeviceResponse> {
+        return await self.client.unary(path: "/profile.v1.ProfileService/AddDevice", idempotencyLevel: .unknown, request: request, headers: headers)
+    }
+
     public enum Metadata {
         public enum Methods {
             public static let getProfile = Connect.MethodSpec(name: "GetProfile", service: "profile.v1.ProfileService", type: .unary)
+            public static let addDevice = Connect.MethodSpec(name: "AddDevice", service: "profile.v1.ProfileService", type: .unary)
         }
     }
 }

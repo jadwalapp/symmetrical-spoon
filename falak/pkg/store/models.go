@@ -37,6 +37,14 @@ type Customer struct {
 	UpdatedAt time.Time
 }
 
+type Device struct {
+	ID         uuid.UUID
+	CustomerID uuid.UUID
+	ApnsToken  string
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
+}
+
 type MagicLink struct {
 	ID         uuid.UUID
 	CustomerID uuid.UUID

@@ -20,6 +20,7 @@ require (
 	github.com/rabbitmq/amqp091-go v1.10.0
 	github.com/resendlabs/resend-go v1.7.0
 	github.com/rs/zerolog v1.33.0
+	github.com/sideshow/apns2 v0.25.0
 	github.com/spf13/viper v1.19.0
 	golang.org/x/net v0.30.0
 	golang.org/x/term v0.27.0
@@ -30,6 +31,7 @@ require (
 	github.com/antlr4-go/antlr/v4 v4.13.1 // indirect
 	github.com/docker/docker v27.3.1+incompatible // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
+	github.com/golang-jwt/jwt/v4 v4.4.2 // indirect
 	github.com/google/cel-go v0.21.0 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
