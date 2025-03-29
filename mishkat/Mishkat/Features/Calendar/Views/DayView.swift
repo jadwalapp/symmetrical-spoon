@@ -42,9 +42,37 @@ struct DayView: View {
                         }
                     }
                     
-                    TimelineView(events: timedEvents) { event in
-                        selectedEvent = event
-                        showingEventEditor = true
+                    if timedEvents.isEmpty && allDayEvents.isEmpty {
+                        VStack(spacing: 20) {
+                            Spacer(minLength: 100)
+                            Image(systemName: "calendar.badge.plus")
+                                .font(.system(size: 50))
+                                .foregroundColor(.secondary.opacity(0.7))
+                            
+                            Text("No Events")
+                                .font(.title3)
+                                .foregroundColor(.secondary)
+                            
+                            Button {
+                                showingEventEditor = true
+                            } label: {
+                                Text("Add Event")
+                                    .padding(.horizontal, 16)
+                                    .padding(.vertical, 8)
+                                    .background(Color.accentColor)
+                                    .foregroundColor(.white)
+                                    .cornerRadius(20)
+                            }
+                            
+                            Spacer()
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.top, 40)
+                    } else {
+                        TimelineView(events: timedEvents) { event in
+                            selectedEvent = event
+                            showingEventEditor = true
+                        }
                     }
                 }
                 .padding(.horizontal)

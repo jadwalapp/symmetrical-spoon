@@ -15,10 +15,20 @@ struct DayButton: View {
         VStack(spacing: 4) {
             Text(dayOfWeek(from: date))
                 .font(.system(size: 12))
+            
             Text(dayOfMonth(from: date))
                 .font(.system(size: 20, weight: .medium))
+                .overlay(
+                    Circle()
+                        .stroke(isToday(date) && !isSelected ? .green : .clear, lineWidth: 1.5)
+                        .frame(width: 28, height: 28)
+                )
         }
-        .foregroundColor(isSelected ? .white : .primary)
+        .foregroundColor(isSelected ? .white : (isToday(date) ? .green : .primary))
+    }
+    
+    private func isToday(_ date: Date) -> Bool {
+        return Calendar.current.isDateInToday(date)
     }
     
     private func dayOfWeek(from date: Date) -> String {
@@ -35,5 +45,9 @@ struct DayButton: View {
 }
 
 #Preview {
-    DayButton(date: Date(), isSelected: true)
+    HStack {
+        DayButton(date: Date(), isSelected: false)
+        DayButton(date: Date(), isSelected: true)
+        DayButton(date: Calendar.current.date(byAdding: .day, value: 1, to: Date())!, isSelected: false)
+    }
 }

@@ -215,4 +215,20 @@ class CalendarViewModel: NSObject, ObservableObject, EKEventEditViewDelegate {
         fetchEvents(for: selectedDate)
         isLoading = false
     }
+    
+    // This ensures a smooth transition when switching to day view
+    func prepareForDayView(date: Date) {
+        // Pre-fetch the events for the day to ensure a smooth transition
+        fetchDailyEvents(for: date)
+        
+        // Pre-fetch adjacent days for swiping experience
+        let calendar = Calendar.current
+        if let yesterday = calendar.date(byAdding: .day, value: -1, to: date) {
+            fetchDailyEvents(for: yesterday)
+        }
+        
+        if let tomorrow = calendar.date(byAdding: .day, value: 1, to: date) {
+            fetchDailyEvents(for: tomorrow)
+        }
+    }
 }

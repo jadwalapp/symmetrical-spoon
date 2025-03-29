@@ -27,10 +27,20 @@ struct EnhancedCalendarView: View {
                     .onAppear {
                         viewModel.fetchMonthlyEvents(for: currentMonth, forceRefresh: true)
                     }
-                    .transition(.opacity)
+                    .transition(
+                        AnyTransition.asymmetric(
+                            insertion: .opacity.combined(with: .scale(scale: 1.05)).animation(.spring(response: 0.3, dampingFraction: 0.7)),
+                            removal: .opacity.animation(.easeOut(duration: 0.2))
+                        )
+                    )
             } else {
                 DayView(selectedDate: $viewModel.selectedDate, viewModel: viewModel, isMonthView: $isMonthView, animation: animation)
-                    .transition(.opacity)
+                    .transition(
+                        AnyTransition.asymmetric(
+                            insertion: .opacity.combined(with: .scale(scale: 0.95)).animation(.spring(response: 0.3, dampingFraction: 0.7)),
+                            removal: .opacity.animation(.easeOut(duration: 0.2))
+                        )
+                    )
             }
         }
         .onChange(of: viewModel.selectedDate) { newDate in

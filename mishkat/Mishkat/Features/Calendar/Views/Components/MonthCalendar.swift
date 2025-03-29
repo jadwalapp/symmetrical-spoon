@@ -136,6 +136,13 @@ struct MonthCalendar: UIViewRepresentable {
             guard let dateComponents = dateComponents,
                   let date = Calendar.current.date(from: dateComponents) else { return }
             
+            // Add light haptic feedback
+            let generator = UIImpactFeedbackGenerator(style: .light)
+            generator.impactOccurred()
+            
+            // Prepare the day view with pre-fetched events
+            parent.viewModel.prepareForDayView(date: date)
+            
             withAnimation {
                 parent.selectedDate = date
                 parent.isMonthView = false

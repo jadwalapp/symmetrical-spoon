@@ -20,7 +20,16 @@ struct CalendarView: View {
                 EnhancedCalendarView(isMonthView: $isMonthView)
                     .blur(radius: viewModel.authorizationStatus != .authorized ? 10 : 0)
                     .refreshable {
+                        let generator = UINotificationFeedbackGenerator()
+                        generator.prepare()
+                        
+                        // Show loading state
+                        viewModel.isLoading = true
+                        
+                        await Task.sleep(500_000_000) // 0.5 second visual delay
                         viewModel.refreshAllEvents()
+                        
+                        generator.notificationOccurred(.success)
                     }
                 
                 if viewModel.authorizationStatus != .authorized {
@@ -53,6 +62,16 @@ struct CalendarView: View {
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     HStack(spacing: 16) {
+                        Button {
+                            viewModel.selectedDate = Date()
+                            if !isMonthView {
+                                viewModel.fetchDailyEvents(for: Date())
+                            }
+                        } label: {
+                            Text("Today")
+                                .foregroundStyle(.green)
+                        }
+                        
                         Button {
                             showingCalendarsSheet.toggle()
                         } label: {
