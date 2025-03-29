@@ -11,13 +11,17 @@ struct EnhancedCalendarView: View {
     @EnvironmentObject var viewModel: CalendarViewModel
     @Binding var isMonthView: Bool
     @Namespace private var animation
+    @State private var currentMonth: Date = Date()
     
     var body: some View {
         VStack(spacing: 0) {
             if isMonthView {
                 MonthView(selectedDate: $viewModel.selectedDate, viewModel: viewModel, isMonthView: $isMonthView, animation: animation)
+                    .onChange(of: currentMonth) { newMonth in
+                        viewModel.fetchMonthlyEvents(for: newMonth)
+                    }
                     .onAppear {
-                        viewModel.fetchMonthlyEvents(for: viewModel.selectedDate)
+                        viewModel.fetchMonthlyEvents(for: currentMonth)
                     }
                     .transition(.opacity)
             } else {
@@ -26,12 +30,25 @@ struct EnhancedCalendarView: View {
             }
         }
         .onChange(of: viewModel.selectedDate) { newDate in
+            let calendar = Calendar.current
+            let selectedMonth = calendar.startOfMonth(for: newDate)
+            if !calendar.isDate(currentMonth, equalTo: selectedMonth, toGranularity: .month) {
+                currentMonth = selectedMonth
+            }
+            
             if isMonthView {
                 viewModel.fetchMonthlyEvents(for: newDate)
             } else {
                 viewModel.fetchDailyEvents(for: newDate)
             }
         }
+    }
+}
+
+private extension Calendar {
+    func startOfMonth(for date: Date) -> Date {
+        let components = dateComponents([.year, .month], from: date)
+        return self.date(from: components) ?? date
     }
 }
 

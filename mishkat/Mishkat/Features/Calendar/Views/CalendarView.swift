@@ -19,11 +19,19 @@ struct CalendarView: View {
             ZStack {
                 EnhancedCalendarView(isMonthView: $isMonthView)
                     .blur(radius: viewModel.authorizationStatus != .authorized ? 10 : 0)
+                    .refreshable {
+                        viewModel.refreshAllEvents()
+                    }
                 
                 if viewModel.authorizationStatus != .authorized {
                     AccessRequestCard(status: viewModel.authorizationStatus,
-                                      requestAccess: viewModel.requestAccess,
-                                      openSettings: viewModel.openSettings)
+                                   requestAccess: viewModel.requestAccess,
+                                   openSettings: viewModel.openSettings)
+                }
+                
+                if viewModel.isLoading {
+                    ProgressView()
+                        .scaleEffect(1.5)
                 }
             }
             .navigationTitle(isMonthView ? "Calendar" : viewModel.selectedDate.formatted(.dateTime.month().year()))
@@ -56,7 +64,7 @@ struct CalendarView: View {
                             showingAddEventSheet = true
                         } label: {
                             Image(systemName: "plus.circle.fill")
-                                .foregroundStyle(.accent)
+                                .foregroundStyle(.green)
                         }
                     }
                 }

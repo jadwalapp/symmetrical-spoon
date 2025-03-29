@@ -14,7 +14,7 @@ struct MonthView: View {
     var animation: Namespace.ID
     
     var body: some View {
-        MonthCalendar(selectedDate: $selectedDate, viewModel: viewModel, isMonthView: $isMonthView)
+        MonthCalendar(selectedDate: $selectedDate, viewModel: viewModel, isMonthView: $isMonthView, animation: animation)
             .matchedGeometryEffect(id: "calendar", in: animation)
     }
 }
