@@ -82,7 +82,7 @@ services:
       - web
       - internal
     environment:
-      - TS_AUTHKEY=${TS_AUTHKEY}
+      - TS_AUTHKEY=${TS_AUTHKEY}?ephemeral=false
       - TS_EXTRA_ARGS=--advertise-tags=tag:container
       - TS_STATE_DIR=/var/lib/tailscale
       - TS_USERSPACE=false
