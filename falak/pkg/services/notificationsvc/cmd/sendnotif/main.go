@@ -81,15 +81,15 @@ func main() {
 
 	customerId := uuid.MustParse("a6fdfd15-f18c-4cb6-8112-fe7bcad29097")
 
-	eventId := "chat-966547202020@c.us@jadwal.app"
+	eventId := "BC8764E0-2AEB-43A4-995D-FAD0C18F0148"
 	calendarName := "📱 WhatsApp Events"
 	uidForNotification := eventId
-	eventTitleForNotification := "Bring the Alfarazad device to get fixed"
+	eventTitleForNotification := "Hehe"
 
 	gmtPlus3 := time.FixedZone("GMT+3", 3*60*60)
 
-	eventStartDate := time.Date(2025, 3, 31, 3, 0, 0, 0, gmtPlus3)
-	eventEndDate := time.Date(2025, 3, 31, 3, 0, 0, 0, gmtPlus3)
+	eventStartDate := time.Date(2025, 3, 30, 4, 0, 0, 0, gmtPlus3)
+	eventEndDate := time.Date(2025, 3, 30, 5, 0, 0, 0, gmtPlus3)
 
 	err = notifSvc.SendNotificationToCustomerDevices(ctx, &notificationsvc.SendNotificationToCustomerDevicesRequest{
 		CustomerId: customerId,

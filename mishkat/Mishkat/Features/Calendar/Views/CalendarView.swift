@@ -10,6 +10,7 @@ import EventKit
 
 struct CalendarView: View {
     @EnvironmentObject var viewModel: CalendarViewModel
+    @StateObject private var conflictManager = ConflictManager.shared
     @State private var showingAddEventSheet = false
     @State private var showingCalendarsSheet = false
     @State private var isMonthView = true
@@ -80,6 +81,13 @@ struct CalendarView: View {
                         }
                         
                         Button {
+                            conflictManager.showConflictsView = true
+                        } label: {
+                            Image(systemName: "exclamationmark.triangle")
+                                .foregroundStyle(.orange)
+                        }
+                        
+                        Button {
                             showingAddEventSheet = true
                         } label: {
                             Image(systemName: "plus.circle.fill")
@@ -94,6 +102,9 @@ struct CalendarView: View {
             }
             .sheet(isPresented: $showingCalendarsSheet) {
                 CalendarsListView()
+            }
+            .sheet(isPresented: $conflictManager.showConflictsView) {
+                ConflictsView()
             }
         }
     }

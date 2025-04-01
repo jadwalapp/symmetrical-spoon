@@ -66,7 +66,8 @@ class MishkatAppDelegate: NSObject, UIApplicationDelegate, ObservableObject {
 
 extension MishkatAppDelegate: UNUserNotificationCenterDelegate {
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse) async {
-        print("User interacted with notification: ", response.notification.request.content.title);
+        print("User interacted with notification: ", response.notification.request.content.title)
+        await notificationHandlerService.handleLocalNotification(response.notification)
     }
     
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification) async -> UNNotificationPresentationOptions {
