@@ -4,13 +4,14 @@ import (
 	"context"
 	"database/sql"
 	"encoding/base64"
-	"fmt"
+	"os"
 
 	"github.com/google/uuid"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/apple/apns"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/services/notificationsvc"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/store"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/util"
+	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/sideshow/apns2"
 
@@ -25,6 +26,12 @@ func main() {
 	if err != nil {
 		log.Fatal().Msgf("cannot load config: %v", err)
 	}
+
+	// ======== LOGGER ========
+	// Pretty logging for development
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+	zerolog.SetGlobalLevel(zerolog.InfoLevel)
+	// ======== LOGGER ========
 
 	// ======== DATABASE ========
 	dbSource := util.CreateDbSource(
@@ -45,7 +52,6 @@ func main() {
 	// ======== DATABASE ========
 
 	// ======== APNS ========
-	fmt.Println(config.ApnsAuthKey)
 	apnsAuthKeyBytes, err := base64.StdEncoding.DecodeString(config.ApnsAuthKey)
 	if err != nil {
 		log.Fatal().Msgf("failed to decode base64 APNS auth key: %v", err)
@@ -69,13 +75,18 @@ func main() {
 
 	// ======= APP IS BELOW =======
 
+	ctx := context.Background()
+	ctx = log.Logger.WithContext(ctx)
+
 	customerId := uuid.MustParse("a6fdfd15-f18c-4cb6-8112-fe7bcad29097")
-	err = notifSvc.SendNotificationToCustomerDevices(context.Background(), &notificationsvc.SendNotificationToCustomerDevicesRequest{
+	err = notifSvc.SendNotificationToCustomerDevices(ctx, &notificationsvc.SendNotificationToCustomerDevicesRequest{
 		CustomerId: customerId,
 		Title:      "Hello Brother!",
 		Body:       "This is the body :D",
 	})
 	if err != nil {
-		log.Fatal().Err(err).Msg("we screwed up sending the message :D")
+		log.Ctx(ctx).Fatal().Err(err).Msg("we screwed up sending the message :D")
 	}
+
+	log.Ctx(ctx).Info().Msg("Successfully sent notification attempt.")
 }
