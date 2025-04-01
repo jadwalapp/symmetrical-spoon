@@ -28,7 +28,10 @@ struct MishkatApp: App {
         
         PostHogSDK.shared.capture("i_guess_it_works")
         
-        _authViewModel = StateObject(wrappedValue: AuthViewModel(authRepository: DependencyContainer.shared.authRepository))
+        _authViewModel = StateObject(wrappedValue: AuthViewModel(
+            authRepository: DependencyContainer.shared.authRepository,
+            profileRepository: DependencyContainer.shared.profileRepository
+        ))
     }
     
     var body: some Scene {
@@ -38,11 +41,6 @@ struct MishkatApp: App {
                 .onOpenURL { url in
                     handleDeepLink(url)
                 }
-                .onAppear {
-                    appDelegate.app = self
-                    
-                    askForNotificationsPermission()
-                }
         }
     }
     
@@ -51,25 +49,10 @@ struct MishkatApp: App {
               let components = URLComponents(url: url, resolvingAgainstBaseURL: true),
               let token = components.queryItems?.first(where: { $0.name == "token" })?.value
         else {
+            print("Deep link URL is not a valid magic link: \(url)")
             return
         }
-        
+        print("Handling magic link deep link with token.")
         authViewModel.completeEmail(token: token)
-        registerDeviceTokenIfNeeded()
-    }
-    
-    private func askForNotificationsPermission() {
-        let notifCenter = UNUserNotificationCenter.current()
-        notifCenter.requestAuthorization(options: [.alert, .badge, .sound]) { _, _ in }
-    }
-    
-    private func registerDeviceTokenIfNeeded() {
-        if let deviceToken = appDelegate.currentDeviceToken {
-            Task {
-                try? await DependencyContainer.shared.profileRepository.addDevice(deviceToken: deviceToken)
-            }
-        } else {
-            UIApplication.shared.registerForRemoteNotifications()
-        }
     }
 }
