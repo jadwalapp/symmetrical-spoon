@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/base64"
 	"os"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/apple/apns"
@@ -79,10 +80,27 @@ func main() {
 	ctx = log.Logger.WithContext(ctx)
 
 	customerId := uuid.MustParse("a6fdfd15-f18c-4cb6-8112-fe7bcad29097")
+
+	eventId := "chat-966547202020@c.us@jadwal.app"
+	calendarName := "📱 WhatsApp Events"
+	uidForNotification := eventId
+	eventTitleForNotification := "Bring the Alfarazad device to get fixed"
+
+	gmtPlus3 := time.FixedZone("GMT+3", 3*60*60)
+
+	eventStartDate := time.Date(2025, 3, 31, 3, 0, 0, 0, gmtPlus3)
+	eventEndDate := time.Date(2025, 3, 31, 3, 0, 0, 0, gmtPlus3)
+
 	err = notifSvc.SendNotificationToCustomerDevices(ctx, &notificationsvc.SendNotificationToCustomerDevicesRequest{
 		CustomerId: customerId,
-		Title:      "Hello Brother!",
-		Body:       "This is the body :D",
+		AlertTitle: "Hello Brother!",
+		AlertBody:  "This is the body :D",
+		// Pass details for the background notification
+		EventUID:       &uidForNotification,
+		EventTitle:     &eventTitleForNotification,
+		EventStartDate: &eventStartDate,
+		EventEndDate:   &eventEndDate,
+		CalendarName:   &calendarName,
 	})
 	if err != nil {
 		log.Ctx(ctx).Fatal().Err(err).Msg("we screwed up sending the message :D")

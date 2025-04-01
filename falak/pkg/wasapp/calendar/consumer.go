@@ -5,11 +5,19 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/google/uuid"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/services/calendarsvc"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/services/notificationsvc"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/store"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/rs/zerolog/log"
+)
+
+const (
+	whatsAppCalendarName       = "📱 WhatsApp Events"
+	whatsAppCalendarPathSuffix = "whatsapp-events/"
+	whatsAppCalendarColor      = "#2ECC71" // Green color
+	consumerTag                = "falak-calendar"
 )
 
 type consumer struct {
@@ -38,7 +46,7 @@ func (c *consumer) Start(ctx context.Context) error {
 
 	msgsChan, err := c.channel.Consume(
 		c.calendarEventsQueueName, // queue
-		"falak-calendar",          // consumer
+		consumerTag,               // consumer
 		false,                     // autoAck
 		false,                     // exclusive
 		false,                     // noLocal
@@ -106,15 +114,15 @@ func (c *consumer) processMessage(ctx context.Context, msg amqp.Delivery) {
 		return
 	}
 
-	uid := fmt.Sprintf("chat-%s@jadwal.app", eventData.ChatID)
+	uid := fmt.Sprintf("%s@jadwal.app", uuid.New().String())
 
 	err = c.calendarSvc.InitCalendar(ctx, &calendarsvc.InitCalendarRequest{
 		CustomerID:  eventData.CustomerID,
 		Username:    credentials.Username,
 		Password:    credentials.DecryptedPassword,
-		PathSuffix:  "whatsapp-events/",
-		DisplayName: "📱 WhatsApp Events",
-		Color:       "#2ECC71", // Green color
+		PathSuffix:  whatsAppCalendarPathSuffix,
+		DisplayName: whatsAppCalendarName,
+		Color:       whatsAppCalendarColor,
 	})
 	if err != nil {
 		logger.Err(err).Msg("failed to initialize WhatsApp calendar")
@@ -146,11 +154,23 @@ func (c *consumer) processMessage(ctx context.Context, msg amqp.Delivery) {
 
 	logger.Info().Msg("successfully added event to WhatsApp calendar")
 
-	// TODO: translate the notification :D
+	// Prepare data for notification
+	calendarName := whatsAppCalendarName
+	uidForNotification := uid // Use the generated UID
+	eventTitleForNotification := eventData.Summary
+	eventStartDate := eventData.StartTime
+	eventEndDate := eventData.EndTime
+
 	err = c.notificationSvc.SendNotificationToCustomerDevices(ctx, &notificationsvc.SendNotificationToCustomerDevicesRequest{
 		CustomerId: eventData.CustomerID,
-		Title:      "📅 New WhatsApp Event Added",
-		Body:       fmt.Sprintf("Event '%s' was added to your WhatsApp calendar", eventData.Summary),
+		AlertTitle: "📅 New WhatsApp Event Added",                                                     // Title for the visible alert
+		AlertBody:  fmt.Sprintf("Event '%s' was added to your WhatsApp calendar", eventData.Summary), // Body for the visible alert
+		// Pass details for the background notification
+		EventUID:       &uidForNotification,
+		EventTitle:     &eventTitleForNotification,
+		EventStartDate: &eventStartDate,
+		EventEndDate:   &eventEndDate,
+		CalendarName:   &calendarName,
 	})
 	if err != nil {
 		logger.Err(err).Msg("failed to send push notification")

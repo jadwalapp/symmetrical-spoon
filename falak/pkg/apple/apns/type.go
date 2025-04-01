@@ -6,5 +6,5 @@ import (
 )
 
 type APNS interface {
-	Send(token string, payload *apns2payload.Payload) (*apns2.Response, error)
+	Send(token string, payload *apns2payload.Payload, pushType apns2.EPushType) (*apns2.Response, error)
 }
