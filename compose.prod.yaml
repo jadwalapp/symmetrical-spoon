@@ -74,8 +74,25 @@ services:
   rabbitmq:
     restart: always
 
+  tailscale:
+    image: tailscale/tailscale:latest
+    restart: always
+    hostname: batata
+    networks:
+      - web
+      - internal
+    environment:
+      - TS_AUTHKEY=${TS_AUTHKEY}
+      - TS_STATE_DIR=/var/lib/tailscale
+    volumes:
+      - tailscale-state:/var/lib/tailscale
+      - /dev/net/tun:/dev/net/tun
+    cap_add:
+      - net_admin
+
 volumes:
   traefik-certificates:
+  tailscale-state:
 
 networks:
   web:
