@@ -50,8 +50,20 @@ type FalakConfig struct {
 	ApnsTeamID                    string `mapstructure:"APNS_TEAM_ID"`
 }
 
-// LoadFalakConfig reads configuration from the provided path or environment variables.
-func LoadFalakConfig() (config FalakConfig, err error) {
+// LoadFalakConfig reads configuration from the environment variables.
+// By default it reads from .env file, but can be configured to read from a different file.
+// Falls back to environment variables if the file doesn't exist or fails to read.
+func LoadFalakConfig(envFile ...string) (config FalakConfig, err error) {
+	configFile := ".env"
+	if len(envFile) > 0 && envFile[0] != "" {
+		configFile = envFile[0]
+	}
+
+	viper.SetConfigFile(configFile)
+	if err := viper.ReadInConfig(); err != nil {
+		fmt.Printf("Could not read config file %s: %v\n", configFile, err)
+	}
+
 	t := reflect.TypeOf(FalakConfig{})
 	for i := 0; i < t.NumField(); i++ {
 		f := t.Field(i)
