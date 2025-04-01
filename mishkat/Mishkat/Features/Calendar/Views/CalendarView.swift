@@ -83,8 +83,22 @@ struct CalendarView: View {
                         Button {
                             conflictManager.showConflictsView = true
                         } label: {
-                            Image(systemName: "exclamationmark.triangle")
-                                .foregroundStyle(.orange)
+                            let unresolvedCount = conflictManager.conflicts.filter { !$0.resolved }.count
+                            ZStack(alignment: .topTrailing) {
+                                Image(systemName: "exclamationmark.triangle")
+                                    .foregroundStyle(unresolvedCount > 0 ? .orange : .gray.opacity(0.5))
+                                
+                                if unresolvedCount > 0 {
+                                    Text("\(unresolvedCount)")
+                                        .font(.system(size: 10))
+                                        .fontWeight(.bold)
+                                        .foregroundColor(.white)
+                                        .frame(width: 16, height: 16)
+                                        .background(Color.red)
+                                        .clipShape(Circle())
+                                        .offset(x: 8, y: -8)
+                                }
+                            }
                         }
                         
                         Button {

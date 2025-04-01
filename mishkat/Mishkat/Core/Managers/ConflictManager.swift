@@ -10,7 +10,7 @@ struct Conflict: Identifiable, Codable {
     var resolved: Bool
     var resolution: ConflictResolution?
     
-    struct EventInfo: Codable {
+    struct EventInfo: Codable, Equatable {
         let title: String
         let startDate: Date
         let endDate: Date
@@ -18,10 +18,23 @@ struct Conflict: Identifiable, Codable {
         let eventIdentifier: String?
     }
     
-    enum ConflictResolution: Codable {
+    enum ConflictResolution: Codable, Equatable {
         case keepBoth
         case moveEvent(EventInfo, Date)
         case deleteEvent(EventInfo)
+        
+        static func == (lhs: ConflictResolution, rhs: ConflictResolution) -> Bool {
+            switch (lhs, rhs) {
+            case (.keepBoth, .keepBoth):
+                return true
+            case let (.moveEvent(lhsEvent, lhsDate), .moveEvent(rhsEvent, rhsDate)):
+                return lhsEvent == rhsEvent && lhsDate == rhsDate
+            case let (.deleteEvent(lhsEvent), .deleteEvent(rhsEvent)):
+                return lhsEvent == rhsEvent
+            default:
+                return false
+            }
+        }
     }
 }
 
