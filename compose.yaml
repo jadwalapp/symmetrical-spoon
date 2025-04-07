@@ -16,16 +16,7 @@ services:
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_DB=${DB_NAME}
     healthcheck:
-      test:
-        [
-          "CMD",
-          "pg_isready",
-          "-q",
-          "-d",
-          "${POSTGRES_DB}",
-          "-U",
-          "${POSTGRES_USER}",
-        ]
+      test: ["CMD", "pg_isready", "-q", "-d", "${DB_NAME}", "-U", "${DB_USER}"]
       interval: 5s
       timeout: 5s
       retries: 5

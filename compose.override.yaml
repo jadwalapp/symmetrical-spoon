@@ -18,7 +18,7 @@ services:
 
   postgresdb:
     ports:
-      - ${POSTGRES_PORT}:${POSTGRES_PORT}
+      - ${DB_PORT}:${DB_PORT}
 
   falak:
     build:
