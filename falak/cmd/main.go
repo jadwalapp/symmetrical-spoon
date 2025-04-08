@@ -236,6 +236,9 @@ func main() {
 		TeamID:  config.ApnsTeamID,
 	}
 	apns2Client := apns2.NewTokenClient(apns2ClientToken)
+	if config.IsProd {
+		apns2Client.Production()
+	}
 	apns := apns.NewApns(*apns2Client)
 	// ======== APNS ========
 

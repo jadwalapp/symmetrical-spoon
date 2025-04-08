@@ -48,6 +48,7 @@ type FalakConfig struct {
 	ApnsAuthKey                   string `mapstructure:"APNS_AUTH_KEY"`
 	ApnsKeyID                     string `mapstructure:"APNS_KEY_ID"`
 	ApnsTeamID                    string `mapstructure:"APNS_TEAM_ID"`
+	IsProd                        bool   `mapstructure:"IS_PROD"`
 }
 
 // LoadFalakConfig reads configuration from the environment variables.
