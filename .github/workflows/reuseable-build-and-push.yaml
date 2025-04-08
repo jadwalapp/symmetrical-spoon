@@ -44,7 +44,7 @@ jobs:
 
     - name: Build and push
       id: push
-      uses: docker/build-push-action@v6.9.0
+      uses: useblacksmith/build-push-action@v1
       with:
         context: ${{ inputs.context_path }}
         platforms: linux/amd64,linux/arm64
