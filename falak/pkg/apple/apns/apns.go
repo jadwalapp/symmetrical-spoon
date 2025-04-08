@@ -21,6 +21,10 @@ func (a *apns) Send(token string, payload *apns2payload.Payload, pushType apns2.
 		return nil, err
 	}
 
+	// Log the APNs host being used
+	host := a.apns2Cli.Host
+	println("APNs Host:", host)
+
 	return resp, nil
 }
 

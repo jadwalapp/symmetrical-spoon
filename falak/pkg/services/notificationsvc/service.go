@@ -92,6 +92,13 @@ func (s *svc) sendNotification(logger zerolog.Logger, device store.Device, paylo
 		return err
 	}
 
+	logger.Info().
+		Int("status_code", resp.StatusCode).
+		Str("reason", resp.Reason).
+		Str("apns_id", resp.ApnsID).
+		Interface("response", resp).
+		Msg("raw apns response")
+
 	if resp.StatusCode != apns2.StatusSent {
 		logger.Warn().
 			Int("status_code", resp.StatusCode).
