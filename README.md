@@ -10,7 +10,7 @@ you know, something :D
 - buf cli: [https://buf.build/docs/installation](https://buf.build/docs/installation)
 - protoc-gen-go: `go install google.golang.org/protobuf/cmd/protoc-gen-go@latest`
 - protoc-gen-connect-go: `go install connectrpc.com/connect/cmd/protoc-gen-connect-go@latest`
-- sqlc: [https://docs.sqlc.dev/en/stable/overview/install.html](https://docs.sqlc.dev/en/stable/overview/install.html)
+- sqlc (v1.28.0): [https://docs.sqlc.dev/en/stable/overview/install.html](https://docs.sqlc.dev/en/stable/overview/install.html)
 - migrate: [https://github.com/golang-migrate/migrate/tree/master/cmd/migrate](https://github.com/golang-migrate/migrate/tree/master/cmd/migrate)
 
 ### Software that helps:

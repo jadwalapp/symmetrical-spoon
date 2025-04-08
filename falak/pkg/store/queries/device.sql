@@ -7,7 +7,3 @@ ON CONFLICT (apns_token) DO NOTHING;
 SELECT *
 FROM device
 WHERE customer_id = $1;
-
--- name: DeleteDevices :exec
-DELETE FROM device
-WHERE id IN ($1::string[]);
