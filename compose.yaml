@@ -65,6 +65,7 @@ services:
       APNS_AUTH_KEY: ${APNS_AUTH_KEY}
       APNS_KEY_ID: ${APNS_KEY_ID}
       APNS_TEAM_ID: ${APNS_TEAM_ID}
+      IS_PROD: ${IS_PROD}
     depends_on:
       postgresdb:
         condition: service_healthy
