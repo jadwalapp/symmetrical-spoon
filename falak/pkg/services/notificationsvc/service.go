@@ -75,13 +75,14 @@ func (s *svc) SendNotificationToCustomerDevices(ctx context.Context, r *SendNoti
 		}
 	}
 
-	if len(deviceIdsToDelete) > 0 {
-		logger.Info().Int("delete_count", len(deviceIdsToDelete)).Msg("deleting invalid devices")
-		err := s.store.DeleteDevices(ctx, deviceIdsToDelete)
-		if err != nil {
-			logger.Err(err).Msg("failed running DeleteDevices")
-		}
-	}
+	// TODO: do it later, things aren't working :D
+	// if len(deviceIdsToDelete) > 0 {
+	// 	logger.Info().Int("delete_count", len(deviceIdsToDelete)).Msg("deleting invalid devices")
+	// 	err := s.store.DeleteDevices(ctx, deviceIdsToDelete)
+	// 	if err != nil {
+	// 		logger.Err(err).Msg("failed running DeleteDevices")
+	// 	}
+	// }
 
 	return nil
 }
