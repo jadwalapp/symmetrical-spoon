@@ -10,4 +10,4 @@ WHERE customer_id = $1;
 
 -- name: DeleteDevices :exec
 DELETE FROM device
-WHERE id IN (sqlc.slice('ids'));
+WHERE id IN ($1::string[]);

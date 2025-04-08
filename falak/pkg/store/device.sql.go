@@ -7,9 +7,9 @@ package store
 
 import (
 	"context"
-	"strings"
 
 	"github.com/google/uuid"
+	"github.com/lib/pq"
 )
 
 const createDeviceIfNotExists = `-- name: CreateDeviceIfNotExists :exec
@@ -30,21 +30,11 @@ func (q *Queries) CreateDeviceIfNotExists(ctx context.Context, arg CreateDeviceI
 
 const deleteDevices = `-- name: DeleteDevices :exec
 DELETE FROM device
-WHERE id IN ($1)
+WHERE id IN ($1::string[])
 `
 
-func (q *Queries) DeleteDevices(ctx context.Context, ids []uuid.UUID) error {
-	query := deleteDevices
-	var queryParams []interface{}
-	if len(ids) > 0 {
-		for _, v := range ids {
-			queryParams = append(queryParams, v)
-		}
-		query = strings.Replace(query, "/*SLICE:ids*/?", strings.Repeat(",?", len(ids))[1:], 1)
-	} else {
-		query = strings.Replace(query, "/*SLICE:ids*/?", "NULL", 1)
-	}
-	_, err := q.db.ExecContext(ctx, query, queryParams...)
+func (q *Queries) DeleteDevices(ctx context.Context, dollar_1 []string) error {
+	_, err := q.db.ExecContext(ctx, deleteDevices, pq.Array(dollar_1))
 	return err
 }
 
