@@ -164,7 +164,8 @@ struct EmailInputView: View {
     NavigationStack {
         EmailInputView()
             .environmentObject(AuthViewModel(
-                authRepository: DependencyContainer.shared.authRepository
+                authRepository: DependencyContainer.shared.authRepository,
+                profileRepository: DependencyContainer.shared.profileRepository
             ))
     }
 }

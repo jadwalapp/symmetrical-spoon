@@ -18,9 +18,13 @@ services:
 
   postgresdb:
     ports:
-      - ${POSTGRES_PORT}:${POSTGRES_PORT}
+      - ${DB_PORT}:${DB_PORT}
 
   falak:
+    build:
+      context: ./falak
+      dockerfile: "Dockerfile"
+      target: dev
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=symmetrical-spoon_web"
@@ -29,7 +33,16 @@ services:
       - "traefik.http.services.falak.loadbalancer.server.port=${FALAK_PORT}"
       - "traefik.http.services.falak.loadbalancer.server.scheme=h2c"
     ports:
-      - "9090:50064"
+      - "50064:50064"
+    develop:
+      watch:
+        - path: ./falak
+          target: /falak
+          action: sync+restart
+          ignore:
+            - go.sum
+        - path: ./falak/go.sum
+          action: rebuild
 
   website:
     labels:
@@ -60,13 +73,24 @@ services:
       - "traefik.http.routers.baikal.entrypoints=web"
       - "traefik.http.services.baikal.loadbalancer.server.port=80"
 
-  plantuml:
-    image: plantuml/plantuml-server:jetty
-    labels:
-      - "traefik.enable=true"
-      - "traefik.docker.network=symmetrical-spoon_web"
-      - "traefik.http.routers.plantuml.rule=Host(`plantuml.localhost`)"
-      - "traefik.http.routers.plantuml.entrypoints=web"
-      - "traefik.http.services.plantuml.loadbalancer.server.port=8080"
-    networks:
-      - web
+  wasapp:
+    ports:
+      - 3000:3000
+
+  rabbitmq:
+    ports:
+      - "5672:5672" # AMQP protocol port
+      - "15672:15672" # Management UI port
+
+
+  # extra stuff - only local
+  # plantuml:
+  #   image: plantuml/plantuml-server:jetty
+  #   labels:
+  #     - "traefik.enable=true"
+  #     - "traefik.docker.network=symmetrical-spoon_web"
+  #     - "traefik.http.routers.plantuml.rule=Host(`plantuml.localhost`)"
+  #     - "traefik.http.routers.plantuml.entrypoints=web"
+  #     - "traefik.http.services.plantuml.loadbalancer.server.port=8080"
+  #   networks:
+  #     - web

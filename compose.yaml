@@ -12,20 +12,11 @@ services:
   postgresdb:
     image: postgres:17
     environment:
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
     healthcheck:
-      test:
-        [
-          "CMD",
-          "pg_isready",
-          "-q",
-          "-d",
-          "${POSTGRES_DB}",
-          "-U",
-          "${POSTGRES_USER}",
-        ]
+      test: ["CMD", "pg_isready", "-q", "-d", "${DB_NAME}", "-U", "${DB_USER}"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -35,23 +26,53 @@ services:
       - internal
 
   falak:
-    build:
-      context: ./falak
-      dockerfile: "Dockerfile"
-    env_file: ./falak/falak.env
     environment:
-      DB_USER: ${POSTGRES_USER}
-      DB_PASSWORD: ${POSTGRES_PASSWORD}
-      DB_HOST: postgresdb
-      DB_PORT: ${POSTGRES_PORT}
-      DB_NAME: ${POSTGRES_DB}
-      DB_SSL_MODE: disable
       PORT: ${FALAK_PORT}
+      JWT_PUBLIC_KEY: ${JWT_PUBLIC_KEY}
+      JWT_PRIVATE_KEY: ${JWT_PRIVATE_KEY}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_HOST: postgresdb
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${DB_NAME}
+      DB_SSL_MODE: disable
+      EMAILER_NAME: ${EMAILER_NAME}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_USERNAME: ${SMTP_USERNAME}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+      DOMAIN: ${DOMAIN}
+      RESEND_API_KEY: ${RESEND_API_KEY}
+      GOOGLE_CLIENT_BASE_URL: ${GOOGLE_CLIENT_BASE_URL}
+      GOOGLE_OAUTH_CLIENT_ID: ${GOOGLE_OAUTH_CLIENT_ID}
+      LOKI_ENDPOINT: http://loki:3100
+      LOKI_PUSH_INTERVAL_SECONDS: ${LOKI_PUSH_INTERVAL_SECONDS}
+      LOKI_MAX_BATCH_SIZE: ${LOKI_MAX_BATCH_SIZE}
+      BAIKAL_HOST: http://baikal:80
+      BAIKAL_PHPSESSID: ${BAIKAL_PHPSESSID}
+      CALDAV_PASSWORD_ENCRYPTION_KEY: ${CALDAV_PASSWORD_ENCRYPTION_KEY}
+      WASAPP_BASE_URL: http://wasapp:3000
+      RABBITMQ_USERNAME: ${RABBITMQ_USERNAME}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+      RABBITMQ_HOSTNAME: rabbitmq
+      RABBITMQ_PORT: ${RABBITMQ_PORT}
+      WASAPP_MESSAGES_QUEUE_NAME: ${WASAPP_MESSAGES_QUEUE_NAME}
+      OPEN_AI_BASE_URL: ${OPEN_AI_BASE_URL}
+      OPEN_AI_API_KEY: ${OPEN_AI_API_KEY}
+      OPEN_AI_MODEL_NAME: ${OPEN_AI_MODEL_NAME}
+      WASAPP_CALENDAR_EVENTS_QUEUE_NAME: ${WASAPP_CALENDAR_EVENTS_QUEUE_NAME}
+      WHATSAPP_MESSAGES_ENCRYPTION_KEY: ${WHATSAPP_MESSAGES_ENCRYPTION_KEY}
+      APNS_AUTH_KEY: ${APNS_AUTH_KEY}
+      APNS_KEY_ID: ${APNS_KEY_ID}
+      APNS_TEAM_ID: ${APNS_TEAM_ID}
+      IS_PROD: ${IS_PROD}
     depends_on:
       postgresdb:
         condition: service_healthy
       loki:
         condition: service_started
+      rabbitmq:
+        condition: service_healthy
     networks:
       - web
       - internal
@@ -109,12 +130,53 @@ services:
       - baikal-config:/var/www/baikal/config
       - baikal-data:/var/www/baikal/Specific
 
+  wasapp:
+    build:
+      context: ./wasapp
+      dockerfile: Dockerfile
+    networks:
+      - internal
+    volumes:
+      - wasapp-wwebjs_auth:/app/.wwebjs_auth
+    # so it has time to shutdown all whatsapp stuff, so no data is corrupt
+    stop_grace_period: 60s
+    environment:
+      PORT: 3000
+      IS_HEADLESS: "true"
+      RABBITMQ_HOSTNAME: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USERNAME: ${RABBITMQ_USERNAME}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+      WASAPP_MESSAGES_QUEUE_NAME: ${WASAPP_MESSAGES_QUEUE_NAME}
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  rabbitmq:
+    image: rabbitmq:4-management
+    networks:
+      - internal
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+      - rabbitmq_logs:/var/log/rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USERNAME}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD}
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_port_connectivity"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
 volumes:
   postgres_data:
   grafana-storage:
   loki-storage:
   baikal-config:
   baikal-data:
+  wasapp-wwebjs_auth:
+  rabbitmq_data:
+  rabbitmq_logs:
 
 networks:
   web:

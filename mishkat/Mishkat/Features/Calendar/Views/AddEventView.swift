@@ -8,13 +8,21 @@
 import SwiftUI
 import EventKitUI
 
-/// View for adding a new event to the calendar.
+/// View for adding or editing an event in the calendar.
 struct AddEventView: UIViewControllerRepresentable {
     @EnvironmentObject var viewModel: CalendarViewModel
     @Binding var isPresented: Bool
+    var event: EKEvent? = nil
 
     func makeUIViewController(context: Context) -> EKEventEditViewController {
-        viewModel.addEvent()
+        if let existingEvent = event {
+            let controller = EKEventEditViewController()
+            controller.event = existingEvent
+            controller.eventStore = viewModel.eventStore
+            controller.editViewDelegate = context.coordinator
+            return controller
+        }
+        return viewModel.addEvent()
     }
 
     func updateUIViewController(_ uiViewController: EKEventEditViewController, context: Context) {}
@@ -40,6 +48,7 @@ struct AddEventView: UIViewControllerRepresentable {
         
         func eventEditViewController(_ controller: EKEventEditViewController, didCompleteWith action: EKEventEditViewAction) {
             parent.viewModel.eventEditViewController(controller, didCompleteWith: action)
+            parent.isPresented = false
         }
         
         @objc func dismissAddEventView() {

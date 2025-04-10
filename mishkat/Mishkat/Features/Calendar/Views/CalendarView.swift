@@ -10,6 +10,7 @@ import EventKit
 
 struct CalendarView: View {
     @EnvironmentObject var viewModel: CalendarViewModel
+    @StateObject private var conflictManager = ConflictManager.shared
     @State private var showingAddEventSheet = false
     @State private var showingCalendarsSheet = false
     @State private var isMonthView = true
@@ -19,11 +20,28 @@ struct CalendarView: View {
             ZStack {
                 EnhancedCalendarView(isMonthView: $isMonthView)
                     .blur(radius: viewModel.authorizationStatus != .authorized ? 10 : 0)
+                    .refreshable {
+                        let generator = UINotificationFeedbackGenerator()
+                        generator.prepare()
+                        
+                        // Show loading state
+                        viewModel.isLoading = true
+                        
+                        await Task.sleep(500_000_000) // 0.5 second visual delay
+                        viewModel.refreshAllEvents()
+                        
+                        generator.notificationOccurred(.success)
+                    }
                 
                 if viewModel.authorizationStatus != .authorized {
                     AccessRequestCard(status: viewModel.authorizationStatus,
-                                      requestAccess: viewModel.requestAccess,
-                                      openSettings: viewModel.openSettings)
+                                   requestAccess: viewModel.requestAccess,
+                                   openSettings: viewModel.openSettings)
+                }
+                
+                if viewModel.isLoading {
+                    ProgressView()
+                        .scaleEffect(1.5)
                 }
             }
             .navigationTitle(isMonthView ? "Calendar" : viewModel.selectedDate.formatted(.dateTime.month().year()))
@@ -46,6 +64,16 @@ struct CalendarView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     HStack(spacing: 16) {
                         Button {
+                            viewModel.selectedDate = Date()
+                            if !isMonthView {
+                                viewModel.fetchDailyEvents(for: Date())
+                            }
+                        } label: {
+                            Text("Today")
+                                .foregroundStyle(.green)
+                        }
+                        
+                        Button {
                             showingCalendarsSheet.toggle()
                         } label: {
                             Image(systemName: "calendar")
@@ -53,10 +81,31 @@ struct CalendarView: View {
                         }
                         
                         Button {
+                            conflictManager.showConflictsView = true
+                        } label: {
+                            let unresolvedCount = conflictManager.conflicts.filter { !$0.resolved }.count
+                            ZStack(alignment: .topTrailing) {
+                                Image(systemName: "exclamationmark.triangle")
+                                    .foregroundStyle(unresolvedCount > 0 ? .orange : .gray.opacity(0.5))
+                                
+                                if unresolvedCount > 0 {
+                                    Text("\(unresolvedCount)")
+                                        .font(.system(size: 10))
+                                        .fontWeight(.bold)
+                                        .foregroundColor(.white)
+                                        .frame(width: 16, height: 16)
+                                        .background(Color.red)
+                                        .clipShape(Circle())
+                                        .offset(x: 8, y: -8)
+                                }
+                            }
+                        }
+                        
+                        Button {
                             showingAddEventSheet = true
                         } label: {
                             Image(systemName: "plus.circle.fill")
-                                .foregroundStyle(.accent)
+                                .foregroundStyle(.green)
                         }
                     }
                 }
@@ -67,6 +116,9 @@ struct CalendarView: View {
             }
             .sheet(isPresented: $showingCalendarsSheet) {
                 CalendarsListView()
+            }
+            .sheet(isPresented: $conflictManager.showConflictsView) {
+                ConflictsView()
             }
         }
     }

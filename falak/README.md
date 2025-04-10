@@ -1,7 +1,5 @@
 # falak
 
-- you need to make a copy of `falak.env.example` and put it in `falak.env`, then fill the values.
-
 ## JWT Token Keys Generation:
 
 Start by generating the key using openssl:
@@ -13,7 +11,7 @@ base64 -i falak-dev-public.pem > falak-dev-public.pem.base64
 base64 -i falak-dev-private.pem > falak-dev-private.pem.base64
 ```
 
-Finally, update your `falak.env` file with the keys.
+Finally, update your `/.env` file with the keys.
 
 For additional steps and details, consult the main repository's README.
 

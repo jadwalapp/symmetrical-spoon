@@ -31,4 +31,7 @@ class DependencyContainer {
     
     lazy private var calendarClient: Calendar_V1_CalendarServiceClient = { return Calendar_V1_CalendarServiceClient(client: client) }()
     lazy var calendarRepository: CalendarRepository = { return CalendarRepository(calendarClient: calendarClient) }()
+    
+    lazy private var whatsappClient: Whatsapp_V1_WhatsappServiceClient = { return Whatsapp_V1_WhatsappServiceClient(client: client) }()
+    lazy var whatsappRepository: WhatsappRepository = { return WhatsappRepository(whatsappClient: whatsappClient) }()
 }

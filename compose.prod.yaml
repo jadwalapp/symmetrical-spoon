@@ -24,8 +24,6 @@ services:
 
   postgresdb:
     restart: always
-    # ports:
-    #   - ${POSTGRES_PORT}:${POSTGRES_PORT}
 
   falak:
     image: ghcr.io/jadwalapp/symmetrical-spoon/falak:main
@@ -69,5 +67,42 @@ services:
       - "traefik.http.routers.baikal.tls.certresolver=myresolver"
       - "traefik.http.services.baikal.loadbalancer.server.port=80"
 
+  wasapp:
+    image: ghcr.io/jadwalapp/symmetrical-spoon/wasapp:main
+    restart: always
+
+  rabbitmq:
+    restart: always
+
+  tailscale:
+    image: tailscale/tailscale:latest
+    restart: always
+    hostname: batata
+    networks:
+      - web
+      - internal
+    environment:
+      - TS_AUTHKEY=${TS_AUTHKEY}?ephemeral=false
+      - TS_EXTRA_ARGS=--advertise-tags=tag:container
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_USERSPACE=false
+      - TS_ROUTES=10.98.0.0/16,10.99.0.0/16
+    volumes:
+      - tailscale-state:/var/lib/tailscale
+      - /dev/net/tun:/dev/net/tun
+    cap_add:
+      - net_admin
+
 volumes:
   traefik-certificates:
+  tailscale-state:
+
+networks:
+  web:
+    ipam:
+      config:
+        - subnet: 10.98.0.0/16
+  internal:
+    ipam:
+      config:
+        - subnet: 10.99.0.0/16

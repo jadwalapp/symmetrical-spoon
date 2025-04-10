@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UIKit
 
 class AuthViewModel: ObservableObject {
     enum AuthState {
@@ -31,9 +32,31 @@ class AuthViewModel: ObservableObject {
     
     
     private let authRepository: AuthRepository
-    init(authRepository: AuthRepository) {
+    private let profileRepository: ProfileRepository
+    
+    init(authRepository: AuthRepository, profileRepository: ProfileRepository) {
         self.authRepository = authRepository
+        self.profileRepository = profileRepository
         self.isAuthenticated = KeychainManager.shared.getToken() != nil
+    }
+    
+    private func registerDeviceToken() {
+        Task {
+            guard let appDelegate = await UIApplication.shared.delegate as? MishkatAppDelegate,
+                  let deviceToken = await appDelegate.currentDeviceToken else {
+                print("Device token not available yet for registration.")
+                await UIApplication.shared.registerForRemoteNotifications()
+                return
+            }
+
+            print("Attempting to register device token after login: \(deviceToken)")
+            do {
+                try await self.profileRepository.addDevice(deviceToken: deviceToken)
+                print("Device token registered successfully after login.")
+            } catch {
+                print("Failed to register device token after login: \(error)")
+            }
+        }
     }
     
     func useGoogle() {
@@ -49,6 +72,7 @@ class AuthViewModel: ObservableObject {
                     KeychainManager.shared.saveToken(response.accessToken)
                     self.isAuthenticated = true
                     useGoogleState = .loaded(response)
+                    self.registerDeviceToken()
                 }
             } catch {
                 await MainActor.run {
@@ -99,6 +123,7 @@ class AuthViewModel: ObservableObject {
                     KeychainManager.shared.saveToken(response.accessToken)
                     self.isAuthenticated = true
                     self.completeEmailState = .loaded(response)
+                    self.registerDeviceToken()
                 }
             } catch {
                 await MainActor.run {

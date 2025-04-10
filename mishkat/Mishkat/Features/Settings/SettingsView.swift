@@ -29,21 +29,101 @@ struct SettingsView: View {
                     .listRowBackground(Color.clear)
             }
             Section {
-                Button {
-                    print("connect whatsapp")
-                } label: {
-                    HStack {
-                        Image(systemName: "message.fill")
-                        Text("Connect WhatsApp")
-                    }
-                }
-                
-                Button {
-                    print("connect caldav")
-                } label: {
-                    HStack {
-                        Image(systemName: "calendar")
-                        Text("Connect CalDAV")
+                AsyncView(
+                    response: profileViewModel.whatsappAccountState
+                ) { whatsappAccount in
+                    if whatsappAccount.isReady {
+                        VStack(spacing: 16) {
+                            HStack {
+                                Image(systemName: "message.fill")
+                                    .foregroundStyle(.green)
+                                    .font(.title3)
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("WhatsApp Connected")
+                                        .font(.headline)
+                                    Text(whatsappAccount.phoneNumber)
+                                        .font(.subheadline)
+                                        .foregroundStyle(.secondary)
+                                }
+                                Spacer()
+                                Menu {
+                                    Button(role: .destructive) {
+                                        profileViewModel.disconnectWhatsapp()
+                                    } label: {
+                                        Label("Disconnect", systemImage: "xmark.circle")
+                                    }
+                                } label: {
+                                    Image(systemName: "ellipsis.circle")
+                                        .foregroundStyle(.secondary)
+                                        .font(.title3)
+                                }
+                            }
+                            
+                            if !whatsappAccount.name.isEmpty {
+                                HStack {
+                                    Image(systemName: "person.fill")
+                                        .foregroundStyle(.secondary)
+                                    Text(whatsappAccount.name)
+                                        .font(.subheadline)
+                                        .foregroundStyle(.secondary)
+                                    Spacer()
+                                }
+                            }
+                            
+                            HStack {
+                                Image(systemName: "checkmark.seal.fill")
+                                    .foregroundStyle(.green)
+                                Text("Scanning messages for events")
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                                Spacer()
+                            }
+                        }
+                        .padding(.vertical, 4)
+                    } else if whatsappAccount.status == "WAITING_FOR_PAIRING" {
+                        Button {
+                            profileViewModel.showWhatsappSheet = true
+                        } label: {
+                            HStack {
+                                Image(systemName: "message.badge.circle.fill")
+                                    .font(.title3)
+                                    .foregroundStyle(.orange)
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("Complete WhatsApp Setup")
+                                        .font(.headline)
+                                    Text("Waiting for pairing code")
+                                        .font(.subheadline)
+                                        .foregroundStyle(.secondary)
+                                }
+                                Spacer()
+                                Image(systemName: "chevron.right")
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                            }
+                            .padding(.vertical, 4)
+                        }
+                    } else {
+                        Button {
+                            profileViewModel.showWhatsappSheet = true
+                        } label: {
+                            HStack {
+                                Image(systemName: "message.fill")
+                                    .font(.title3)
+                                    .foregroundStyle(.green)
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("Connect WhatsApp")
+                                        .font(.headline)
+                                    Text("Sync your events from chats")
+                                        .font(.subheadline)
+                                        .foregroundStyle(.secondary)
+                                }
+                                Spacer()
+                                Image(systemName: "chevron.right")
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                            }
+                            .padding(.vertical, 4)
+                        }
                     }
                 }
             }
@@ -66,10 +146,20 @@ struct SettingsView: View {
         .onFirstAppear {
             profileViewModel.getProfile()
             profileViewModel.getCalDavAccount()
+            profileViewModel.getWhatsappAccount()
         }
         .refreshable {
             profileViewModel.getProfile()
             profileViewModel.getCalDavAccount()
+            profileViewModel.getWhatsappAccount()
+        }
+        .sheet(isPresented: $profileViewModel.showWhatsappSheet) {
+            WhatsappConnectionSheet(whatsappRepository: DependencyContainer.shared.whatsappRepository)
+                .presentationDragIndicator(.visible)
+                .presentationDetents([.large])
+                .onDisappear {
+                    profileViewModel.getWhatsappAccount()
+                }
         }
     }
 }
@@ -79,7 +169,7 @@ struct SettingsView: View {
         .environmentObject(
             ProfileViewModel(
                 profileRepository: DependencyContainer.shared.profileRepository,
-                calendarRepository: DependencyContainer.shared.calendarRepository
+                calendarRepository: DependencyContainer.shared.calendarRepository, whatsappRepository: DependencyContainer.shared.whatsappRepository
             )
         )
 }

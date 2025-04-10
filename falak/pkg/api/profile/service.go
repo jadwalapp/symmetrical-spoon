@@ -49,6 +49,30 @@ func (s *service) GetProfile(ctx context.Context, r *connect.Request[profilev1.G
 	}, nil
 }
 
+func (s *service) AddDevice(ctx context.Context, r *connect.Request[profilev1.AddDeviceRequest]) (*connect.Response[profilev1.AddDeviceResponse], error) {
+	if err := s.pv.Validate(r.Msg); err != nil {
+		log.Ctx(ctx).Err(err).Msg("invalid request")
+		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+	}
+
+	tokenClaims, ok := s.apiMetadata.GetClaims(ctx)
+	if !ok {
+		log.Ctx(ctx).Error().Msg("failed running GetClaims")
+		return nil, internalError
+	}
+
+	err := s.store.CreateDeviceIfNotExists(ctx, store.CreateDeviceIfNotExistsParams{
+		CustomerID: tokenClaims.Payload.CustomerId,
+		ApnsToken:  r.Msg.DeviceToken,
+	})
+	if err != nil {
+		log.Ctx(ctx).Err(err).Msg("failed running CreateDeviceIfNotExists")
+		return nil, internalError
+	}
+
+	return &connect.Response[profilev1.AddDeviceResponse]{}, nil
+}
+
 func NewService(pv protovalidate.Validator, store store.Queries, apiMetadata apimetadata.ApiMetadata) profilev1connect.ProfileServiceHandler {
 	return &service{
 		pv:          pv,

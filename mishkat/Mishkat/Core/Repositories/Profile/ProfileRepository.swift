@@ -25,4 +25,17 @@ class ProfileRepository {
             throw ProfileRepositoryError.unknown
         }
     }
+    
+    func addDevice(deviceToken: String) async throws -> Profile_V1_AddDeviceResponse {
+        do {
+            var req = Profile_V1_AddDeviceRequest()
+            req.deviceToken = deviceToken
+            
+            let resp = await profileClient.addDevice(request: req, headers: [:])
+            return try resp.result.get()
+        } catch {
+            debugPrint("things went south running addDevice: \(error)")
+            throw ProfileRepositoryError.unknown
+        }
+    }
 }

@@ -1,7 +1,9 @@
 package main
 
 import (
+	"context"
 	"database/sql"
+	"encoding/base64"
 	"fmt"
 	"net/http"
 	"os"
@@ -15,13 +17,16 @@ import (
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/api/auth"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/api/calendar"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/api/profile"
+	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/api/whatsapp"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/apimetadata"
+	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/apple/apns"
 	baikalclient "github.com/jadwalapp/symmetrical-spoon/falak/pkg/baikal/client"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/email/emailer"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/email/template"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/gen/proto/auth/v1/authv1connect"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/gen/proto/calendar/v1/calendarv1connect"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/gen/proto/profile/v1/profilev1connect"
+	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/gen/proto/whatsapp/v1/whatsappv1connect"
 	geolocationclient "github.com/jadwalapp/symmetrical-spoon/falak/pkg/geolocation/client"
 	googlesvc "github.com/jadwalapp/symmetrical-spoon/falak/pkg/google"
 	googleclient "github.com/jadwalapp/symmetrical-spoon/falak/pkg/google/client"
@@ -29,12 +34,23 @@ import (
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/interceptors"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/lokilogger"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/prayer/client"
+	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/services/calendarsvc"
+	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/services/notificationsvc"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/store"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/tokens"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/util"
+	wasappcalendar "github.com/jadwalapp/symmetrical-spoon/falak/pkg/wasapp/calendar"
+	wasappclient "github.com/jadwalapp/symmetrical-spoon/falak/pkg/wasapp/client"
+	wasappmsganalyzer "github.com/jadwalapp/symmetrical-spoon/falak/pkg/wasapp/msganalyzer"
+	wasappmsgconsumer "github.com/jadwalapp/symmetrical-spoon/falak/pkg/wasapp/msgconsumer"
+	"github.com/openai/openai-go"
+	openaioption "github.com/openai/openai-go/option"
+	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/resendlabs/resend-go"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+	"github.com/sideshow/apns2"
+	apns2token "github.com/sideshow/apns2/token"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 
@@ -44,7 +60,7 @@ import (
 const dbDriverName = "pgx"
 
 func main() {
-	config, err := util.LoadFalakConfig(".")
+	config, err := util.LoadFalakConfig()
 	if err != nil {
 		log.Fatal().Msgf("cannot load config: %v", err)
 	}
@@ -97,6 +113,9 @@ func main() {
 	if err != nil {
 		log.Fatal().Msgf("cannot create store migration instance: %v", err)
 	}
+	defer migStore.Close()
+	defer dbDriver.Close()
+	defer dbConn.Close()
 
 	err = migStore.Up()
 	if err != nil && err != migrate.ErrNoChange {
@@ -158,6 +177,108 @@ func main() {
 	baikalCli := baikalclient.NewClient(baikalHttpCli, config.BaikalHost, config.BaikalPhpSessionID)
 	// ======== BAIKAL CLIENT ========
 
+	// ======== BAIKAL CLIENT ========
+	wasappHttpCli := httpclient.NewClient(&http.Client{})
+	wasappCli := wasappclient.NewClient(wasappHttpCli, config.WasappBaseUrl)
+	// ======== BAIKAL CLIENT ========
+
+	// ======== AMQP CHAN ========
+	amqpUrl := util.CreateAmqpSource(
+		config.RabbitMqUser,
+		config.RabbitMqPass,
+		config.RabbitMqHost,
+		config.RabbitMqPort,
+	)
+	amqpConn, err := amqp.Dial(amqpUrl)
+	if err != nil {
+		log.Fatal().Msgf("failed to dial amqp: %v", err)
+	}
+
+	amqpChan, err := amqpConn.Channel()
+	if err != nil {
+		log.Fatal().Msgf("failed to open an amqp channel: %v", err)
+	}
+	defer amqpChan.Close()
+	defer amqpConn.Close()
+	// ======== AMQP CHAN ========
+
+	// ======== LLM CLI ========
+	llmCli := openai.NewClient(
+		openaioption.WithBaseURL(config.OpenAiBaseUrl),
+		openaioption.WithAPIKey(config.OpenAiApiKey),
+	)
+	// ======== LLM CLI ========
+
+	// ======== MSG ANALYZER ========
+	msgAnalyzer := wasappmsganalyzer.NewAnalyzer(llmCli, config.OpenAiModelName)
+	// ======== MSG ANALYZER ========
+
+	// ======== CALENDAR SERVICE ========
+	calendarService := calendarsvc.NewSvc(config.BaikalHost, *dbStore)
+	// ======== CALENDAR SERVICE ========
+
+	// ======== WASAPP CALENDAR PRODUCER ========
+	wasappCalendarProducer := wasappcalendar.NewProducer(amqpChan, config.WasappCalendarEventsQueueName)
+	// ======== WASAPP CALENDAR PRODUCER ========
+
+	// ======== APNS ========
+	apnsAuthKeyBytes, err := base64.StdEncoding.DecodeString(config.ApnsAuthKey)
+	if err != nil {
+		log.Fatal().Msgf("failed to decode base64 APNS auth key: %v", err)
+	}
+
+	apns2AuthKey, err := apns2token.AuthKeyFromBytes(apnsAuthKeyBytes)
+	if err != nil {
+		log.Fatal().Msgf("failed to parse apns auth key from bytes: %v", err)
+	}
+
+	apns2ClientToken := &apns2token.Token{
+		AuthKey: apns2AuthKey,
+		KeyID:   config.ApnsKeyID,
+		TeamID:  config.ApnsTeamID,
+	}
+	apns2Client := apns2.NewTokenClient(apns2ClientToken)
+	if config.IsProd {
+		apns2Client.Production()
+	}
+	apns := apns.NewApns(*apns2Client)
+	// ======== APNS ========
+
+	// ======== NOTIFICATION SERVICE ========
+	notificationSvc := notificationsvc.NewSvc(*dbStore, apns)
+	// ======== NOTIFICATION SERVICE ========
+
+	// ======== CALENDAR CONSUMER ========
+	calendarConsumerCtx := context.Background()
+	calendarConsumerCtx = log.Logger.WithContext(calendarConsumerCtx)
+
+	calendarConsumer := wasappcalendar.NewConsumer(amqpChan, config.WasappCalendarEventsQueueName, *dbStore, calendarService, config.CalDAVPasswordEncryptionKey, notificationSvc)
+	err = calendarConsumer.Start(calendarConsumerCtx)
+	if err != nil {
+		log.Fatal().Msgf("failed to start calendar consumer: %v", err)
+	}
+	defer calendarConsumer.Stop(calendarConsumerCtx)
+	// ======== CALENDAR CONSUMER ========
+
+	// ======== WASAPP CONSUMER ========
+	wasappConsumerCtx := context.Background()
+	wasappConsumerCtx = log.Logger.WithContext(wasappConsumerCtx)
+
+	wasappConsumer := wasappmsgconsumer.NewConsumer(
+		amqpChan,
+		config.WasappMessagesQueueName,
+		*dbStore,
+		msgAnalyzer,
+		wasappCalendarProducer,
+		config.WhatsappMessagesEncryptionKey,
+	)
+	err = wasappConsumer.Start(wasappConsumerCtx)
+	if err != nil {
+		log.Fatal().Msgf("failed to start wasapp consumer: %v", err)
+	}
+	defer wasappConsumer.Stop(wasappConsumerCtx)
+	// ======== WASAPP CONSUMER ========
+
 	// ======== PROTOVALIDATE ========
 	pv, err := protovalidate.New()
 	if err != nil {
@@ -190,6 +311,7 @@ func main() {
 		authv1connect.AuthServiceName,
 		profilev1connect.ProfileServiceName,
 		calendarv1connect.CalendarServiceName,
+		whatsappv1connect.WhatsappServiceName,
 	)
 	mux.Handle(grpcreflect.NewHandlerV1(reflector))
 	mux.Handle(grpcreflect.NewHandlerV1Alpha(reflector))
@@ -202,6 +324,9 @@ func main() {
 
 	calendarServer := calendar.NewService(*pv, *dbStore, apiMetadata, geoLocClient, prayerTime, config.CalDAVPasswordEncryptionKey)
 	mux.Handle(calendarv1connect.NewCalendarServiceHandler(calendarServer, interceptorsForServer))
+
+	whatsappServer := whatsapp.NewService(*pv, apiMetadata, wasappCli)
+	mux.Handle(whatsappv1connect.NewWhatsappServiceHandler(whatsappServer, interceptorsForServer))
 
 	addr := fmt.Sprintf("0.0.0.0:%s", config.Port)
 	log.Info().Msgf("listening on %s", addr)

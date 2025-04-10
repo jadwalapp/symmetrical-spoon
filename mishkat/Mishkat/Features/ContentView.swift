@@ -15,7 +15,7 @@ struct ContentView: View {
     @StateObject private var calendarViewModel: CalendarViewModel
     init() {
         _settingsViewModel = StateObject(wrappedValue: SettingsViewModel())
-        _profileViewModel = StateObject(wrappedValue: ProfileViewModel(profileRepository: DependencyContainer.shared.profileRepository, calendarRepository: DependencyContainer.shared.calendarRepository))
+        _profileViewModel = StateObject(wrappedValue: ProfileViewModel(profileRepository: DependencyContainer.shared.profileRepository, calendarRepository: DependencyContainer.shared.calendarRepository, whatsappRepository: DependencyContainer.shared.whatsappRepository))
         _calendarViewModel = StateObject(wrappedValue: CalendarViewModel())
     }
     

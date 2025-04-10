@@ -2,7 +2,7 @@
 
   on:
     workflow_run:
-      workflows: ["Build and Push Falak Image", "Build and Push Website Image"]
+      workflows: ["Build and Push Falak Image", "Build and Push Website Image", "Build and Push Wasapp Image"]
       types:
         - completed
     workflow_dispatch:
@@ -31,4 +31,4 @@
               cd symmetrical-spoon
               git pull
               docker compose -f compose.yaml -f compose.prod.yaml pull
-              docker compose -f compose.yaml -f compose.prod.yaml up -d
+              docker compose -f compose.yaml -f compose.prod.yaml up -d --remove-orphans

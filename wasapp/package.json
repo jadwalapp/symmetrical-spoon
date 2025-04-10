@@ -1,0 +1,24 @@
+{
+  "name": "wasapp",
+  "description": "",
+  "version": "0.0.1",
+  "main": "main.ts",
+  "scripts": {
+    "dev": "ts-node-dev --respawn --transpile-only main.ts",
+    "build": "tsc",
+    "start": "node dist/main.js"
+  },
+  "keywords": [],
+  "author": "Jadwal Team",
+  "license": "MIT",
+  "dependencies": {
+    "amqplib": "^0.10.5",
+    "fastify": "^5.2.1",
+    "pino-pretty": "^13.0.0",
+    "whatsapp-web.js": "https://github.com/jadwalapp/whatsapp-web.js.git#main"
+  },
+  "devDependencies": {
+    "@types/amqplib": "^0.10.6",
+    "@types/bun": "latest"
+  }
+}
