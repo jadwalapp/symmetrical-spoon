@@ -30,6 +30,7 @@ import (
 	googlesvc "github.com/jadwalapp/symmetrical-spoon/falak/pkg/google"
 	googleclient "github.com/jadwalapp/symmetrical-spoon/falak/pkg/google/client"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/httpclient"
+	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/httpj"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/interceptors"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/lokilogger"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/services/calendarsvc"
@@ -284,6 +285,10 @@ func main() {
 	}
 	// ======== PROTOVALIDATE ========
 
+	// ======== HTTPJ SERVICE ========
+	httpjRouter := httpj.NewRouter(*dbStore, config.CalDAVPasswordEncryptionKey)
+	// ======== HTTPJ SERVICE ========
+
 	// ======== INTERCEPTORS ========
 	interceptorsForServer := connect.WithInterceptors(
 		interceptors.LoggingInterceptor(lokiClient),
@@ -294,6 +299,10 @@ func main() {
 
 	// ======== SERVER ========
 	mux := http.NewServeMux()
+
+	mux.HandleFunc("/httpj", httpjRouter.HandleRoot)
+	mux.HandleFunc("/httpj/mobile-config/caldav", httpjRouter.HandleMobileConfigCaldav)
+	mux.HandleFunc("/httpj/mobile-config/webcal", httpjRouter.HandleMobileConfigWebcal)
 
 	reflector := grpcreflect.NewStaticReflector(
 		authv1connect.AuthServiceName,

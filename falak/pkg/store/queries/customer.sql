@@ -28,9 +28,9 @@ SELECT
     -- not ((has magic link entry where used_at is not null) -> has account)
     NOT EXISTS (
       SELECT 1 
-      FROM magic_link ml
-      WHERE ml.customer_id = $1
-        AND ml.used_at IS NOT NULL
+      FROM magic_token mt
+      WHERE mt.customer_id = $1
+        AND mt.used_at IS NOT NULL
     )
     AND 
     -- not ((has google entry) -> has account)

@@ -6,10 +6,54 @@ package store
 
 import (
 	"database/sql"
+	"database/sql/driver"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
 )
+
+type MagicTokenType string
+
+const (
+	MagicTokenTypeAuth   MagicTokenType = "auth"
+	MagicTokenTypeCaldav MagicTokenType = "caldav"
+)
+
+func (e *MagicTokenType) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = MagicTokenType(s)
+	case string:
+		*e = MagicTokenType(s)
+	default:
+		return fmt.Errorf("unsupported scan type for MagicTokenType: %T", src)
+	}
+	return nil
+}
+
+type NullMagicTokenType struct {
+	MagicTokenType MagicTokenType
+	Valid          bool // Valid is true if MagicTokenType is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullMagicTokenType) Scan(value interface{}) error {
+	if value == nil {
+		ns.MagicTokenType, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.MagicTokenType.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullMagicTokenType) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.MagicTokenType), nil
+}
 
 type AuthGoogle struct {
 	ID         uuid.UUID
@@ -45,7 +89,7 @@ type Device struct {
 	UpdatedAt  time.Time
 }
 
-type MagicLink struct {
+type MagicToken struct {
 	ID         uuid.UUID
 	CustomerID uuid.UUID
 	TokenHash  string
@@ -53,6 +97,7 @@ type MagicLink struct {
 	UsedAt     sql.NullTime
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
+	TokenType  MagicTokenType
 }
 
 type WasappChat struct {
