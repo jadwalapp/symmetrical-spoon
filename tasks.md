@@ -10,3 +10,4 @@
 - [ ] add "event update in converstaions" if whatsapp messages update themselves, like keep messages til last day of the event, so that we keep context, db might be weird :D
 - [ ] implement refresh and access token to increase security :D, since access token is sent in the headers so you know more time for attacker, very bad :D
 - [ ] add some html to the webpage in the downloading of the file, like redirect the user after download somehow so he doesn't panic :D
+- [ ] add "are you sure?" before submitting for connect whastapp, and show phone number in the code page, just ot ensur ebeter experience for user and if entered it in a wrong way.
