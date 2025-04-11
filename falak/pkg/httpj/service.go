@@ -19,6 +19,8 @@ import (
 type service struct {
 	store                       store.Queries
 	calDAVPasswordEncryptionKey string
+	caldavHost                  string
+	isProd                      bool
 }
 
 func (s *service) HandleMobileConfigCaldav(w http.ResponseWriter, r *http.Request) {
@@ -30,7 +32,6 @@ func (s *service) HandleMobileConfigCaldav(w http.ResponseWriter, r *http.Reques
 
 	q := r.URL.Query()
 	mtHashedFromUser := q.Get("s")
-	// TODO: make this re-usable
 	hashedToken := util.HashStringToBase64SHA256(mtHashedFromUser)
 
 	magicToken, err := s.store.GetUnusedMagicTokenByTokenHash(ctx, store.GetUnusedMagicTokenByTokenHashParams{
@@ -73,6 +74,11 @@ func (s *service) HandleMobileConfigCaldav(w http.ResponseWriter, r *http.Reques
 	profileIdentifier := "app.jadwal.mishkat.profile.caldavconfig"
 	payloadIdentifier := profileIdentifier + ".caldavpayload"
 
+	caldavPort := 80
+	if s.isProd {
+		caldavPort = 443
+	}
+
 	caldavPayload := mobileconfig.CalDAVPayload{
 		PayloadVersion:           1,
 		PayloadType:              "com.apple.caldav.account",
@@ -80,9 +86,9 @@ func (s *service) HandleMobileConfigCaldav(w http.ResponseWriter, r *http.Reques
 		PayloadUUID:              payloadUUID,
 		PayloadDisplayName:       fmt.Sprintf("Jadwal Calendar - %s", customer.Username),
 		CalDAVAccountDescription: fmt.Sprintf("Jadwal Calendar Account for %s", customer.Username),
-		CalDAVHostName:           "baikal.jadwal.app", // TODO: accept this from outside
-		CalDAVPort:               443,                 // TODO: accept this from outside
-		CalDAVUseSSL:             true,                // TODO: accept this from outside
+		CalDAVHostName:           s.caldavHost,
+		CalDAVPort:               caldavPort,
+		CalDAVUseSSL:             s.isProd,
 		CalDAVPrincipalURL:       "/dav.php",
 		CalDAVUsername:           customer.Username,
 		CalDAVPassword:           customer.DecryptedPassword,
@@ -191,9 +197,11 @@ func (s *service) HandleRoot(w http.ResponseWriter, r *http.Request) {
           .      .                                   .           .                                . `))
 }
 
-func NewRouter(store store.Queries, calDAVPasswordEncryptionKey string) Svc {
+func NewRouter(store store.Queries, calDAVPasswordEncryptionKey string, caldavHost string, isProd bool) Svc {
 	return &service{
 		store:                       store,
 		calDAVPasswordEncryptionKey: calDAVPasswordEncryptionKey,
+		caldavHost:                  caldavHost,
+		isProd:                      isProd,
 	}
 }
