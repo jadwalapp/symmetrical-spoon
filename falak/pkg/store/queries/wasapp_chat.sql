@@ -36,4 +36,4 @@ JOIN wasapp_chat c ON c.id = m.wasapp_chat_id
 WHERE c.chat_id = $2;
 
 -- name: DeleteChat :exec
-DELETE FROM wasapp_chat WHERE chat_id = $1;
+DELETE FROM wasapp_chat WHERE chat_id = $1 AND customer_id = $2;

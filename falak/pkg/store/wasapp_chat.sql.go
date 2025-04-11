@@ -126,10 +126,15 @@ func (q *Queries) AddMessageToChatReturningMessages(ctx context.Context, arg Add
 }
 
 const deleteChat = `-- name: DeleteChat :exec
-DELETE FROM wasapp_chat WHERE chat_id = $1
+DELETE FROM wasapp_chat WHERE chat_id = $1 AND customer_id = $2
 `
 
-func (q *Queries) DeleteChat(ctx context.Context, chatID string) error {
-	_, err := q.db.ExecContext(ctx, deleteChat, chatID)
+type DeleteChatParams struct {
+	ChatID     string
+	CustomerID uuid.UUID
+}
+
+func (q *Queries) DeleteChat(ctx context.Context, arg DeleteChatParams) error {
+	_, err := q.db.ExecContext(ctx, deleteChat, arg.ChatID, arg.CustomerID)
 	return err
 }
