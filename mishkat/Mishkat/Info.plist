@@ -10,6 +10,7 @@
 		<string>ms-outlook</string>
 		<string>ymail</string>
 		<string>mailto</string>
+		<string>App-prefs</string>
 	</array>
 	<key>NSCalendarsFullAccessUsageDescription</key>
 	<string>Jadwal needs full access to your calendars to allow you to manage them through Jadwal's app. No data will be transmitted, we just show it in the app.</string>

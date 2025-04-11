@@ -9,76 +9,227 @@ import SwiftUI
 
 struct CalDAVCredentialsView: View {
     @EnvironmentObject var profileViewModel: ProfileViewModel
-    @State private var isExpanded = false
-    @State private var showingSetupGuide = false
     @State private var copiedField: String?
-
+    @State private var showingEasySetupInstructions = false
+    @State private var isAccountDetailsExpanded = false
+    
     var body: some View {
-        VStack(spacing: 0) {
-            header
+        ZStack {
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color(UIColor.secondarySystemBackground))
+                .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
             
-            VStack {
-                if isExpanded {
-                    credentialsContent
-                        .transition(.opacity.combined(with: .move(edge: .top)))
-                }
-            }
-            .clipped()
-        }
-        .background(Color(UIColor.systemBackground))
-        .cornerRadius(12)
-        .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
-        .animation(.easeInOut(duration: 0.25), value: isExpanded)
-        .sheet(isPresented: $showingSetupGuide) {
-            CalDAVSetupGuideView()
-        }
-    }
-
-    private var header: some View {
-        Button(action: { withAnimation { isExpanded.toggle() } }) {
-            HStack {
-                Image(systemName: "calendar")
-                    .foregroundColor(.accentColor)
-                    .font(.title2)
-                Text("CalDAV Account")
-                    .font(.headline)
-                Spacer()
-                Image(systemName: isExpanded ? "chevron.up.circle.fill" : "chevron.down.circle.fill")
-                    .foregroundColor(.accentColor)
-                    .imageScale(.large)
-            }
-            .padding()
-            .background(Color(UIColor.secondarySystemBackground))
-        }
-        .buttonStyle(PlainButtonStyle())
-    }
-
-    private var credentialsContent: some View {
-        VStack(spacing: 20) {
-            AsyncView(response: profileViewModel.calDavAccountState) { account in
+            VStack(spacing: 0) {
+                // Header
+                header
+                
+                Divider()
+                
+                // Content
                 VStack(spacing: 16) {
-                    credentialRow(title: "Server URL", value: "https://baikal.jadwal.app/dav.php", systemImage: "globe")
-                    credentialRow(title: "Username", value: account.username, systemImage: "person.fill")
-                    credentialRow(title: "Password", value: account.password, systemImage: "lock.fill", isSecure: true)
+                    connectionStatusView
+                    
+                    if profileViewModel.isDeviceCalDavAccountDetected {
+                        accountDetailsView
+                    } else {
+                        setupOptionsView
+                    }
                 }
+                .padding()
             }
+        }
+        // Only keep the Easy Setup sheet
+        .fullScreenCover(isPresented: $showingEasySetupInstructions) {
+            CalDAVSetupInstructionsView()
+                .environmentObject(profileViewModel)
+        }
+    }
+    
+    // MARK: - UI Components
+    
+    private var header: some View {
+        HStack {
+            Image(systemName: "calendar")
+                .foregroundStyle(Color.accentColor)
+                .font(.title2)
             
-            HStack(spacing: 20) {
-                actionButton(title: "Setup Guide", systemImage: "book.fill") {
-                    showingSetupGuide = true
+            Text("Calendar Sync")
+                .font(.headline)
+            
+            Spacer()
+            
+            Button {
+                Task {
+                    await profileViewModel.checkDeviceCalDavAccountStatus()
                 }
+            } label: {
+                Image(systemName: "arrow.clockwise")
+                    .foregroundStyle(Color.accentColor)
             }
+            .buttonStyle(.plain)
         }
         .padding()
-        .background(Color(UIColor.secondarySystemBackground))
     }
-
-    private func credentialRow(title: String, value: String, systemImage: String, isSecure: Bool = false) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Label(title, systemImage: systemImage)
-                .font(.subheadline)
-                .foregroundColor(.secondary)
+    
+    private var connectionStatusView: some View {
+        HStack(spacing: 12) {
+            // Status icon with loading state
+            ZStack {
+                if case .loading = profileViewModel.calDavAccountState {
+                    ProgressView()
+                        .frame(width: 40, height: 40)
+                } else {
+                    Circle()
+                        .fill(profileViewModel.isDeviceCalDavAccountDetected ? Color.green : Color.gray.opacity(0.3))
+                        .frame(width: 40, height: 40)
+                    
+                    Image(systemName: profileViewModel.isDeviceCalDavAccountDetected ? "checkmark" : "xmark")
+                        .foregroundStyle(.white)
+                        .font(.system(size: 16, weight: .bold))
+                }
+            }
             
+            VStack(alignment: .leading, spacing: 4) {
+                if case .loading = profileViewModel.calDavAccountState {
+                    Text("Checking Connection...")
+                        .font(.headline)
+                        .foregroundStyle(.secondary)
+                } else {
+                    Text(profileViewModel.isDeviceCalDavAccountDetected ? "Connected" : "Not Connected")
+                        .font(.headline)
+                        .foregroundStyle(profileViewModel.isDeviceCalDavAccountDetected ? .green : .secondary)
+                }
+                
+                Text(profileViewModel.isDeviceCalDavAccountDetected ? 
+                    "Your CalDAV calendars are syncing with this device" : 
+                    "Set up CalDAV to sync your calendars")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+            
+            Spacer()
+        }
+        .padding()
+        .background(
+            RoundedRectangle(cornerRadius: 10)
+                .fill(profileViewModel.isDeviceCalDavAccountDetected ? Color.green.opacity(0.1) : Color(.systemGray6))
+        )
+    }
+    
+    private var accountDetailsView: some View {
+        VStack(spacing: 16) {
+            // Title row with expand/collapse button
+            HStack {
+                Text("Account Details")
+                    .font(.headline)
+                
+                Spacer()
+                
+                Button {
+                    withAnimation {
+                        isAccountDetailsExpanded.toggle()
+                    }
+                } label: {
+                    Image(systemName: isAccountDetailsExpanded ? "chevron.up" : "chevron.down")
+                        .foregroundStyle(Color.accentColor)
+                }
+                .buttonStyle(.plain)
+            }
+            .padding(.horizontal, 4)
+            
+            if isAccountDetailsExpanded {
+                AsyncView(response: profileViewModel.calDavAccountState) { account in
+                    VStack(spacing: 16) {
+                        // Credential cards
+                        credentialCard(
+                            title: "Server",
+                            value: "https://baikal.jadwal.app/dav.php",
+                            icon: "server.rack"
+                        )
+                        
+                        credentialCard(
+                            title: "Username",
+                            value: account.username,
+                            icon: "person.fill"
+                        )
+                        
+                        credentialCard(
+                            title: "Password",
+                            value: account.password,
+                            icon: "lock.fill",
+                            isSecure: true
+                        )
+                    }
+                }
+            } else {
+                HStack {
+                    Text("Tap to view your CalDAV credentials")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                }
+                .padding(.horizontal, 4)
+            }
+        }
+    }
+    
+    private var setupOptionsView: some View {
+        VStack(spacing: 20) {
+            // Easy setup button (primary)
+            Button {
+                showingEasySetupInstructions = true
+            } label: {
+                Label("Easy Setup", systemImage: "wand.and.stars")
+                    .font(.headline)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.accentColor)
+                    .foregroundStyle(.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+            }
+            
+            // Description
+            Text("Automatically configure your device for CalDAV sync")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+            
+            /* Commenting out Manual Setup for now
+            Divider()
+            
+            // Manual setup button (secondary)
+            Button {
+                showingEasySetupInstructions = false  // Ensure the other sheet is off
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    showingManualSetupGuide = true
+                }
+            } label: {
+                Label("Manual Setup", systemImage: "gear")
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.gray.opacity(0.1))
+                    .foregroundStyle(.primary)
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+            }
+            */
+        }
+    }
+    
+    private func credentialCard(title: String, value: String, icon: String, isSecure: Bool = false) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            // Title row
+            HStack {
+                Image(systemName: icon)
+                    .foregroundStyle(Color.accentColor)
+                
+                Text(title)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                
+                Spacer()
+            }
+            
+            // Value row with copy button
             HStack {
                 Group {
                     if isSecure {
@@ -86,17 +237,17 @@ struct CalDAVCredentialsView: View {
                             .disabled(true)
                     } else {
                         Text(value)
+                            .lineLimit(1)
                     }
                 }
-                .font(.body.monospaced())
+                .font(.subheadline.monospaced())
                 .textSelection(.enabled)
-                .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.vertical, 8)
                 .padding(.horizontal, 12)
-                .background(Color(UIColor.tertiarySystemBackground))
-                .cornerRadius(8)
                 
-                Button(action: {
+                Spacer()
+                
+                Button {
                     UIPasteboard.general.string = value
                     copiedField = title
                     DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
@@ -104,29 +255,29 @@ struct CalDAVCredentialsView: View {
                             copiedField = nil
                         }
                     }
-                }) {
+                } label: {
                     Image(systemName: copiedField == title ? "checkmark.circle.fill" : "doc.on.doc")
-                        .foregroundColor(copiedField == title ? .green : .accentColor)
-                        .frame(width: 44, height: 44)
-                        .background(Color(UIColor.tertiarySystemBackground))
-                        .cornerRadius(8)
+                        .foregroundStyle(copiedField == title ? .green : Color.accentColor)
+                        .padding(8)
                 }
-                .buttonStyle(PlainButtonStyle())
+                .buttonStyle(.plain)
             }
+            .background(Color(UIColor.tertiarySystemBackground))
+            .cornerRadius(8)
         }
-    }
-
-    private func actionButton(title: String, systemImage: String, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            Label(title, systemImage: systemImage)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 12)
-        }
-        .buttonStyle(.bordered)
-        .tint(.accentColor)
+        .padding(.horizontal, 4)
     }
 }
 
 #Preview {
-    CalDAVCredentialsView()
+    VStack {
+        CalDAVCredentialsView()
+            .padding()
+    }
+    .background(Color(UIColor.systemBackground))
+    .environmentObject(ProfileViewModel(
+        profileRepository: DependencyContainer.shared.profileRepository,
+        calendarRepository: DependencyContainer.shared.calendarRepository,
+        whatsappRepository: DependencyContainer.shared.whatsappRepository
+    ))
 }

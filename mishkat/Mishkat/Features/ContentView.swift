@@ -15,7 +15,12 @@ struct ContentView: View {
     @StateObject private var calendarViewModel: CalendarViewModel
     init() {
         _settingsViewModel = StateObject(wrappedValue: SettingsViewModel())
-        _profileViewModel = StateObject(wrappedValue: ProfileViewModel(profileRepository: DependencyContainer.shared.profileRepository, calendarRepository: DependencyContainer.shared.calendarRepository, whatsappRepository: DependencyContainer.shared.whatsappRepository))
+        _profileViewModel = StateObject(wrappedValue: ProfileViewModel(
+            profileRepository: DependencyContainer.shared.profileRepository, 
+            calendarRepository: DependencyContainer.shared.calendarRepository, 
+            whatsappRepository: DependencyContainer.shared.whatsappRepository, 
+            authRepository: DependencyContainer.shared.authRepository
+        ))
         _calendarViewModel = StateObject(wrappedValue: CalendarViewModel())
     }
     
@@ -26,6 +31,14 @@ struct ContentView: View {
                     .environmentObject(settingsViewModel)
                     .environmentObject(profileViewModel)
                     .environmentObject(calendarViewModel)
+                    .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
+                        // Check CalDAV status when app becomes active
+                        if authViewModel.isAuthenticated {
+                            Task {
+                                await profileViewModel.checkDeviceCalDavAccountStatus()
+                            }
+                        }
+                    }
             } else {
                 AuthView()
             }

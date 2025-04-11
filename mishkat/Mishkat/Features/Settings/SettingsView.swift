@@ -147,11 +147,20 @@ struct SettingsView: View {
             profileViewModel.getProfile()
             profileViewModel.getCalDavAccount()
             profileViewModel.getWhatsappAccount()
+            Task {
+                await profileViewModel.checkDeviceCalDavAccountStatus()
+            }
+        }
+        .onAppear {
+            Task {
+                await profileViewModel.checkDeviceCalDavAccountStatus()
+            }
         }
         .refreshable {
             profileViewModel.getProfile()
             profileViewModel.getCalDavAccount()
             profileViewModel.getWhatsappAccount()
+            await profileViewModel.checkDeviceCalDavAccountStatus()
         }
         .sheet(isPresented: $profileViewModel.showWhatsappSheet) {
             WhatsappConnectionSheet(whatsappRepository: DependencyContainer.shared.whatsappRepository)
