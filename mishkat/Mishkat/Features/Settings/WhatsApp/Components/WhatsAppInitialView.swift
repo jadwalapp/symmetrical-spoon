@@ -3,13 +3,13 @@ import SwiftUI
 struct WhatsAppInitialView: View {
     @Environment(\.colorScheme) var colorScheme
     @Binding var phoneNumber: String
-    @FocusState private var isPhoneFieldFocused: Bool
+    @Binding var isPhoneFieldFocused: Bool
     
     var body: some View {
         VStack(spacing: 32) {
             PhoneNumberInput(
                 phoneNumber: $phoneNumber,
-                isFocused: _isPhoneFieldFocused
+                isFocused: $isPhoneFieldFocused
             )
             .padding(.top, 32)
             
@@ -21,8 +21,10 @@ struct WhatsAppInitialView: View {
 private struct PhoneNumberInput: View {
     @Environment(\.colorScheme) var colorScheme
     @Binding var phoneNumber: String
-    @FocusState var isFocused: Bool
+    @Binding var isFocused: Bool
     
+    @FocusState private var textFieldIsFocused: Bool
+
     var body: some View {
         VStack(spacing: 24) {
             HStack(spacing: 12) {
@@ -37,7 +39,7 @@ private struct PhoneNumberInput: View {
                 .textContentType(.telephoneNumber)
                 .autocorrectionDisabled()
                 .textInputAutocapitalization(.never)
-                .focused($isFocused)
+                .focused($textFieldIsFocused)
             }
             .padding()
             .background(
@@ -49,6 +51,17 @@ private struct PhoneNumberInput: View {
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
+        }
+        .onChange(of: isFocused) { newValue in
+            textFieldIsFocused = newValue
+        }
+        .onChange(of: textFieldIsFocused) { newValue in
+            if isFocused != newValue {
+                 isFocused = newValue
+            }
+        }
+        .onAppear {
+             textFieldIsFocused = isFocused
         }
     }
 }

@@ -9,6 +9,8 @@ struct WhatsAppCodeDisplay: View {
     let canRefresh: Bool
     let remainingCooldown: Int
     
+    @State private var isCopied = false
+    
     var body: some View {
         VStack(spacing: 24) {
             let mid = code.count / 2
@@ -27,7 +29,7 @@ struct WhatsAppCodeDisplay: View {
             .id(code)
             
             VStack(spacing: 12) {
-                CopyButton(code: code, onCopy: onCopy)
+                CopyButton(code: code, onCopy: handleCopyTapped)
                 RefreshButton(
                     canRefresh: canRefresh,
                     isLoading: isLoading,
@@ -38,6 +40,18 @@ struct WhatsAppCodeDisplay: View {
             .fixedSize(horizontal: false, vertical: true)
         }
         .animation(.none, value: code)
+    }
+    
+    private func handleCopyTapped() {
+        UIPasteboard.general.string = code
+        isCopied = true
+        onCopy()
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                isCopied = false
+            }
+        }
     }
     
     private func codeBox(_ text: String) -> some View {
@@ -70,10 +84,8 @@ private struct CopyButton: View {
     
     var body: some View {
         Button(action: {
-            UIPasteboard.general.string = code
-            isCopied = true
             onCopy()
-            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            isCopied = true
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                 withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {

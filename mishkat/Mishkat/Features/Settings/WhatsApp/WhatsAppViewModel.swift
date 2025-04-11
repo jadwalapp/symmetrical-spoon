@@ -1,6 +1,6 @@
 import SwiftUI
 
-final class WhatsAppViewModel: ObservableObject {
+final class WhatsappViewModel: ObservableObject {
     enum ConnectionState: Equatable {
         case initial
         case initializing
@@ -21,11 +21,6 @@ final class WhatsAppViewModel: ObservableObject {
             default:
                 return false
             }
-        }
-        
-        var needsUserIntervention: Bool {
-            if case .initializing = self { return true }
-            return false
         }
     }
     
@@ -69,12 +64,12 @@ final class WhatsAppViewModel: ObservableObject {
     
     private let whatsappRepository: WhatsappRepository
     private var pollingTimer: Timer?
-    private var loadingTimeoutTimer: Timer?
     private var pollAttempts = 0
     private let maxPollAttempts = 60
     
     init(whatsappRepository: WhatsappRepository) {
         self.whatsappRepository = whatsappRepository
+        checkExistingSession()
     }
     
     func reset() {
@@ -83,8 +78,6 @@ final class WhatsAppViewModel: ObservableObject {
         isLoading = false
         pollingTimer?.invalidate()
         pollingTimer = nil
-        loadingTimeoutTimer?.invalidate()
-        loadingTimeoutTimer = nil
         pollAttempts = 0
     }
     
@@ -226,6 +219,5 @@ final class WhatsAppViewModel: ObservableObject {
     
     deinit {
         pollingTimer?.invalidate()
-        loadingTimeoutTimer?.invalidate()
     }
 } 
