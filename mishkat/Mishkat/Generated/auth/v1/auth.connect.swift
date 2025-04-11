@@ -26,6 +26,12 @@ public protocol Auth_V1_AuthServiceClientInterface: Sendable {
 
     @available(iOS 13, *)
     func `useGoogle`(request: Auth_V1_UseGoogleRequest, headers: Connect.Headers) async -> ResponseMessage<Auth_V1_UseGoogleResponse>
+
+    @discardableResult
+    func `generateMagicToken`(request: Auth_V1_GenerateMagicTokenRequest, headers: Connect.Headers, completion: @escaping @Sendable (ResponseMessage<Auth_V1_GenerateMagicTokenResponse>) -> Void) -> Connect.Cancelable
+
+    @available(iOS 13, *)
+    func `generateMagicToken`(request: Auth_V1_GenerateMagicTokenRequest, headers: Connect.Headers) async -> ResponseMessage<Auth_V1_GenerateMagicTokenResponse>
 }
 
 /// Concrete implementation of `Auth_V1_AuthServiceClientInterface`.
@@ -66,11 +72,22 @@ public final class Auth_V1_AuthServiceClient: Auth_V1_AuthServiceClientInterface
         return await self.client.unary(path: "/auth.v1.AuthService/UseGoogle", idempotencyLevel: .unknown, request: request, headers: headers)
     }
 
+    @discardableResult
+    public func `generateMagicToken`(request: Auth_V1_GenerateMagicTokenRequest, headers: Connect.Headers = [:], completion: @escaping @Sendable (ResponseMessage<Auth_V1_GenerateMagicTokenResponse>) -> Void) -> Connect.Cancelable {
+        return self.client.unary(path: "/auth.v1.AuthService/GenerateMagicToken", idempotencyLevel: .unknown, request: request, headers: headers, completion: completion)
+    }
+
+    @available(iOS 13, *)
+    public func `generateMagicToken`(request: Auth_V1_GenerateMagicTokenRequest, headers: Connect.Headers = [:]) async -> ResponseMessage<Auth_V1_GenerateMagicTokenResponse> {
+        return await self.client.unary(path: "/auth.v1.AuthService/GenerateMagicToken", idempotencyLevel: .unknown, request: request, headers: headers)
+    }
+
     public enum Metadata {
         public enum Methods {
             public static let initiateEmail = Connect.MethodSpec(name: "InitiateEmail", service: "auth.v1.AuthService", type: .unary)
             public static let completeEmail = Connect.MethodSpec(name: "CompleteEmail", service: "auth.v1.AuthService", type: .unary)
             public static let useGoogle = Connect.MethodSpec(name: "UseGoogle", service: "auth.v1.AuthService", type: .unary)
+            public static let generateMagicToken = Connect.MethodSpec(name: "GenerateMagicToken", service: "auth.v1.AuthService", type: .unary)
         }
     }
 }

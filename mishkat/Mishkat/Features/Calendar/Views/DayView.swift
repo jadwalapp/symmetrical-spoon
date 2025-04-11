@@ -70,10 +70,10 @@ struct DayView: View {
                         .frame(maxWidth: .infinity)
                         .padding(.top, 40)
                     } else {
-                        TimelineView(events: timedEvents) { event in
+                        TimelineView(eventWrappers: generateEventWrappers(timedEvents), onEventTap: { event in
                             selectedEvent = event
                             showingEventEditor = true
-                        }
+                        })
                     }
                 }
                 .padding(.horizontal)
@@ -114,6 +114,10 @@ struct DayView: View {
         return (-3...3).compactMap { offset in
             calendar.date(byAdding: .day, value: offset, to: selectedDate)
         }
+    }
+    
+    private func generateEventWrappers(_ events: [EKEvent]) -> [EventWrapper] {
+        events.map { EventWrapper(event: $0) }
     }
 }
 
@@ -164,9 +168,13 @@ struct AllDayEventsSection: View {
 }
 
 struct TimelineView: View {
-    let events: [EKEvent]
+    let eventWrappers: [EventWrapper]
     let onEventTap: (EKEvent) -> Void
     private let hourHeight: CGFloat = 60
+    
+    private var events: [EKEvent] {
+        eventWrappers.map { $0.event }
+    }
     
     var body: some View {
         ZStack(alignment: .topLeading) {
@@ -178,11 +186,11 @@ struct TimelineView: View {
             }
             
             // Events
-            ForEach(groupedEvents.keys.sorted(), id: \.self) { hour in
-                if let hourEvents = groupedEvents[hour] {
+            ForEach(groupedEventWrappers.keys.sorted(), id: \.self) { hour in
+                if let hourWrappers = groupedEventWrappers[hour] {
                     EventsRow(
                         hour: hour,
-                        events: hourEvents,
+                        eventWrappers: hourWrappers,
                         hourHeight: hourHeight,
                         onEventTap: onEventTap
                     )
@@ -191,9 +199,9 @@ struct TimelineView: View {
         }
     }
     
-    private var groupedEvents: [Int: [EKEvent]] {
-        Dictionary(grouping: events) { event in
-            Calendar.current.component(.hour, from: event.startDate)
+    private var groupedEventWrappers: [Int: [EventWrapper]] {
+        Dictionary(grouping: eventWrappers) { wrapper in
+            Calendar.current.component(.hour, from: wrapper.event.startDate)
         }
     }
 }
@@ -226,22 +234,26 @@ struct HourRow: View {
 
 struct EventsRow: View {
     let hour: Int
-    let events: [EKEvent]
+    let eventWrappers: [EventWrapper]
     let hourHeight: CGFloat
     let onEventTap: (EKEvent) -> Void
     
+    private var events: [EKEvent] {
+        eventWrappers.map { $0.event }
+    }
+    
     var body: some View {
-        let sortedEvents = events.sorted { $0.startDate < $1.startDate }
-        let groups = calculateOverlappingGroups(sortedEvents)
+        let sortedWrappers = eventWrappers.sorted { $0.event.startDate < $1.event.startDate }
+        let groups = calculateOverlappingGroups(sortedWrappers)
         
         ForEach(groups.indices, id: \.self) { groupIndex in
             let group = groups[groupIndex]
             HStack(spacing: 2) {
-                ForEach(group, id: \.eventIdentifier) { event in
-                    EventView(event: event, hourHeight: hourHeight)
+                ForEach(group, id: \.id) { wrapper in
+                    EventView(eventWrapper: wrapper, hourHeight: hourHeight)
                         .frame(maxWidth: .infinity)
                         .onTapGesture {
-                            onEventTap(event)
+                            onEventTap(wrapper.event)
                         }
                 }
             }
@@ -249,18 +261,18 @@ struct EventsRow: View {
         }
     }
     
-    private func calculateOverlappingGroups(_ events: [EKEvent]) -> [[EKEvent]] {
-        var groups: [[EKEvent]] = []
-        var currentGroup: [EKEvent] = []
+    private func calculateOverlappingGroups(_ wrappers: [EventWrapper]) -> [[EventWrapper]] {
+        var groups: [[EventWrapper]] = []
+        var currentGroup: [EventWrapper] = []
         
-        for event in events {
+        for wrapper in wrappers {
             if currentGroup.isEmpty {
-                currentGroup.append(event)
-            } else if eventsOverlap(currentGroup.last!, event) {
-                currentGroup.append(event)
+                currentGroup.append(wrapper)
+            } else if eventsOverlap(currentGroup.last!.event, wrapper.event) {
+                currentGroup.append(wrapper)
             } else {
                 groups.append(currentGroup)
-                currentGroup = [event]
+                currentGroup = [wrapper]
             }
         }
         
@@ -272,17 +284,24 @@ struct EventsRow: View {
     }
     
     private func eventsOverlap(_ event1: EKEvent, _ event2: EKEvent) -> Bool {
-        event1.endDate > event2.startDate && event2.endDate > event1.startDate
+        guard let start1 = event1.startDate, let end1 = event1.endDate,
+              let start2 = event2.startDate, let end2 = event2.endDate else {
+            return false // Cannot determine overlap if dates are missing
+        }
+        // Standard overlap logic: (StartA < EndB) and (StartB < EndA)
+        return start1 < end2 && start2 < end1
     }
 }
 
 struct EventView: View {
-    let event: EKEvent
+    let eventWrapper: EventWrapper
     let hourHeight: CGFloat
+    
+    private var event: EKEvent { eventWrapper.event }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text(event.title)
+            Text(event.title ?? "Untitled Event")
                 .font(.caption)
                 .bold()
                 .lineLimit(1)
@@ -296,10 +315,10 @@ struct EventView: View {
         }
         .padding(6)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(event.calendar.cgColor).opacity(0.2))
+        .background((event.calendar != nil ? Color(event.calendar.cgColor) : Color.gray).opacity(0.2))
         .overlay(
             Rectangle()
-                .fill(Color(event.calendar.cgColor))
+                .fill(event.calendar != nil ? Color(event.calendar.cgColor) : Color.gray)
                 .frame(width: 4)
                 .clipped(),
             alignment: .leading
@@ -310,14 +329,18 @@ struct EventView: View {
     }
     
     private var eventHeight: CGFloat {
-        let duration = event.endDate.timeIntervalSince(event.startDate)
-        return max(hourHeight * CGFloat(duration / 3600), 30)
+        guard let startDate = event.startDate, let endDate = event.endDate else { return 30 } // Default height
+        let duration = endDate.timeIntervalSince(startDate)
+        // Ensure non-negative duration for height calculation
+        return max(hourHeight * CGFloat(max(0, duration) / 3600), 30) // Minimum height 30
     }
     
     private var yOffset: CGFloat {
+        guard let startDate = event.startDate else { return 0 } // Default offset
         let calendar = Calendar.current
-        let startHour = calendar.component(.hour, from: event.startDate)
-        let startMinute = calendar.component(.minute, from: event.startDate)
+        let startHour = calendar.component(.hour, from: startDate)
+        let startMinute = calendar.component(.minute, from: startDate)
+        // Calculate offset based on the start time within the day
         return CGFloat(startMinute) / 60.0 * hourHeight + CGFloat(startHour) * hourHeight
     }
 }
