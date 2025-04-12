@@ -203,10 +203,8 @@ func main() {
 	// ======== AMQP CHAN ========
 
 	// ======== LLM CLI ========
-
 	llmHttpiCli := &http.Client{}
-
-	if config.ProxyUrl == "" {
+	if config.ProxyUrl != "" {
 		proxyURL, err := url.Parse(config.ProxyUrl)
 		if err != nil {
 			log.Fatal().Msgf("Failed to parse proxy URL: %v", err)
