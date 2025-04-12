@@ -1,6 +1,6 @@
 - [x] add "are you sure?" before submitting for connect whastapp, and show phone number in the code page, just ot ensur ebeter experience for user and if entered it in a wrong way.
-- [ ] schedule prayer times via mobile app with backend stuff
 - [ ] make conflcit resolution work
+- [ ] schedule prayer times via mobile app with backend stuff
 - [ ] fix rabbitmq and make it robust as a consumer in golang, like the connections (reconnect when it disconnects)
 - [ ] google auth in frontend (just open google oauth and send token to backend)
 

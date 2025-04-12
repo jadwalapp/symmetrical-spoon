@@ -286,7 +286,7 @@ func main() {
 	// ======== PROTOVALIDATE ========
 
 	// ======== HTTPJ SERVICE ========
-	httpjRouter := httpj.NewRouter(*dbStore, config.CalDAVPasswordEncryptionKey, config.BaikalHost, config.IsProd)
+	httpjRouter := httpj.NewRouter(*dbStore, config.CalDAVPasswordEncryptionKey, config.CaldavHost, config.IsProd)
 	// ======== HTTPJ SERVICE ========
 
 	// ======== INTERCEPTORS ========
