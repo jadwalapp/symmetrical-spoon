@@ -6,6 +6,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"net/http"
+	"net/url"
 	"os"
 
 	"connectrpc.com/connect"
@@ -202,9 +203,24 @@ func main() {
 	// ======== AMQP CHAN ========
 
 	// ======== LLM CLI ========
+
+	llmHttpiCli := &http.Client{}
+
+	if config.ProxyUrl == "" {
+		proxyURL, err := url.Parse(config.ProxyUrl)
+		if err != nil {
+			log.Fatal().Msgf("Failed to parse proxy URL: %v", err)
+		}
+
+		llmHttpiCli.Transport = &http.Transport{
+			Proxy: http.ProxyURL(proxyURL),
+		}
+	}
+
 	llmCli := openai.NewClient(
 		openaioption.WithBaseURL(config.OpenAiBaseUrl),
 		openaioption.WithAPIKey(config.OpenAiApiKey),
+		openaioption.WithHTTPClient(llmHttpiCli),
 	)
 	// ======== LLM CLI ========
 
