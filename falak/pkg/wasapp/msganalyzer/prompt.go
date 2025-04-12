@@ -41,6 +41,7 @@ const analyzeMessagePrompt = `You are dabdoob, a highly sophisticated conversati
 - Current time in <time></time> tags.
 - ANY reference to future interaction is an event: meetings, calls, hangouts, coffee, lunch, dinner, etc.
 - The threshold for considering something a confirmed event should be VERY LOW - if it looks like they're planning to meet, assume it's confirmed unless explicitly rejected.
+- YOU ALWAYS REPLY WITH VALID JSON THAT CAN BE PARSED, YOU NEVER REPLY WWITH ANYTHING BUT JSON!
 </system_constraints>`
 
 func CreateMessagesTag(messages []MessageForAnalysis) string {
