@@ -132,12 +132,56 @@ func (s *service) HandleMobileConfigCaldav(w http.ResponseWriter, r *http.Reques
 }
 
 func (s *service) HandleMobileConfigWebcal(w http.ResponseWriter, r *http.Request) {
-	// ctx := context.Background()
+	ctx := context.Background()
+	if r.Method != "GET" {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
 
-	// parse values from body
+	q := r.URL.Query()
+	webcalURL := q.Get("url")
 
-	// return the file template with filled values and correct header value :
+	w.Header().Add("Content-Type", "application/x-apple-aspen-config")
+	filename := fmt.Sprintf("%s.mobileconfig", time.Now().Format("2006-01-02"))
+	w.Header().Set("Content-Disposition", "attachment; filename=\""+filename+"\"")
 
+	profileUUID := uuid.NewString()
+	payloadUUID := uuid.NewString()
+	profileIdentifier := "app.jadwal.mishkat.profile.webcalconfig"
+	payloadIdentifier := profileIdentifier + ".webcalpayload"
+
+	webcalPayload := mobileconfig.WebCalPayload{
+		PayloadVersion:           1,
+		PayloadType:              "com.apple.subscribedcalendar.account",
+		PayloadIdentifier:        payloadIdentifier,
+		PayloadUUID:              payloadUUID,
+		PayloadDisplayName:       "Prayer Calendar",
+		SubCalAccountDescription: "Prayer Time Calendar Subscription",
+		SubCalAccountHostName:    webcalURL,
+		SubCalAccountUseSSL:      true,
+	}
+	mobileConfig := mobileconfig.MobileConfig{
+		PayloadContent:           []interface{}{webcalPayload},
+		PayloadDescription:       "Installs Prayer Time Calendar Subscription",
+		PayloadDisplayName:       "Prayer Calendar",
+		PayloadIdentifier:        profileIdentifier,
+		PayloadOrganization:      "Jadwal",
+		PayloadRemovalDisallowed: false,
+		PayloadScope:             "User",
+		PayloadType:              "Configuration",
+		PayloadUUID:              profileUUID,
+		PayloadVersion:           1,
+	}
+	plistBytes := new(bytes.Buffer)
+	encoder := plist.NewEncoder(plistBytes)
+	encoder.Indent("  ")
+	err := encoder.Encode(mobileConfig)
+	if err != nil {
+		log.Ctx(ctx).Err(err).Msg("failed encoding plist")
+		http.Error(w, "Failed to generate configuration profile", http.StatusInternalServerError)
+		return
+	}
+	w.Write(plistBytes.Bytes())
 }
 
 func (s *service) HandleRoot(w http.ResponseWriter, r *http.Request) {
