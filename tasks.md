@@ -3,6 +3,7 @@
 - [ ] schedule prayer times via mobile app with backend stuff
 - [ ] fix rabbitmq and make it robust as a consumer in golang, like the connections (reconnect when it disconnects)
 - [ ] google auth in frontend (just open google oauth and send token to backend)
+- [ ] fix the issue of timzones, it adds 3 more it seems :D
 
 - [ ] reminders on events, like the local events, setup local notifications for events, not sure tbh how to do it, to make sure all events are kept track of, or maybe only our events?
 - [ ] make events fetching more robust, and efficient
