@@ -13,6 +13,7 @@ struct WhatsappConnectionSheet: View {
     @State private var animatingCode = false
     @State private var randomizedCode = ""
     private let possibleCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+    @State private var showAreYouSureAlert: Bool = false
 
     init(whatsappRepository: WhatsappRepository) {
         _viewModel = StateObject(wrappedValue: WhatsappViewModel(whatsappRepository: whatsappRepository))
@@ -118,6 +119,18 @@ struct WhatsappConnectionSheet: View {
                     .disabled(viewModel.isLoading)
                 }
             }
+            .confirmationDialog("Are You Sure?", isPresented: $showAreYouSureAlert, titleVisibility: .visible) {
+                Button("Continue", role: .none) {
+                    isPhoneFieldFocused = false
+                    viewModel.connectWhatsapp()
+                }
+                
+                Button("Edit Number", role: .cancel) {
+                    isPhoneFieldFocused = true
+                }
+            } message: {
+                Text("Please confirm that \(viewModel.phoneNumber) is your WhatsApp number. This number will be used to connect to your WhatsApp account.")
+            }
         }
         .interactiveDismissDisabled(viewModel.isLoading)
     }
@@ -181,8 +194,7 @@ struct WhatsappConnectionSheet: View {
                 isLoading: viewModel.isLoading,
                 isDisabled: !viewModel.isValidPhoneNumber || viewModel.isLoading
             ) {
-                isPhoneFieldFocused = false
-                viewModel.connectWhatsapp()
+                showAreYouSureAlert = true
             }
             .padding()
         }
