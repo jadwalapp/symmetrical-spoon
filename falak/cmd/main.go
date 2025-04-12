@@ -210,9 +210,10 @@ func main() {
 			log.Fatal().Msgf("Failed to parse proxy URL: %v", err)
 		}
 
-		llmHttpiCli.Transport = &http.Transport{
-			Proxy: http.ProxyURL(proxyURL),
-		}
+		defaultTransportCopy := http.DefaultTransport.(*http.Transport).Clone()
+		defaultTransportCopy.Proxy = http.ProxyURL(proxyURL)
+		llmHttpiCli.Transport = defaultTransportCopy
+
 	}
 
 	llmCli := openai.NewClient(
