@@ -151,18 +151,18 @@ func (s *service) HandleMobileConfigWebcal(w http.ResponseWriter, r *http.Reques
 	payloadIdentifier := profileIdentifier + ".webcalpayload"
 
 	webcalPayload := mobileconfig.WebCalPayload{
-		PayloadVersion:         1,
-		PayloadType:            "com.apple.subscribedcalendar.account",
-		PayloadIdentifier:      payloadIdentifier,
-		PayloadUUID:            payloadUUID,
-		PayloadDisplayName:     fmt.Sprintf("Prayer Calendar"),
-		CalendarURL:            webcalURL,
-		SubscribeAutomatically: true,
-		RemindersEnabled:       false,
+		PayloadVersion:           1,
+		PayloadType:              "com.apple.subscribedcalendar.account",
+		PayloadIdentifier:        payloadIdentifier,
+		PayloadUUID:              payloadUUID,
+		PayloadDisplayName:       "Prayer Calendar",
+		SubCalAccountDescription: "Prayer Time Calendar Subscription",
+		SubCalAccountHostName:    webcalURL,
+		SubCalAccountUseSSL:      true,
 	}
 	mobileConfig := mobileconfig.MobileConfig{
 		PayloadContent:           []interface{}{webcalPayload},
-		PayloadDescription:       "Installs WebCal calendar subscription",
+		PayloadDescription:       "Installs Prayer Time Calendar Subscription",
 		PayloadDisplayName:       "Prayer Calendar",
 		PayloadIdentifier:        profileIdentifier,
 		PayloadOrganization:      "Jadwal",

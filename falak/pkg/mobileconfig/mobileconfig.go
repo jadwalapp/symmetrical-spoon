@@ -19,14 +19,16 @@ type CalDAVPayload struct {
 }
 
 type WebCalPayload struct {
-	PayloadVersion         int    `plist:"PayloadVersion"`         // Standard: 1
-	PayloadType            string `plist:"PayloadType"`            // Standard: "com.apple.subscribedcalendar.account"
-	PayloadIdentifier      string `plist:"PayloadIdentifier"`      // Unique ID for this payload (e.g., com.yourorg.profile.webcal)
-	PayloadUUID            string `plist:"PayloadUUID"`            // Unique UUID for this payload instance
-	PayloadDisplayName     string `plist:"PayloadDisplayName"`     // User-visible name (e.g., "Work Calendar")
-	CalendarURL            string `plist:"CalendarURL"`            // WebCal URL (e.g., webcal://example.com/calendar.ics)
-	SubscribeAutomatically bool   `plist:"SubscribeAutomatically"` // Whether to automatically subscribe to the calendar
-	RemindersEnabled       bool   `plist:"RemindersEnabled"`       // Password (optional, VERY insecure to include, leave empty)
+	PayloadVersion           int    `plist:"PayloadVersion"`                     // Standard: 1
+	PayloadType              string `plist:"PayloadType"`                        // Standard: "com.apple.subscribedcalendar.account"
+	PayloadIdentifier        string `plist:"PayloadIdentifier"`                  // Unique ID for this payload (e.g., com.yourorg.profile.webcal)
+	PayloadUUID              string `plist:"PayloadUUID"`                        // Unique UUID for this payload instance
+	PayloadDisplayName       string `plist:"PayloadDisplayName"`                 // User-visible name (e.g., "Work Calendar")
+	SubCalAccountDescription string `plist:"SubCalAccountDescription,omitempty"` // Optional. Description of the account.
+	SubCalAccountHostName    string `plist:"SubCalAccountHostName"`              // The server address.
+	SubCalAccountUsername    string `plist:"SubCalAccountUsername,omitempty"`    // The userʼs login name.
+	SubCalAccountPassword    string `plist:"SubCalAccountPassword,omitempty"`    // The userʼs password.
+	SubCalAccountUseSSL      bool   `plist:"SubCalAccountUseSSL"`                // Whether or not to use SSL.
 }
 
 type MobileConfig struct {
