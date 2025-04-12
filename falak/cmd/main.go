@@ -213,7 +213,6 @@ func main() {
 		defaultTransportCopy := http.DefaultTransport.(*http.Transport).Clone()
 		defaultTransportCopy.Proxy = http.ProxyURL(proxyURL)
 		llmHttpiCli.Transport = defaultTransportCopy
-
 	}
 
 	llmCli := openai.NewClient(
