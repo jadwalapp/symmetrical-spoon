@@ -11,6 +11,17 @@
             "comment": "Used for magic link experience :D"
           }
         ]
+      },
+      {
+        "appIDs": [
+          "JL46C549NC.dev.alkhalaf.RekazNativeStoryboard"
+        ],
+        "components": [
+          {
+            "/": "/khalil",
+            "comment": "Thing for Rekaz"
+          }
+        ]
       }
     ]
   }
