@@ -21,4 +21,5 @@ message SchedulePrayerTimesResponse{
 
 service CalendarService {
     rpc GetCalDavAccount(GetCalDavAccountRequest) returns (GetCalDavAccountResponse);
+    rpc SchedulePrayerTimes(SchedulePrayerTimesRequest) returns (SchedulePrayerTimesResponse);
 }

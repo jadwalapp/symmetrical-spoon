@@ -10,11 +10,12 @@ import (
 )
 
 type client struct {
-	cli httpclient.HTTPClient
+	cli     httpclient.HTTPClient
+	baseUrl string
 }
 
 func (c *client) GetGeoLocationInfo(ctx context.Context, r *GetGeoLocationInfoRequest) (*GetGeoLocationInfoResponse, error) {
-	resp, err := c.cli.Get(fmt.Sprintf("https://freeipapi.com/api/json/%s", r.Ip), nil, nil)
+	resp, err := c.cli.Get(fmt.Sprintf("%s/api/json/%s", c.baseUrl, r.Ip), nil, nil)
 	if err != nil {
 		return nil, fmt.Errorf("error fetching location: %v", err)
 	}
@@ -33,8 +34,9 @@ func (c *client) GetGeoLocationInfo(ctx context.Context, r *GetGeoLocationInfoRe
 	return &location, nil
 }
 
-func NewClient(cli httpclient.HTTPClient) Client {
+func NewClient(cli httpclient.HTTPClient, baseUrl string) Client {
 	return &client{
-		cli: cli,
+		cli:     cli,
+		baseUrl: baseUrl,
 	}
 }

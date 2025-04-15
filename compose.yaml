@@ -68,6 +68,7 @@ services:
       IS_PROD: ${IS_PROD}
       CALDAV_HOST: ${CALDAV_HOST}
       PROXY_URL: ${PROXY_URL}
+      GEO_LOCATION_BASE_URL: ${GEO_LOCATION_BASE_URL}
     depends_on:
       postgresdb:
         condition: service_healthy

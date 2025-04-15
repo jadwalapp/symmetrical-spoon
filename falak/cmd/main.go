@@ -35,7 +35,6 @@ import (
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/httpj"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/interceptors"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/lokilogger"
-	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/prayer/client"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/services/calendarsvc"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/services/notificationsvc"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/store"
@@ -303,13 +302,8 @@ func main() {
 
 	// ======== GEO LOCATION CLIENT ========
 	geoLocClientHttpCli := httpclient.NewClient(&http.Client{})
-	geoLocClient := geolocationclient.NewClient(geoLocClientHttpCli)
+	geoLocClient := geolocationclient.NewClient(geoLocClientHttpCli, config.GeoLocationBaseUrl)
 	// ======== GEO LOCATION CLIENT ========
-
-	// ======== Prayer Client ========
-	prayerClientHttpCli := httpclient.NewClient(&http.Client{})
-	prayerTime := client.NewClient(prayerClientHttpCli)
-	// ======== Prayer Client ========
 
 	// ======== HTTPJ SERVICE ========
 	httpjRouter := httpj.NewRouter(*dbStore, config.CalDAVPasswordEncryptionKey, config.CaldavHost, config.IsProd)
@@ -345,7 +339,7 @@ func main() {
 	profileServer := profile.NewService(*pv, *dbStore, apiMetadata)
 	mux.Handle(profilev1connect.NewProfileServiceHandler(profileServer, interceptorsForServer))
 
-	calendarServer := calendar.NewService(*pv, *dbStore, apiMetadata, geoLocClient, prayerTime, config.CalDAVPasswordEncryptionKey)
+	calendarServer := calendar.NewService(*pv, *dbStore, apiMetadata, geoLocClient, config.CalDAVPasswordEncryptionKey)
 	mux.Handle(calendarv1connect.NewCalendarServiceHandler(calendarServer, interceptorsForServer))
 
 	whatsappServer := whatsapp.NewService(*pv, apiMetadata, wasappCli)
