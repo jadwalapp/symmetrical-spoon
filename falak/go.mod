@@ -25,6 +25,7 @@ require (
 	golang.org/x/net v0.30.0
 	golang.org/x/term v0.27.0
 	google.golang.org/protobuf v1.35.1
+	howett.net/plist v1.0.1
 )
 
 require (

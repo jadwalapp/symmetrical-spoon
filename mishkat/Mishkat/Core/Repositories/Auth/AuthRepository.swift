@@ -52,4 +52,17 @@ class AuthRepository {
             throw AuthRepositoryError.unknown
         }
     }
+    
+    func generateMagicToken(type: Auth_V1_MagicTokenType) async throws -> Auth_V1_GenerateMagicTokenResponse {
+        do {
+            var req = Auth_V1_GenerateMagicTokenRequest()
+            req.type = type
+            
+            let resp = await authClient.generateMagicToken(request: req, headers: [:])
+            return try resp.result.get()
+        } catch {
+            debugPrint("things went south running generateMagicToken: \(error)")
+            throw AuthRepositoryError.unknown
+        }
+    }
 }

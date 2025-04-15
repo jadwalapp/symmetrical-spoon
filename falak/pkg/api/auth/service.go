@@ -72,13 +72,14 @@ func (s *service) InitiateEmail(ctx context.Context, r *connect.Request[authv1.I
 		return nil, internalError
 	}
 
-	_, err = s.store.CreateMagicLink(ctx, store.CreateMagicLinkParams{
+	_, err = s.store.CreateMagicToken(ctx, store.CreateMagicTokenParams{
 		CustomerID: customer.ID,
 		TokenHash:  hashMagicLinkToken,
+		TokenType:  store.MagicTokenTypeAuth,
 		ExpiresAt:  time.Now().Add(magicLinkValidity),
 	})
 	if err != nil {
-		log.Ctx(ctx).Err(err).Msg("failed running CreateMagicLink")
+		log.Ctx(ctx).Err(err).Msg("failed running CreateMagicToken")
 		return nil, internalError
 	}
 
@@ -105,30 +106,33 @@ func (s *service) CompleteEmail(ctx context.Context, r *connect.Request[authv1.C
 	}
 
 	hashedToken := util.HashStringToBase64SHA256(r.Msg.Token)
-	magicLink, err := s.store.GetUnusedMagicLinkByTokenHash(ctx, hashedToken)
+	magicToken, err := s.store.GetUnusedMagicTokenByTokenHash(ctx, store.GetUnusedMagicTokenByTokenHashParams{
+		TokenHash: hashedToken,
+		TokenType: store.MagicTokenTypeAuth,
+	})
 	if err != nil {
 		if err == sql.ErrNoRows {
 			log.Ctx(ctx).Err(err).Msg("no token hash exists in the databse that matches the hash of the token provided by user")
-			return nil, connect.NewError(connect.CodeFailedPrecondition, errors.New("used or non existent magic link"))
+			return nil, connect.NewError(connect.CodeFailedPrecondition, errors.New("used or non existent magic token"))
 		}
 
-		log.Ctx(ctx).Err(err).Msg("failed running GetUnusedMagicLinkByTokenHash")
+		log.Ctx(ctx).Err(err).Msg("failed running GetUnusedMagicTokenByTokenHash")
 		return nil, internalError
 	}
-	if magicLink.ExpiresAt.Before(time.Now()) {
+	if magicToken.ExpiresAt.Before(time.Now()) {
 		// TODO: perhaps send a new email by calling InitiateEmail, or have a method ouside that both RPCs share :D
-		log.Ctx(ctx).Error().Msg("expired magic link")
-		return nil, connect.NewError(connect.CodeFailedPrecondition, errors.New("expired magic link"))
+		log.Ctx(ctx).Error().Msg("expired magic token")
+		return nil, connect.NewError(connect.CodeFailedPrecondition, errors.New("expired magic token"))
 	}
 
-	isNewCustomer, err := s.store.IsCustomerFirstLogin(ctx, magicLink.CustomerID)
+	isNewCustomer, err := s.store.IsCustomerFirstLogin(ctx, magicToken.CustomerID)
 	if err != nil {
 		log.Ctx(ctx).Err(err).Msg("failed running IsCustomerFirstLogin")
 		return nil, internalError
 	}
 
 	if isNewCustomer.Valid && isNewCustomer.Bool {
-		customer, err := s.store.GetCustomerById(ctx, magicLink.CustomerID)
+		customer, err := s.store.GetCustomerById(ctx, magicToken.CustomerID)
 		if err != nil {
 			log.Ctx(ctx).Err(err).Msg("failed running IsCustomerFirstLogin")
 			return nil, internalError
@@ -165,16 +169,16 @@ func (s *service) CompleteEmail(ctx context.Context, r *connect.Request[authv1.C
 		}
 	}
 
-	err = s.store.UpdateMagicLinkUsedAtByTokenHash(ctx, store.UpdateMagicLinkUsedAtByTokenHashParams{
-		TokenHash: magicLink.TokenHash,
+	err = s.store.UpdateMagicTokenUsedAtByTokenHash(ctx, store.UpdateMagicTokenUsedAtByTokenHashParams{
+		TokenHash: magicToken.TokenHash,
 		UsedAt:    sql.NullTime{Time: time.Now(), Valid: true},
 	})
 	if err != nil {
-		log.Ctx(ctx).Err(err).Msg("failed running UpdateMagicLinkUsedAtByTokenHash")
+		log.Ctx(ctx).Err(err).Msg("failed running UpdateMagicTokenUsedAtByTokenHash")
 		return nil, internalError
 	}
 
-	token, err := s.tokens.NewToken(magicLink.CustomerID, tokens.Audience_SymmetricalSpoon)
+	token, err := s.tokens.NewToken(magicToken.CustomerID, tokens.Audience_SymmetricalSpoon)
 	if err != nil {
 		log.Ctx(ctx).Err(err).Msg("failed running NewToken")
 		return nil, internalError
@@ -264,6 +268,56 @@ func (s *service) UseGoogle(ctx context.Context, r *connect.Request[authv1.UseGo
 	return &connect.Response[authv1.UseGoogleResponse]{
 		Msg: &authv1.UseGoogleResponse{
 			AccessToken: token,
+		},
+	}, nil
+}
+
+func (s *service) GenerateMagicToken(ctx context.Context, r *connect.Request[authv1.GenerateMagicTokenRequest]) (*connect.Response[authv1.GenerateMagicTokenResponse], error) {
+	if err := s.pv.Validate(r.Msg); err != nil {
+		log.Ctx(ctx).Err(err).Msg("invalid request")
+		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+	}
+
+	tokenClaims, ok := s.apiMetadata.GetClaims(ctx)
+	if !ok {
+		log.Ctx(ctx).Error().Msg("failed running GetClaims")
+		return nil, internalError
+	}
+
+	magicLinkToken, hashMagicLinkToken, err := s.generateTokenWithHash()
+	if err != nil {
+		log.Ctx(ctx).Err(err).Msg("failed running generateTokenWithHash")
+		return nil, internalError
+	}
+
+	if r.Msg.Type == authv1.MagicTokenType_MAGIC_TOKEN_TYPE_UNSPECIFIED {
+		log.Ctx(ctx).Error().Msg("token type not specified")
+		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("token type not specified"))
+	}
+
+	var tokenType store.MagicTokenType
+	switch r.Msg.Type {
+	case authv1.MagicTokenType_MAGIC_TOKEN_TYPE_CALDAV:
+		tokenType = store.MagicTokenTypeCaldav
+	default:
+		log.Ctx(ctx).Error().Msg("invalid token type")
+		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("invalid token type"))
+	}
+
+	_, err = s.store.CreateMagicToken(ctx, store.CreateMagicTokenParams{
+		CustomerID: tokenClaims.Payload.CustomerId,
+		TokenHash:  hashMagicLinkToken,
+		TokenType:  tokenType,
+		ExpiresAt:  time.Now().Add(magicLinkValidity),
+	})
+	if err != nil {
+		log.Ctx(ctx).Err(err).Msg("failed running CreateMagicToken")
+		return nil, internalError
+	}
+
+	return &connect.Response[authv1.GenerateMagicTokenResponse]{
+		Msg: &authv1.GenerateMagicTokenResponse{
+			MagicToken: magicLinkToken.String(),
 		},
 	}, nil
 }

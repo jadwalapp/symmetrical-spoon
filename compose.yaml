@@ -66,6 +66,8 @@ services:
       APNS_KEY_ID: ${APNS_KEY_ID}
       APNS_TEAM_ID: ${APNS_TEAM_ID}
       IS_PROD: ${IS_PROD}
+      CALDAV_HOST: ${CALDAV_HOST}
+      PROXY_URL: ${PROXY_URL}
     depends_on:
       postgresdb:
         condition: service_healthy

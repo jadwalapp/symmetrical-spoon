@@ -6,6 +6,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"net/http"
+	"net/url"
 	"os"
 
 	"connectrpc.com/connect"
@@ -31,6 +32,7 @@ import (
 	googlesvc "github.com/jadwalapp/symmetrical-spoon/falak/pkg/google"
 	googleclient "github.com/jadwalapp/symmetrical-spoon/falak/pkg/google/client"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/httpclient"
+	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/httpj"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/interceptors"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/lokilogger"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/prayer/client"
@@ -203,9 +205,22 @@ func main() {
 	// ======== AMQP CHAN ========
 
 	// ======== LLM CLI ========
+	llmHttpiCli := &http.Client{}
+	if config.ProxyUrl != "" {
+		proxyURL, err := url.Parse(config.ProxyUrl)
+		if err != nil {
+			log.Fatal().Msgf("Failed to parse proxy URL: %v", err)
+		}
+
+		defaultTransportCopy := http.DefaultTransport.(*http.Transport).Clone()
+		defaultTransportCopy.Proxy = http.ProxyURL(proxyURL)
+		llmHttpiCli.Transport = defaultTransportCopy
+	}
+
 	llmCli := openai.NewClient(
 		openaioption.WithBaseURL(config.OpenAiBaseUrl),
 		openaioption.WithAPIKey(config.OpenAiApiKey),
+		openaioption.WithHTTPClient(llmHttpiCli),
 	)
 	// ======== LLM CLI ========
 
@@ -296,6 +311,10 @@ func main() {
 	prayerTime := client.NewClient(prayerClientHttpCli)
 	// ======== Prayer Client ========
 
+	// ======== HTTPJ SERVICE ========
+	httpjRouter := httpj.NewRouter(*dbStore, config.CalDAVPasswordEncryptionKey, config.CaldavHost, config.IsProd)
+	// ======== HTTPJ SERVICE ========
+
 	// ======== INTERCEPTORS ========
 	interceptorsForServer := connect.WithInterceptors(
 		interceptors.LoggingInterceptor(lokiClient),
@@ -306,6 +325,10 @@ func main() {
 
 	// ======== SERVER ========
 	mux := http.NewServeMux()
+
+	mux.HandleFunc("/httpj", httpjRouter.HandleRoot)
+	mux.HandleFunc("/httpj/mobile-config/caldav", httpjRouter.HandleMobileConfigCaldav)
+	mux.HandleFunc("/httpj/mobile-config/webcal", httpjRouter.HandleMobileConfigWebcal)
 
 	reflector := grpcreflect.NewStaticReflector(
 		authv1connect.AuthServiceName,

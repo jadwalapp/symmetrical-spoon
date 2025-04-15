@@ -148,7 +148,10 @@ func (c *consumer) Start(ctx context.Context) error {
 								Msg("successfully published event to calendar queue")
 						}
 
-						err = c.store.DeleteChat(ctx, chatID)
+						err = c.store.DeleteChat(ctx, store.DeleteChatParams{
+							ChatID:     chatID,
+							CustomerID: wasappMsg.CustomerID,
+						})
 						if err != nil {
 							log.Ctx(ctx).Err(err).
 								Str("chat_id", chatID).
@@ -166,7 +169,10 @@ func (c *consumer) Start(ctx context.Context) error {
 						log.Ctx(ctx).Info().
 							Str("chat_id", chatID).
 							Msg("event denied, proceeding to delete chat")
-						err = c.store.DeleteChat(ctx, chatID)
+						err = c.store.DeleteChat(ctx, store.DeleteChatParams{
+							ChatID:     chatID,
+							CustomerID: wasappMsg.CustomerID,
+						})
 						if err != nil {
 							log.Ctx(ctx).Err(err).
 								Str("chat_id", chatID).

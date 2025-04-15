@@ -49,6 +49,8 @@ type FalakConfig struct {
 	ApnsKeyID                     string `mapstructure:"APNS_KEY_ID"`
 	ApnsTeamID                    string `mapstructure:"APNS_TEAM_ID"`
 	IsProd                        bool   `mapstructure:"IS_PROD"`
+	CaldavHost                    string `mapstructure:"CALDAV_HOST"`
+	ProxyUrl                      string `mapstructure:"PROXY_URL"`
 }
 
 // LoadFalakConfig reads configuration from the environment variables.

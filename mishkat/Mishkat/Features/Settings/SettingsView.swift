@@ -6,10 +6,12 @@
 //
 
 import SwiftUI
+import SafariServices
 
 struct SettingsView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
     @EnvironmentObject var profileViewModel: ProfileViewModel
+    @StateObject var settingsViewModel = SettingsViewModel()
     
     var body: some View {
         List {
@@ -27,6 +29,10 @@ struct SettingsView: View {
                 CalDAVCredentialsView()
                     .listRowInsets(EdgeInsets())
                     .listRowBackground(Color.clear)
+            }
+            Section {
+                // Prayer Times Calendar Setup
+                PrayerTimesSetupView()
             }
             Section {
                 AsyncView(
@@ -143,15 +149,25 @@ struct SettingsView: View {
                 }
             }
         }
+        .environmentObject(settingsViewModel)
         .onFirstAppear {
             profileViewModel.getProfile()
             profileViewModel.getCalDavAccount()
             profileViewModel.getWhatsappAccount()
+            Task {
+                await profileViewModel.checkDeviceCalDavAccountStatus()
+            }
+        }
+        .onAppear {
+            Task {
+                await profileViewModel.checkDeviceCalDavAccountStatus()
+            }
         }
         .refreshable {
             profileViewModel.getProfile()
             profileViewModel.getCalDavAccount()
             profileViewModel.getWhatsappAccount()
+            await profileViewModel.checkDeviceCalDavAccountStatus()
         }
         .sheet(isPresented: $profileViewModel.showWhatsappSheet) {
             WhatsappConnectionSheet(whatsappRepository: DependencyContainer.shared.whatsappRepository)
@@ -161,7 +177,30 @@ struct SettingsView: View {
                     profileViewModel.getWhatsappAccount()
                 }
         }
+        .sheet(isPresented: $settingsViewModel.showPrayerTimesSetupWebView, onDismiss: {
+            settingsViewModel.prayerTimesWebViewDismissed()
+        }) {
+            if let url = settingsViewModel.prayerTimesSetupURL {
+                SafariViewWrapper(  url: url)
+            }
+        }
     }
+}
+
+// MARK: - Safari View Wrapper
+struct SafariViewWrapper: UIViewControllerRepresentable {
+    let url: URL
+    
+    func makeUIViewController(context: Context) -> SFSafariViewController {
+        let config = SFSafariViewController.Configuration()
+        config.entersReaderIfAvailable = false
+        let safariVC = SFSafariViewController(url: url, configuration: config)
+        safariVC.preferredControlTintColor = UIColor(Color.accentColor)
+        safariVC.preferredBarTintColor = .systemBackground
+        return safariVC
+    }
+    
+    func updateUIViewController(_ uiViewController: SFSafariViewController, context: Context) {}
 }
 
 #Preview {

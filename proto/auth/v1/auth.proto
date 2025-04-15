@@ -33,8 +33,22 @@ message UseGoogleResponse {
     string access_token = 1;
 }
 
+enum MagicTokenType {
+    MAGIC_TOKEN_TYPE_UNSPECIFIED = 0;
+    MAGIC_TOKEN_TYPE_CALDAV = 1;
+}
+
+message GenerateMagicTokenRequest {
+    MagicTokenType type = 1;
+}
+
+message GenerateMagicTokenResponse {
+    string magic_token = 1;
+}
+
 service AuthService {
     rpc InitiateEmail(InitiateEmailRequest) returns (InitiateEmailResponse);
     rpc CompleteEmail(CompleteEmailRequest) returns (CompleteEmailResponse);
     rpc UseGoogle(UseGoogleRequest) returns (UseGoogleResponse);
+    rpc GenerateMagicToken(GenerateMagicTokenRequest) returns (GenerateMagicTokenResponse);
 }
