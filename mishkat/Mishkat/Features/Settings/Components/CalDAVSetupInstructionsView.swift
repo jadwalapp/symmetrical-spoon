@@ -468,23 +468,6 @@ struct ProfileInstallStep: View {
     }
 }
 
-// MARK: - Safari View Wrapper
-
-struct SafariViewWrapper: UIViewControllerRepresentable {
-    let url: URL
-    
-    func makeUIViewController(context: Context) -> SFSafariViewController {
-        let config = SFSafariViewController.Configuration()
-        config.entersReaderIfAvailable = false
-        let safariVC = SFSafariViewController(url: url, configuration: config)
-        safariVC.preferredControlTintColor = UIColor(Color.accentColor)
-        safariVC.preferredBarTintColor = .systemBackground
-        return safariVC
-    }
-    
-    func updateUIViewController(_ uiViewController: SFSafariViewController, context: Context) {}
-}
-
 //MARK: - Preview
 
 #Preview {
