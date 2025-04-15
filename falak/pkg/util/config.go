@@ -51,6 +51,8 @@ type FalakConfig struct {
 	IsProd                        bool   `mapstructure:"IS_PROD"`
 	CaldavHost                    string `mapstructure:"CALDAV_HOST"`
 	ProxyUrl                      string `mapstructure:"PROXY_URL"`
+	PrayerTimeBaseUrl             string `mapstructure:"PRAYER_TIME_BASE_URL"`
+	GeoLocationBaseUrl            string `mapstructure:"GEO_LOCATION_BASE_URL"`
 }
 
 // LoadFalakConfig reads configuration from the environment variables.

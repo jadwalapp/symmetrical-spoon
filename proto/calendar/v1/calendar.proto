@@ -11,6 +11,15 @@ message GetCalDavAccountResponse {
     string password = 2;
 }
 
+message SchedulePrayerTimesRequest{
+    
+}
+message SchedulePrayerTimesResponse{
+    string ical_url = 1;
+}
+
+
 service CalendarService {
     rpc GetCalDavAccount(GetCalDavAccountRequest) returns (GetCalDavAccountResponse);
+    rpc SchedulePrayerTimes(SchedulePrayerTimesRequest) returns (SchedulePrayerTimesResponse);
 }

@@ -28,6 +28,7 @@ import (
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/gen/proto/calendar/v1/calendarv1connect"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/gen/proto/profile/v1/profilev1connect"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/gen/proto/whatsapp/v1/whatsappv1connect"
+	geolocationclient "github.com/jadwalapp/symmetrical-spoon/falak/pkg/geolocation/client"
 	googlesvc "github.com/jadwalapp/symmetrical-spoon/falak/pkg/google"
 	googleclient "github.com/jadwalapp/symmetrical-spoon/falak/pkg/google/client"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/httpclient"
@@ -299,6 +300,11 @@ func main() {
 	}
 	// ======== PROTOVALIDATE ========
 
+	// ======== GEO LOCATION CLIENT ========
+	geoLocClientHttpCli := httpclient.NewClient(&http.Client{})
+	geoLocClient := geolocationclient.NewClient(geoLocClientHttpCli, config.GeoLocationBaseUrl)
+	// ======== GEO LOCATION CLIENT ========
+
 	// ======== HTTPJ SERVICE ========
 	httpjRouter := httpj.NewRouter(*dbStore, config.CalDAVPasswordEncryptionKey, config.CaldavHost, config.IsProd)
 	// ======== HTTPJ SERVICE ========
@@ -333,7 +339,7 @@ func main() {
 	profileServer := profile.NewService(*pv, *dbStore, apiMetadata)
 	mux.Handle(profilev1connect.NewProfileServiceHandler(profileServer, interceptorsForServer))
 
-	calendarServer := calendar.NewService(*pv, *dbStore, apiMetadata, config.CalDAVPasswordEncryptionKey)
+	calendarServer := calendar.NewService(*pv, *dbStore, apiMetadata, geoLocClient, config.CalDAVPasswordEncryptionKey)
 	mux.Handle(calendarv1connect.NewCalendarServiceHandler(calendarServer, interceptorsForServer))
 
 	whatsappServer := whatsapp.NewService(*pv, apiMetadata, wasappCli)
