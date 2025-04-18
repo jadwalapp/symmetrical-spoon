@@ -6,50 +6,66 @@ graph TB
     end
 
     subgraph "Backend (Falak)"
-        B[gRPC Server]
+        B[ConnectRPC Server]
         C[Auth Service]
         D[Calendar Service]
         E[CalDAV Client]
-        I[Event Consumer]
+        I[WhatsApp Event Consumer]
+        M[Calendar Task Producer/Consumer]
     end
 
-    subgraph "WhatsApp Service"
-        F[Node.js gRPC Server]
-        G[WhatsApp Web.js]
-        J[Event Producer]
+    subgraph "Wasapp (WhatsApp) Service"
+        F[Bun HTTP RESTful Server]
+        G[WhatsApp Web.js Client]
+        J[WhatsApp Event Producer]
     end
 
-    subgraph "Message Queue"
-        K[(RabbitMQ)]
+    subgraph "RabbitMQ"
+        K_WA[(WhatsApp Event Queue)]
+        K_CAL[(Calendar Task Queue)]
     end
 
     subgraph "Database"
         H[(PostgreSQL)]
     end
 
-    A --gRPC--> B
+    subgraph "Calendar Server"
+        BAIKAL[Baikal CalDAV Server]
+    end
+
+    %% Frontend -> Backend
+    A --"ConnectRPC"--> B
+
     B --> C
     B --> D
     D --> E
-    B --gRPC--> F
-    F --> G
+    E --"CalDAV Protocol"--> BAIKAL
+    B --"HTTP/REST"--> F
 
+    F --> G
     G --> J
-    J --"Publish Events"--> K
-    K --"Consume Events"--> I
+    J --"Publish WhatsApp Events"--> K_WA
+
+    K_WA --"Consume WhatsApp Events"--> I
     I --> D
+
+    D --"Publish Calendar Tasks"--> K_CAL
+    K_CAL --"Consume Calendar Tasks"--> M
+    M --> D
 
     C --> H
     D --> H
 
-    classDef frontend fill:#f9f,stroke:#333,stroke-width:4px;
+    classDef frontend fill:#f9f,stroke:#333,stroke-width:2px;
     classDef backend fill:#bbf,stroke:#333,stroke-width:2px;
     classDef whatsapp fill:#bfb,stroke:#333,stroke-width:2px;
     classDef database fill:#fbb,stroke:#333,stroke-width:2px;
     classDef queue fill:#ff9,stroke:#333,stroke-width:2px;
+    classDef calendar fill:#fdb,stroke:#333,stroke-width:2px;
 
     class A frontend;
-    class B,C,D,E,I backend;
+    class B,C,D,E,I,M backend;
     class F,G,J whatsapp;
     class H database;
-    class K queue;
+    class K_WA,K_CAL queue;
+    class BAIKAL calendar;

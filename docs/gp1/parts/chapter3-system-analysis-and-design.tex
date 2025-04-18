@@ -21,10 +21,10 @@ The following requirements outline the core features and capabilities that Jadwa
     \item The user should be able to connect their WhatsApp account.
     \item The user should be able to add events manually.
     \item The user should be able to view integrated calendar.
-    \item The user should be able to manage scheduling conflicts.
     \item The user should be able to schedule prayer times.
     \item The system shall send event notifications to the user.
     \item The system shall add the WhatsApp extracted events to the calendar. If a conflict occurs, the user shall get a notification to resolve the conflict with suggestions.
+    \item The user should be able to manage scheduling conflicts.
 \end{itemize}
 
 Each functional requirement listed above will be explained in details through a use case description in the coming sections.
@@ -47,27 +47,31 @@ While functional requirements define what the system does, non-functional requir
 
 In today's digital world, security is a key concern for any application that handles user data. Jadwal places a strong emphasis on ensuring the security and trustworthiness of the platform for its users, implementing multiple layers of security measures to protect user data.
 
-\subsection{Authentication: Magic Link and JWT Tokens}
+\subsection{Authentication: Magic Token and JWT Tokens}
 
-To provide secure authentication, Jadwal implements Magic Link authentication. Instead of relying on traditional username and password combinations, which is vulnerable to various attacks, such as credentials leakage through database dumps. To mitigate this, Jadwal sends the users trying to authenticate a secure magic link to their verified email address. A magic link is a special URL that contains a secure token. For example:
+To provide secure authentication, Jadwal implements Magic Token authentication. Instead of relying on traditional username and password combinations, which is vulnerable to various attacks, such as credentials leakage through database dumps. To mitigate this, Jadwal sends the users trying to authenticate a secure magic link to their verified email address. A magic link is a special URL that contains a secure token, the magic token. For example:
 
 \begin{verbatim}
     https://jadwal.app/magic-link?token=some-uuid
 \end{verbatim}
 
-In this URL, \texttt{some-uuid} is the secure token, and the complete URL is what we call the magic link. When sent to the user's email, clicking this link proves they have access to the email account they're trying to use.
+In this URL, \texttt{some-uuid} is the secure token, which we call magic token, and the complete URL is what we call the magic link. When sent to the user's email, clicking this link proves they have access to the email account they're trying to use.
 
-When a user logs in using the Magic Link sent to their email, Jadwal secures the user's account by verifying the magic token provided. This ensures that the account can only be accessed by the legitimate user who has access to the registered email account. To enhance security, the magic token has a limited lifetime of 15 minutes, significantly reducing the window of opportunity for potential attacks.
+When a user logs in using the magic link sent to their email, Jadwal secures the user's account by verifying the magic token provided. This ensures that the account can only be accessed by the legitimate user who has access to the registered email account. To enhance security, the magic token has a limited lifetime of 15 minutes, significantly reducing the window of opportunity for potential attacks.
 
-Upon successful magic link verification, Jadwal issues a JWT (JSON Web Token) signed with the platform's private key. This digital signature serves as a cryptographic guarantee of the token's authenticity, allowing the system to verify that tokens haven't been tampered with and were legitimately issued by Jadwal.
+Upon successful magic token verification, Jadwal issues two JWTs (JSON Web Token) signed with the platform's private key. This digital signature serves as a cryptographic guarantee of the token's authenticity, allowing the system to verify that tokens haven't been tampered with and were legitimately issued by Jadwal's own system.
 
-\subsection{Token Storage and Security}
+The first JWT is called the \textit{access token}, and it is a short-lived token that expires after 5 minutes. This token is back by the client in the \textit{Authorization} HTTP header as a \textit{\gls{bearer-authentication}} token, also known as \textit{token authentication}, to authenticate themselves when calling protected resources.
 
-To ensure the security of authentication tokens, Jadwal implements secure storage practices for storing the magic token in the database. Magic tokens are never stored in their original form; instead, they are protected using the SHA-256 hashing algorithm before being saved in the database. When verifying user tokens, the system hashes the user-provided token and compares it with the stored hash, ensuring that even in the unlikely event of a database breach, the original tokens remain secure.
+The second JWT is called the \textit{refresh token}, and it is transmitted securely encrpyted in-transit to the device. This is a long-lived token that allows the user to ask for a new token every time the \text{access token} expires.
+
+\subsection{Magic Token Storage and Security}
+
+To ensure the security of magic tokens, Jadwal implements secure storage practices for storing the magic token in the database. Magic tokens are never stored in their original form; instead, they are protected using the SHA-256 hashing algorithm before being saved in the database. When verifying magic tokens, the system hashes the user-provided magic token and compares it with the stored hash, ensuring that even in the unlikely event of a database breach, the original magic tokens remain secure.
 
 \subsection{Secure Logout Implementation}
 
-Jadwal implements a secure logout mechanism by removing the authentication token from the user's device upon logout. This practice ensures that once a user logs out, their session token cannot be reused for unauthorized access, maintaining the integrity of user sessions.
+Jadwal implements a secure logout mechanism by removing the refresh token from the user's device upon logout. This practice ensures that once a user logs out, their refresh token cannot be reused for unauthorized access, maintaining the integrity of user sessions.
 
 \subsection{Transparency Through Open Source}
 
@@ -77,6 +81,8 @@ As part of our commitment to security and privacy, Jadwal will be released as op
 \section{System Architecture}
 
 Jadwal implements a modern, distributed architecture leveraging gRPC (Google Remote Procedure Call) for efficient communication between its components. The system is divided into several key services, each responsible for specific functionality while maintaining high performance and reliability.
+
+Jadwal implements a modern architecture leveraging \gls{connectrpc} for communication between the backend and the mobile app for efficient communcation. It also enhances the developer experience and makes the developer think about the design of the API before the programming language to use.
 
 \begin{figure}[!h]
     \centering
@@ -90,35 +96,36 @@ The architecture, shown in \textbf{Figure~\ref{fig:architecture}}, consists of t
 \begin{enumerate}
     \item \textbf{Frontend (Mishkat)}
           \begin{itemize}
-              \item iOS SwiftUI application implementing the client-side gRPC communication
+              \item iOS SwiftUI application implementing the client-side \gls{connectrpc} communication
               \item Handles user interface and local state management
           \end{itemize}
 
     \item \textbf{Backend (Falak)}
           \begin{itemize}
-              \item Core gRPC server implementing the primary business logic
-              \item Auth Service managing user authentication and session management
-              \item Calendar Service handling calendar operations and integration
-              \item CalDAV Client enabling connection to external calendar services
-              \item Event Consumer processing WhatsApp events from the message queue
+              \item \Gls{connectrpc} server implementing the primary business logic
+              \item Auth service managing user authentication
+              \item Calendar service making use of a CalDAV client enabling connection to our \Gls{baikal} server to add events to the WhatsApp calendar
+              \item Event consumer processing WhatsApp events from the messages queue
+              \item Event producer and consumer for extracted calendar events to process
           \end{itemize}
 
-    \item \textbf{WhatsApp Service}
+    \item \textbf{Wasapp (WhatsApp) Service}
           \begin{itemize}
-              \item Node.js gRPC server managing WhatsApp communication
-              \item WhatsApp Web.js client for message monitoring
-              \item Event Producer publishing detected events to the message queue
+              \item \gls{bun} HTTP RESTful API that allows \textit{falak} to communicate with this 
+              \item \gls{whatsappwebjs} client for message receiving
+              \item Event producer publishing detected events to the message queue
           \end{itemize}
 
-    \item \textbf{Message Queue}
+    \item \textbf{\gls{rabbitmq} Queue}
           \begin{itemize}
-              \item RabbitMQ handling asynchronous event processing
+              \item \gls{rabbitmq} handling asynchronous event processing
               \item Ensures reliable delivery of WhatsApp events to the backend
+              \item Ensures reliable handling of adding calendar events and sending user notifications
           \end{itemize}
 
     \item \textbf{Database}
           \begin{itemize}
-              \item PostgreSQL storing user data, calendar information, and events
+              \item \gls{postgresql} storing customer data, calendar credentials, device IDs, magic tokens, Wasapp chats, and Wasapp messages
               \item Maintains data consistency across all services
           \end{itemize}
 \end{enumerate}
@@ -126,7 +133,7 @@ The architecture, shown in \textbf{Figure~\ref{fig:architecture}}, consists of t
 This architecture enables several key benefits:
 
 \begin{itemize}
-    \item \textbf{Performance}: gRPC's use of Protocol Buffers and HTTP/2 ensures efficient communication between services
+    \item \textbf{Performance}: \gls{connectrpc}'s use of \gls{protobuf} and \gls{http2} ensures efficient communication between services
     \item \textbf{Scalability}: Separate services can be scaled independently based on load
     \item \textbf{Reliability}: Message queue ensures no events are lost during processing
     \item \textbf{Maintainability}: Clear separation of concerns makes the system easier to maintain and update
