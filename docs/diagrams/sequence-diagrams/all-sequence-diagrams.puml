@@ -32,8 +32,8 @@ Backend -> Database : Get Magic Link by HashedToken
 alt MagicLink exists
     Backend -> Backend : Check (Hashed MagicToken == Hashed MagicToken from Database)
     alt Auth Success
-        Backend -> Backend : Issue JWT
-        Backend --> User : JWT (Access Token)
+        Backend -> Backend : Issue two JWTs
+        Backend --> User : JWTs (Access Token & Refresh Token)
     else Auth Failure
         Backend --> User : Permission Denied
     end
