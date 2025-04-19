@@ -1,49 +1,86 @@
 \begin{usecase}{Manage Scheduling Conflicts}
   \ucbasicinfo{Medium}{Regular}
-  \ucshortdescription{This UC allows the user to manage scheduling conflicts by suggesting resolutions when overlapping events are detected.}
-  \uctrigger{This UC is triggered when an automatically added event overlaps with an existing event.}
-  \ucactors{User}{None}
+  \ucshortdescription{This UC allows users to view and manage all unresolved scheduling conflicts in their calendar through a dedicated interface.}
+  \uctrigger{This UC is triggered when the user opens the Conflicts view in the iOS app.}
+  \ucactors{User}{iOS App}
   \ucpreconditions{
     \begin{itemize}
-      \item User is logged in.
-      \item Conflicting events list is not empty.
+      \item The iOS app is installed and running
+      \item Calendar access is authorized
+      \item There are unresolved conflicts in the ConflictManager
     \end{itemize}
   }
   \ucrelationships{N/A}{N/A}{N/A}
   \ucinputsoutputs{
     \begin{itemize}
-      \item \textbf{Conflicting events} (Source: System)
-      \item \textbf{Event to override} (Source: User)
+      \item \textbf{Unresolved conflicts} (Source: ConflictManager)
+      \item \textbf{User resolution choices} (Source: User Interface)
     \end{itemize}
   }{
     \begin{itemize}
-      \item \textbf{Conflict resolution suggestion} (Destination: User Interface)
-      \item \textbf{Updated event schedules} (Destination: Calendar)
+      \item \textbf{Updated calendar events} (Destination: iOS Calendar)
+      \item \textbf{Updated conflict status} (Destination: ConflictManager)
     \end{itemize}
   }
   \ucmainflow{
     \begin{enumerate}
-      \item The user opens the application and clicks on the view conflicts icon
-            \ucinfo{The application shows all the conflics with their resolution options}
-      \item The user chooses the best fit option to manage each conflict
-            \ucinfo{The conflict is resolved and is removed from the conflict list }
-
+      \item The user opens the Conflicts view in the app
+            \ucinfo{The app displays a list of all unresolved conflicts using ConflictRowView for each conflict.}
+      \item For each conflict, the user can:
+            \ucinfo{
+              \begin{itemize}
+                \item View the conflicting events in a timeline visualization
+                \item See the event titles, times, and number of conflicts
+                \item Select a conflict to resolve
+              \end{itemize}
+            }
+      \item When selecting a conflict, the user is presented with resolution options
+            \ucinfo{The ConflictResolutionView presents three options:
+              \begin{itemize}
+                \item Keep All Events - Leave events as is with known conflict
+                \item Reschedule Event - Move the new event to a different time
+                \item Cancel Event - Remove the new event from the calendar
+              \end{itemize}
+            }
+      \item The user can visualize the impact of their choice
+            \ucinfo{The ConflictTimelineView provides a visual representation of:
+              \begin{itemize}
+                \item Current event positions
+                \item Proposed new time (when rescheduling)
+                \item Conflict resolution preview
+              \end{itemize}
+            }
     \end{enumerate}
   }
   \ucalternateflows{
     \begin{enumerate}
-      \item If the user doesn't choose any option, it shows conflicting status until the user chooses any option or the event expires.
-      \item If the user clicks on reject the event is left overlapping.
+      \item If no unresolved conflicts exist:
+            \ucinfo{The app displays a "No Scheduling Conflicts" message with a checkmark.}
+      \item If the user dismisses without resolving:
+            \ucinfo{The conflict remains in the unresolved state and can be addressed later.}
     \end{enumerate}
   }
   \ucexceptions{
     \begin{itemize}
-      \item Network failure
+      \item If calendar access is revoked, the app prompts for re-authorization
+      \item If event modification fails, the conflict remains unresolved and can be retried
     \end{itemize}
   }
-  \ucconclusion{The UC ends when the conflicting events are either resolved or marked as conflicting, based on the user's choice.}
-  \ucpostconditions{The calendar reflects the user's decision regarding event conflicts.}
-  \ucspecialrequirements{The system should provide best suggestions for resolving conflicts.}
+  \ucconclusion{The UC ends when the user has reviewed and optionally resolved their calendar conflicts.}
+  \ucpostconditions{
+    \begin{itemize}
+      \item Resolved conflicts are marked as such in the ConflictManager
+      \item Calendar events reflect any changes made through conflict resolution
+      \item Remaining unresolved conflicts are preserved for later
+    \end{itemize}
+  }
+  \ucspecialrequirements{
+    \begin{itemize}
+      \item The interface must provide clear visual feedback through the timeline view
+      \item Resolution options must be easily accessible and understandable
+      \item The system must maintain conflict state across app sessions
+    \end{itemize}
+  }
 \end{usecase}
 
 \begin{figure}[!h]
@@ -53,21 +90,22 @@
   \label{fig:seq/manage-scheduling-conflicts}
 \end{figure}
 
-The ``Manage Scheduling Conflicts Sequence Diagram'', shown in \textbf{Figure~\ref{fig:seq/manage-scheduling-conflicts}}, illustrates the interactive process of handling calendar conflicts within Jadwal. The sequence begins with the ViewConflicts gRPC call, where the user requests to see existing scheduling conflicts.
+The sequence diagram in Figure~\ref{fig:seq/manage-scheduling-conflicts} illustrates how users can manage their calendar conflicts through the iOS app's dedicated Conflicts view. This interface serves as a central hub for reviewing and resolving all scheduling conflicts.
 
-The Backend processes this request through several steps:
-\begin{enumerate}
-  \item Retrieves the list of conflicts from the Database via FetchConflicts
-  \item Generates intelligent resolution options for each conflict
-  \item Returns the conflicts and their possible resolutions to the user
-\end{enumerate}
-
-When the user selects a resolution option, the process continues with:
+The process leverages several key components:
 \begin{itemize}
-  \item The ResolveConflict gRPC call carrying the user's selected option
-  \item Database update to reflect the chosen resolution
-  \item Retrieval of relevant device IDs for notification purposes
-  \item Push notification dispatch through Apple Push Notification service (APNs) to inform affected users
+  \item \textbf{ConflictManager}: Maintains the state of all conflicts and their resolution status
+  \item \textbf{ConflictsView}: Provides the main interface listing all unresolved conflicts
+  \item \textbf{ConflictResolutionView}: Offers the resolution interface with timeline visualization
+  \item \textbf{ConflictTimelineView}: Delivers an interactive visual representation of conflicts
 \end{itemize}
 
-If the user chooses to reject resolution, the system maintains the conflict status without further action. This workflow ensures users have complete control over their schedule while maintaining awareness of conflicts through push notifications. The system's ability to generate and present resolution options helps users make informed decisions about their scheduling conflicts.
+This implementation ensures that users can:
+\begin{itemize}
+  \item View all their conflicts in one place
+  \item Understand conflicts through visual timeline representation
+  \item Make informed decisions about resolution
+  \item Address conflicts at their convenience
+\end{itemize}
+
+The system maintains conflicts until they are explicitly resolved, allowing users to manage their schedule conflicts efficiently while ensuring no scheduling issues go unnoticed.

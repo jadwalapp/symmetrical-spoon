@@ -1,68 +1,113 @@
 \begin{usecase}{Suggest Conflict Resolutions}
-  \ucbasicinfo{High}{Regular}
-  \ucshortdescription{This UC gives the user all the conflicts and possible ways to resolve it.}
-  \uctrigger{The UC is triggered when a conflict is detected between any overlapping event}
-  \ucactors{User}{WhatsApp}
-  \ucpreconditions{The calendar must have events}
-  \ucrelationships{N/A}{Manage Scheduling Conflicts}{N/A}
-  \ucinputsoutputs{
-    \begin{itemize}
-      \item \textbf{Overlapping events} (Source: Saved Events in Database)
-      \item \textbf{User suggested resolution} (Source: User)
-    \end{itemize}
-  }{
-    \begin{itemize}
-      \item \textbf{Resolution options} (Destination: User Interface)
-      \item \textbf{Updated calendar schedule} (Destination: Calendar)
-    \end{itemize}
-  }
-  \ucmainflow{
-    \begin{enumerate}
-      \item The system detection conflicts
-            \ucinfo{The system detects overlapping of events either added manually or extracted from WhatsApp and gives a notification to the user.}
-      \item The system gives the suggestions for Conflicts.
-            \ucinfo{The system provides the user with the list of resolution options.
-              \begin{itemize}
-                \item By moving the overlapping event to another time slot.
-                \item Keep both events with a conflict warning.
-              \end{itemize}}
-    \end{enumerate}
-  }
-  \ucalternateflows{
-    \begin{enumerate}
-      \item {No conflicts detected}
-    \end{enumerate}
-  }
-  \ucexceptions{
-    \begin{itemize}
-      \item If the system doesn't get any possible way to resolve the conflict then the system would mark both the event as conflicting.
-    \end{itemize}
-  }
-  \ucconclusion{The UC ends when the user chooses resolution weather if to reschedule the event or leaving it without resolving and it is reflected in on the calendar.}
-  \ucpostconditions{The conflicting events in the calendar are either resolved or marked as conflicting}
-  \ucspecialrequirements{The system give feasible conflict resolution options}
+	\ucbasicinfo{High}{Regular}
+	\ucshortdescription{This UC provides users with conflict detection and resolution options for calendar events.}
+	\uctrigger{The UC is triggered when a new event is added that overlaps with existing events}
+	\ucactors{User}{iOS App}{Backend Service}
+	\ucpreconditions{
+		\begin{itemize}
+			\item The user has calendar access authorized
+			\item The user has notifications enabled
+			\item The calendar contains at least one event
+		\end{itemize}
+	}
+	\ucrelationships{N/A}{Manage Scheduling Conflicts}{N/A}
+	\ucinputsoutputs{
+		\begin{itemize}
+			\item \textbf{Event details} (Source: Calendar)
+			\item \textbf{User resolution choice} (Source: User Interface)
+		\end{itemize}
+	}{
+		\begin{itemize}
+			\item \textbf{Updated calendar events} (Destination: Calendar)
+			\item \textbf{Conflict notifications} (Destination: User Device)
+		\end{itemize}
+	}
+	\ucmainflow{
+		\begin{enumerate}
+			\item The backend service sends event details to the iOS app via push notification
+			      \ucinfo{When a new event is added, the backend sends both a visible notification and background event data.}
+			\item The iOS app checks for conflicts
+			      \ucinfo{The app processes the event data in the background to detect overlaps with existing events.}
+			\item The iOS app notifies the user about conflicts
+			      \ucinfo{If conflicts are found, a notification is shown to the user.}
+			\item The app presents resolution options
+			      \ucinfo{When the user opens the conflict notification, they are presented with three options:
+				      \begin{itemize}
+					      \item Keep all events (with conflict warning)
+					      \item Reschedule the new event to a different time
+					      \item Cancel the new event
+				      \end{itemize}}
+			\item The user selects a resolution option
+			      \ucinfo{The system provides a visual timeline to help users understand the conflict and make an informed decision.}
+			\item The system applies the chosen resolution
+			      \ucinfo{The calendar is updated according to the user's choice:
+				      \begin{itemize}
+					      \item If keeping both, events are marked as conflicting
+					      \item If rescheduling, the event is moved to the new time
+					      \item If canceling, the new event is removed
+				      \end{itemize}}
+		\end{enumerate}
+	}
+	\ucalternateflows{
+		\begin{enumerate}
+			\item {No conflicts detected}
+			      \ucinfo{If no overlapping events are found, the event is added normally without user intervention.}
+			\item {User ignores conflict notification}
+			      \ucinfo{Conflicts remain in the app's conflict manager and can be resolved later from the conflicts view.}
+		\end{enumerate}
+	}
+	\ucexceptions{
+		\begin{itemize}
+			\item If calendar access is not authorized, conflict detection cannot proceed
+			\item If notifications are disabled, the user won't be notified of conflicts immediately
+			\item If event modification fails, the system retains the conflict state for later resolution
+		\end{itemize}
+	}
+	\ucconclusion{The UC ends when either the conflict is resolved according to user choice, or the conflict is retained for later resolution.}
+	\ucpostconditions{
+		\begin{itemize}
+			\item The calendar reflects the user's chosen resolution
+			\item The conflict is marked as resolved in the conflict manager if user acted on it
+			\item The conflicts view is updated accordingly
+		\end{itemize}
+	}
+	\ucspecialrequirements{
+		\begin{itemize}
+			\item The system must provide real-time visual feedback of conflicts using the timeline view
+			\item The conflict resolution interface must be intuitive and user-friendly
+			\item The system must handle background event processing with best 
+		\end{itemize}
+	}
 \end{usecase}
 
 \begin{figure}[!h]
-  \centering
-  \includegraphics[width=\textwidth]{images/docs/diagrams/sequence-diagrams/all-sequence-diagrams/Suggest Conflict Resolutions.png}
-  \caption{Suggest Conflict Resolutions Sequence Diagram}
-  \label{fig:seq/suggest-conflict-resolutions}
+	\centering
+	\includegraphics[width=\textwidth]{images/docs/diagrams/sequence-diagrams/all-sequence-diagrams/Suggest Conflict Resolutions.png}
+	\caption{Suggest Conflict Resolutions Sequence Diagram}
+	\label{fig:seq/suggest-conflict-resolutions}
 \end{figure}
 
-The sequence diagram in Figure~\ref{fig:seq/suggest-conflict-resolutions} illustrates the conflict detection and resolution workflow in Jadwal. When events are added to the calendar (either manually or through WhatsApp extraction), the System initiates a conflict check in the Database. This check specifically looks for temporal overlaps between events and identifies potential alternative time slots.
+The sequence diagram in Figure~\ref{fig:seq/suggest-conflict-resolutions} illustrates the conflict detection and resolution workflow in Jadwal. The process begins when a new event is added to the calendar, particularly through WhatsApp extraction. The backend service sends both a visible notification and background event data through Apple Push Notification service (APNs).
 
-If conflicts are detected, the System follows a structured resolution process:
+The iOS app implements a sophisticated conflict resolution system that:
 \begin{enumerate}
-  \item Retrieves resolution options from the Database, which include:
-        \begin{itemize}
-          \item Moving the overlapping event to an alternative time slot
-          \item Keeping both events with an explicit conflict warning
-        \end{itemize}
-  \item Obtains the device IDs associated with the customer who owns the conflicting events
-  \item Utilizes Apple Push Notification service (APNs) to notify users about the conflict and present them with resolution options
+	\item Processes background notifications to detect conflicts
+	\item Maintains a conflict manager to track and handle conflicts
+	\item Provides a visual timeline interface for understanding conflicts
+	\item Offers three resolution options:
+	      \begin{itemize}
+		      \item Keep all events with an explicit conflict warning
+		      \item Reschedule the new event to a different time
+		      \item Cancel the new event
+	      \end{itemize}
 \end{enumerate}
 
-If no conflicts are detected, the System continues without any additional actions. This approach ensures users are promptly informed of scheduling conflicts while maintaining the flexibility to either reschedule events or knowingly maintain overlapping appointments. The workflow aligns with Jadwal's goal of providing straightforward conflict management while respecting user preferences in calendar organization.
+The implementation focuses on user experience by:
+\begin{itemize}
+	\item Providing immediate notification of conflicts
+	\item Offering a visual timeline to understand event overlaps
+	\item Allowing flexible resolution timing (immediate or later)
+	\item Maintaining a dedicated conflicts view for managing all unresolved conflicts
+\end{itemize}
 
-This process specifically implements the use case requirements, focusing on practical conflict resolution through user notification and simple resolution options, rather than attempting automated resolution or complex prioritization schemes.
+This approach ensures users have complete control over their calendar while being promptly informed of scheduling conflicts. The system maintains conflicts until explicitly resolved, allowing users to make decisions at their convenience while ensuring no scheduling issues go unnoticed.

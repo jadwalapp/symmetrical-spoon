@@ -310,76 +310,125 @@ end
 @enduml
 
 @startuml Suggest Conflict Resolutions
-actor System
-database Database
+actor User
+participant "Backend Service" as Backend
+participant "Baikal Server" as Baikal
 participant "Apple Push Notification service (APNs)" as APN
+participant "iOS App" as App
+participant "Calendar" as Calendar
 
-activate System
+Backend -> Baikal: Add Event via CalDAV
+Baikal --> Backend: Event Added
 
-System -> Database ++ : Check If Conflicts Exist Between Events
+Backend -> APN: Send Event Details (Background + Alert)
 note right
-  Checks for:
-  1. Time overlap between events
-  2. Available alternative time slots
+  Includes:
+  1. Event UID
+  2. Event Title
+  3. Start/End Time
+  4. Calendar Name
 end note
-Database --> System : ConflictedEvents Result
 
-alt ConflictedEvents are not empty
-    System -> Database : GetResolutionOptions(ConflictedEvents)
-    note right
-      Options are:
-      1. Move event to another time slot
-      2. Keep both with conflict warning
-    end note
-    Database --> System : ResolutionOptions Result
+APN -> App: Deliver Push Notification
 
-    System -> Database : Ask For Device IDs Of Customer Owning Event
-    Database --> System -- : Device IDs of Customer Owning Event
+activate App
+App -> Calendar: Check for Conflicts
+Calendar --> App: Overlapping Events
 
-    System -> APN ++ : Send Push Notification "Telling User There is Conflict" to Device IDs
-    note right: Includes both resolution options
-    APN --> System -- : Push Notification Sending Result
-
-else ConflictedEvents are empty
-    note over System, Database : Do Nothing
+alt Conflicts Found
+    App -> User: Show Conflict Notification
+    
+    opt User Opens Conflict Resolution
+        User -> App: Open Conflict Resolution
+        activate App
+        
+        App -> User: Display Timeline View with Options
+        note right
+          Options:
+          1. Keep All Events (Default if ignored)
+          2. Reschedule Event
+          3. Cancel Event
+        end note
+        
+        User -> App: Select Resolution Option
+        
+        alt Keep All Events
+            note over App: Events remain as is
+        else Reschedule Event
+            User -> App: Select New Time
+            App -> Calendar: Move Event to New Time
+        else Cancel Event
+            App -> Calendar: Delete New Event
+        end
+        
+        App -> App: Mark Conflict as Resolved
+        deactivate App
+    end
+else No Conflicts
+    note over App: Event remains as added
 end
+deactivate App
 
 @enduml
 
 @startuml Manage Scheduling Conflicts
 actor User
-participant Backend
-database Database
-participant "Apple Push Notification service (APNs)" as APN
+participant "ConflictsView" as View
+participant "ConflictManager" as Manager
+participant "ConflictResolutionView" as Resolution
+participant "ConflictTimelineView" as Timeline
+participant "Calendar" as Calendar
 
-activate User
+User -> View: Open Conflicts View
 
-User -> Backend ++ : ViewConflicts
+activate View
+View -> Manager: Get Unresolved Conflicts
+Manager --> View: Conflicts List
 
-Backend -> Database ++ : FetchConflicts
-Database --> Backend -- : ConflictsList
+alt Has Unresolved Conflicts
+    View -> View: Display ConflictRowView for each conflict
+    View --> User: Show conflicts list
 
-Backend -> Backend : GenerateResolutionOptions
-Backend --> User -- : DisplayConflictsWithOptions
-
-alt User Selects Resolution
-    User -> Backend ++ : ResolveConflict(selectedOption)
+    User -> View: Select Conflict
+    View -> Resolution: Open Resolution View
+    activate Resolution
     
-    Backend -> Database ++ : UpdateEvents
-    Database --> Backend -- : EventsUpdated
+    Resolution -> Timeline: Initialize Timeline View
+    Timeline -> Calendar: Get Events Data
+    Calendar --> Timeline: Events Data
+    Timeline --> Resolution: Display Timeline
     
-    Backend -> Database ++ : Ask For Device IDs Of Customer Owning Event
-    Database --> Backend -- : Device IDs of Customer Owning Event
+    Resolution --> User: Show Resolution Options
     
-    Backend -> APN ++ : Send Push Notification "Conflict Resolved" to Device IDs
-    APN --> Backend -- : Push Notification Sending Result
-    
-    Backend --> User : ConflictResolved
-else User Rejects
-    note over User, Backend : Do Nothing
+    alt User Selects Resolution
+        User -> Resolution: Choose Resolution Option
+        
+        alt Keep All Events
+            Resolution -> Manager: Mark Conflict Resolved
+        else Reschedule Event
+            User -> Resolution: Select New Time
+            Resolution -> Calendar: Move Event
+            Calendar --> Resolution: Event Updated
+            Resolution -> Manager: Mark Conflict Resolved
+        else Cancel Event
+            Resolution -> Calendar: Delete Event
+            Calendar --> Resolution: Event Deleted
+            Resolution -> Manager: Mark Conflict Resolved
+        end
+        
+        Resolution --> View: Dismiss
+        deactivate Resolution
+        View -> Manager: Get Updated Conflicts
+        Manager --> View: Updated Conflicts List
+    else User Dismisses
+        Resolution --> View: Dismiss without changes
+        deactivate Resolution
+    end
+else No Conflicts
+    View --> User: Show "No Conflicts" Message
 end
 
-deactivate User
+deactivate View
 
 @enduml
 
