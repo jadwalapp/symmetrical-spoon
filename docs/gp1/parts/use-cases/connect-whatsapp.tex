@@ -8,10 +8,10 @@
   \ucinputsoutputs{
     \begin{itemize}
       \item \textbf{WhatsApp phone number} (Source: User)
-      \item \textbf{WhatsApp linking code} (Source: User)
     \end{itemize}
   }{
     \begin{itemize}
+      \item \textbf{WhatsApp linking code} {Destination: System}
       \item \textbf{WhatsApp auth credentials} (Destination: System)
     \end{itemize}
   }
@@ -20,8 +20,8 @@
       \item The user clicks ``Connect WhatsApp'' button.
             \ucinfo{The system asks for the user's WhatsApp phone number.}
       \item The user enters their WhatsApp phone number.
-            \ucinfo{WhatsApp shows the linking code in their app.}
-      \item The user enters the linking code in our app.
+            \ucinfo{Our app shows the WhatsApp linking code.}
+      \item The user enters the linking code in WhatsApp.
             \ucinfo{The app shows a success screen if connection was sucessful.}
     \end{enumerate}
   }
@@ -41,23 +41,47 @@
   \ucpostconditions{The system has access to the user's WhatsApp account.}
 \end{usecase}
 
-The ``Connect WhatsApp Sequence Diagram'', shown in \textbf{Figure~\ref{fig:seq/connect-whatsapp}}, illustrates the two-phase authentication process for connecting a user's WhatsApp account to Jadwal. The sequence begins with the InitiateWhatsApp gRPC call, where the user provides their phone number to the Backend.
+The ``Connect WhatsApp Sequence Diagram'', shown in \textbf{Figure~\ref{fig:seq/connect-whatsapp}}, illustrates the process of connecting a WhatsApp account to Jadwal. The sequence begins when the user clicks the ``Connect WhatsApp'' button in the app, which prompts them to enter their WhatsApp phone number.
 
-The Backend then communicates with the WhatsApp service to request a linking code. This interaction follows two possible paths:
+After the user provides their phone number, the Jadwal App sends an InitiateWhatsApp request to the Backend, which then communicates with the Wasapp service (built on whatsapp-web.js) to request a linking code. The process can follow several paths:
 
-\begin{itemize}
-  \item If the linking code request succeeds:
+\begin{enumerate}
+  \item \textbf{Successful Path:}
         \begin{enumerate}
-          \item The user receives the linking code in their WhatsApp application
-          \item The user initiates the CompleteWhatsApp gRPC call with the linking code
-          \item The Backend validates the code with WhatsApp
-          \item Upon successful validation, the WhatsApp authentication credentials are securely stored in the Database for future use
+          \item The Wasapp service successfully generates and returns the linking code
+          \item The code is displayed to the user through the Jadwal App
+          \item The user enters this code in their WhatsApp application
+          \item WhatsApp validates the code and, if valid:
+                \begin{itemize}
+                  \item Shows a success message to the user
+                  \item Sends authentication credentials to the Wasapp service
+                  \item The Wasapp service stores these credentials
+                  \item The Backend is notified of successful authentication
+                  \item The Jadwal App shows a success screen to the user
+                \end{itemize}
         \end{enumerate}
-  \item If the linking code request fails:
+  \item \textbf{Invalid Code Path:}
         \begin{itemize}
-          \item The Backend immediately returns an InitiateWhatsApp failure response to the user
+          \item If the user enters an invalid code, WhatsApp shows an error
+          \item The auth failure is propagated through the system
+          \item The Jadwal App shows an "Invalid code" error to the user
         \end{itemize}
-\end{itemize}
+  \item \textbf{User Cancellation Path:}
+        \begin{itemize}
+          \item The user can choose to cancel the connection process
+          \item The Jadwal App notifies the Backend to cancel the setup
+          \item The Backend tells the Wasapp service to cancel the linking code
+          \item The user is shown a "Setup cancelled" message
+        \end{itemize}
+  \item \textbf{Request Failure Path:}
+        \begin{itemize}
+          \item If the initial linking code request fails
+          \item The failure is propagated back through the system
+          \item The user is shown an error message with a retry option
+        \end{itemize}
+\end{enumerate}
+
+This implementation ensures a secure and user-friendly WhatsApp integration process by utilizing a secure verification approach: the user's phone number and a WhatsApp-generated linking code. The system provides clear feedback at each step and handles various failure scenarios gracefully, ensuring users always know the status of their connection attempt.
 
 \begin{figure}[!h]
   \centering
@@ -65,5 +89,3 @@ The Backend then communicates with the WhatsApp service to request a linking cod
   \caption{Connect WhatsApp Sequence Diagram}
   \label{fig:seq/connect-whatsapp}
 \end{figure}
-
-During the completion phase, if the linking code validation fails, the Backend returns a CompleteWhatsApp failure response, requiring the user to restart the process. This secure two-phase authentication ensures that only legitimate WhatsApp account owners can connect their accounts to Jadwal while maintaining the integrity of the WhatsApp integration.

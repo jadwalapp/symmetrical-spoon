@@ -1,31 +1,47 @@
 \begin{usecase}{View Integrated Calendar}
   \ucbasicinfo{High}{Regular}
-  \ucshortdescription{Allows users to view their integrated calendar}
-  \uctrigger{User selects the option to view the integrated calendar.}
-  \ucactors{User}{None}
-  \ucpreconditions{User must be logged into the system.}
+  \ucshortdescription{Allows users to view their calendar events using iOS EventKit integration}
+  \uctrigger{User opens the calendar view in the app.}
+  \ucactors{User}{EventKit}
+  \ucpreconditions{
+    \begin{itemize}
+      \item User must be logged in
+      \item Calendar access must be authorized in iOS Settings
+    \end{itemize}
+  }
   \ucrelationships{N/A}{N/A}{N/A}
   \ucinputsoutputs{
     \begin{itemize}
-      \item \textbf{Integrated calendar} (Source: System)
+      \item \textbf{Calendar data} (Source: EventKit)
+      \item \textbf{View preferences} (Source: User settings)
     \end{itemize}
   }{
     \begin{itemize}
-      \item \textbf{Integrated calendar} (Destination: App)
+      \item \textbf{Integrated calendar view} (Destination: App UI)
     \end{itemize}
   }
   \ucmainflow{
     \begin{enumerate}
-      \item The user clicks on the integrated calendar.
-            \ucinfo{The system displays the all integrated calendars and it's events}
+      \item The user opens the calendar view.
+            \ucinfo{The app queries EventKit for calendars and events.}
+      \item EventKit provides calendar and event data.
+            \ucinfo{The app processes and displays events.}
+      \item The app updates in real-time as EventKit receives changes.
+            \ucinfo{Changes from the Baikal server or other sources are reflected immediately when EventKit notifies us.}
     \end{enumerate}
   }
-  \ucconclusion{User successfully views their integrated calendar with all the events.}
-  \ucpostconditions{The integrated calendar is displayed}
-  \ucspecialrequirements{N/A}
+  \ucconclusion{User views their calendar events in a unified interface powered by EventKit.}
+  \ucpostconditions{Calendar events are displayed and stay in sync with iOS Calendar.}
+  \ucspecialrequirements{
+    \begin{itemize}
+      \item The app must observe EventKit changes for real-time updates.
+      \item The app must handle calendar access permissions gracefully.
+    \end{itemize}
+  }
   \ucbusinessrules{
     \begin{itemize}
-      \item \textbf{Events must be displayed according to user preferences .}
+      \item \textbf{Events must be displayed according to user preferences.}
+      \item \textbf{All calendar sources must be treated equally in the integrated view.}
     \end{itemize}
   }
 \end{usecase}
@@ -37,19 +53,8 @@
   \label{fig:seq/view-integrated-calendar}
 \end{figure}
 
-The ``View Integrated Calendar Sequence Diagram'', shown in \textbf{Figure~\ref{fig:seq/view-integrated-calendar}}, demonstrates the process of presenting a unified view of all connected calendars to the user. The sequence begins when the user initiates a ViewIntegratedCalendar gRPC call to access their comprehensive calendar view.
+The ``View Integrated Calendar Sequence Diagram'', shown in \textbf{Figure~\ref{fig:seq/view-integrated-calendar}}, demonstrates how the app leverages iOS EventKit to provide a unified calendar view. The sequence begins when the user opens the calendar view in the app.
 
-The Backend executes a two-phase data retrieval process:
-\begin{enumerate}
-  \item First queries the Database via FetchAllCalendars to retrieve all calendar sources connected to the user's account
-  \item Then executes FetchAllEvents to gather events from all calendars
-\end{enumerate}
+The app uses EventKit to access calendar and event data directly from iOS's calendar database. This includes events from our Baikal server (synced via CalDAV) and any other calendars the user has configured. EventKit provides real-time updates through its observer system, ensuring the app's display stays synchronized with the system calendar.
 
-After data retrieval, the Backend performs critical processing:
-\begin{itemize}
-  \item Merges events from different calendar sources
-  \item Sorts events chronologically
-  \item Applies user preferences for event display
-\end{itemize}
-
-Finally, the Backend returns the processed calendar data through the gRPC channel as DisplayIntegratedCalendar response. This unified view ensures users can efficiently manage their schedule across all connected calendars, maintaining consistency with user preferences while providing a comprehensive overview of all commitments.
+This client-side approach eliminates the need for separate backend queries, as EventKit efficiently manages data access and synchronization. The app focuses on presenting the data in a user-friendly way, applying custom styling and organization while maintaining consistency with the iOS Calendar app.

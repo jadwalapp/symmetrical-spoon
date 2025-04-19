@@ -9,13 +9,15 @@ activate User
 User -> Backend ++ : InitiateEmail
 
 Backend -> Database ++ : CreateCustomerIfNotExists
-note right of Database : Customer record is always returned.\nIf custoemr doesn't exist, customer\nis created first then returned.
+note right of Database : Customer record is always returned.\nIf customer doesn't exist, customer\nis created first then returned.
 Database --> Backend -- : Customer
 
 Backend -> Backend : Generate Magic Token and its Hash
 
-Backend -> Database ++ : CreateMagicLink(hashed magic token)
-Database --> Backend -- : MagicLink
+Backend -> Database ++ : CreateMagicToken(hashed magic token)
+Database --> Backend -- : MagicToken
+
+Backend -> Backend : Make Magic Link by Adding Magic Token to it
 
 Backend -> EmailServer ++ : SendMagicLink(normal)
 EmailServer --> Backend -- : Email Sent Response
@@ -32,7 +34,7 @@ Backend -> Database : Get Magic Link by HashedToken
 alt MagicLink exists
     Backend -> Backend : Check (Hashed MagicToken == Hashed MagicToken from Database)
     alt Auth Success
-        Backend -> Backend : Issue two JWTs
+        Backend -> Backend : Issue two JWTs (Access Token & Refresh Token)
         Backend --> User : JWTs (Access Token & Refresh Token)
     else Auth Failure
         Backend --> User : Permission Denied
@@ -65,13 +67,13 @@ alt Token Valid
     Database --> Backend : Customer
 
     Backend -> Database : CreateAuthGoogleIfNotExist(UserInfo.sid)
-    note right of Database : Customer record is always returned.\nIf custoemr doesn't exist, customer\nis created first then returned.
+    note right of Database : Customer record is always returned.\nIf customer doesn't exist, customer\nis created first then returned.
     Database --> Backend  -- : AuthGoogle
 
     Backend -> Backend : Check AuthGoogle.sid == UserInfo.sid
     alt Auth Success
-        Backend -> Backend : Issue JWT
-        Backend --> User : JWT (Access Token)
+        Backend -> Backend : Issue two JWTs (Access Token & Refresh Token)
+        Backend --> User : JWTs (Access Token & Refresh Token)
     else Auth Failure
         Backend --> User : Permission Denied
     end
@@ -106,125 +108,202 @@ actor User
 
 activate User
 
-User -> User : Delete JWT from device
+User -> User : Delete JWTs (Access Token & Refresh Token) from device
 
 @enduml
 
 @startuml Connect Calendar
 actor User
-participant Backend
-participant CalDAV
-database Database
+participant "Jadwal App" as App
+participant "Backend" as Backend
+participant "iOS Settings" as Settings
+participant "iOS Calendar" as Calendar
+participant "Baikal Server" as Baikal
 
 activate User
 
-User -> Backend ++ : ConnectCalDAVCalendar
+User -> App ++ : Tap "Easy Setup"
+App -> Backend ++ : Request Magic Token (CalDAV)
+Backend --> App -- : Return Magic Token
 
-Backend -> CalDAV ++ : AuthenticateCredentials
-CalDAV --> Backend -- : AuthResponse
+App -> Backend ++ : Request .mobileconfig profile\nwith Magic Token
+Backend --> App -- : Return .mobileconfig profile
 
-Backend -> Database ++ : StoreCalendarConnection
-Database --> Backend : ConnectionStored
+App -> Settings ++ : Open profile installation
 
-Backend -> CalDAV ++ : SyncCalendarData
-CalDAV --> Backend -- : SyncedData
+Settings -> User : Request profile approval
+alt User Approves Profile
+    User -> Settings : Approve profile
+    
+    Settings -> Calendar ++ : Configure CalDAV account
+    alt Configuration Succeeds
+        Calendar -> Baikal ++ : Verify connection
+        Baikal --> Calendar -- : Connection verified
+        Calendar --> Settings -- : Account configured
+        Settings --> App -- : Profile installed
+        App --> User -- : Show success page
+    else Configuration Fails
+        Calendar --> Settings -- : Configuration error
+        Settings --> App -- : Installation failed
+        App --> User : Show error page\n"Calendar setup failed"
+    end
+else User Denies Profile
+    User -> Settings : Deny profile
+    Settings --> App -- : Profile denied
+    App --> User : Show error page\n"Setup cancelled - Try again later"
+end
 
-Backend -> Database : Store Calendar Data
-Database --> Backend -- :  Database Response
-
-Backend --> User -- : ConnectCalDAVCalendar Response
 deactivate User
 @enduml
 
 @startuml Create Calendar
 actor User
-participant Backend
-database Database
+participant "Jadwal App" as App
+participant "EventKit" as EventKit
 
 activate User
 
-User -> Backend ++ : CreateCalendarRequest
+User -> App ++ : Tap Calendar icon
+App --> User : Show Calendars sheet
 
-Backend -> Database ++ : StoreCalendarInfo
-Database --> Backend -- : CalendarCreated
+User -> App : Tap plus icon
+App --> User : Show calendar creation form
 
-Backend --> User -- : CalendarResponse
+User -> App : Submit calendar details\n(name, account, color)
+
+alt EventKit Access Authorized
+    App -> EventKit ++ : Create Calendar
+    alt Creation Succeeds
+        EventKit --> App -- : Calendar added
+        App --> User : Show success response
+    else Creation Fails
+        EventKit --> App -- : Creation error
+        App --> User : Show error and retry option
+    end
+else EventKit Access Denied
+    App --> User : Show prompt to\nenable calendar access
+end
 
 deactivate User
 @enduml
 
 @startuml Connect WhatsApp
 actor User
+participant "Jadwal App" as App
 participant Backend
-participant WhatsApp
-database Database
+participant "Wasapp (WhatsApp) Service\n(uses whatsapp-web.js)" as Wasapp
+participant "WhatsApp App" as WhatsAppApp
 
 activate User
 
-User -> Backend ++ : InitiateWhatsApp(phone number)
+User -> App ++ : Click "Connect WhatsApp"
+App --> User : Ask for WhatsApp phone number
 
-Backend -> WhatsApp ++ : RequestLinkingCode
-alt RequestLinkingCode Success
-    WhatsApp --> Backend : RequestLinkingCode Succeeded
-    Backend -> User -- : InitiateWhatsApp Succeeded
+User -> App : Enter phone number
+App -> Backend ++ : InitiateWhatsApp(phone number)
+Backend -> Wasapp ++ : Request linking code
 
-    User -> User : Get Linking Code from WhatsApp
+alt Linking Code Generated Successfully
+    Wasapp --> Backend -- : Return linking code
+    Backend --> App -- : Show linking code
+    App --> User : Display linking code
 
-    User -> Backend ++ : CompleteWhatsApp(Linking Code)
-    Backend -> WhatsApp : SendLinkingCode
-    alt SendLinkingCode Success
-        WhatsApp --> Backend : SendLinkingCode Succeeded
-        Backend -> Database ++ : Store WhatsAppAuthCreds for Future Use
-        Database --> Backend -- : Stored WhatsAppAuthCreds Successfully
-        Backend --> User : CompleteWhatsApp Succeeded
-    else SendLinkingCode Failure
-        WhatsApp --> Backend : SendLinkingCode Failed
-        Backend --> User : CompleteWhatsApp Failed
+    alt User Enters Code
+        User -> WhatsAppApp ++ : Enter code in WhatsApp app
+        WhatsAppApp -> WhatsAppApp -- : Validate code
+        
+        alt Code Valid
+            WhatsAppApp --> User : Show success message
+            WhatsAppApp --> Wasapp : Send auth credentials
+            Wasapp -> Wasapp : Store WhatsApp credentials
+            Wasapp -> Backend : Send auth success
+            Backend --> App : Connection successful
+            App --> User : Show success screen
+        else Code Invalid
+            WhatsAppApp --> User : Show invalid code error
+            WhatsAppApp --> Wasapp : Send auth failure
+            Wasapp -> Backend : Send auth failure
+            Backend --> App : Connection failed
+            App --> User : Show "Invalid code" error
+        end
+        deactivate WhatsAppApp
+
+    else User Cancels
+        User -> App : Cancel connection
+        App -> Backend : Cancel WhatsApp setup
+        Backend -> Wasapp : Cancel linking code
+        App --> User : Show "Setup cancelled" message
     end
-else RequestLinkingCode Failure
-    WhatsApp --> Backend -- : RequestLinkingCode Failed
-    Backend --> User -- : InitiateWhatsApp Failed
+
+else Request Failed
+    Wasapp --> Backend -- : Request failed
+    Backend --> App -- : Connection failed
+    App --> User : Show error and retry option
 end
 
 deactivate User
 @enduml
 
 @startuml Extract Events from WhatsApp
-actor "WhatsApp Service\n(uses whatsapp-web.js)" as WhatsApp
-participant Backend
+actor "Wasapp (WhatsApp) Service\n(uses whatsapp-web.js)" as WhatsApp
+queue "RabbitMQ\nMessage Queue" as MessageQueue
+queue "RabbitMQ\nCalendar Queue" as CalendarQueue
+
+participant "Message Consumer" as Consumer
 participant "LLM Service" as LLM
-database Database
-participant "Apple Push Notification service (APNs)" as APN
+participant "Calendar Consumer" as CalConsumer
+database "Database\n(encrypted at rest)" as Database
+participant "CalDAV Server\n(Baikal)" as Baikal
+participant "APNs" as APN
 
 activate WhatsApp
-loop Listen for Messages
-    note over WhatsApp: Client receives\nnew message and waits\n30 seconds for context
-
-    WhatsApp -> WhatsApp: Get last 15 messages\nfrom chat context
+loop Listen for Non-Group Messages
+    WhatsApp -> WhatsApp: Filter out group messages
     
-    WhatsApp ->> Backend ++: Send messages context\nfor analysis
-
-    Backend -> LLM ++: Send context with engineered prompt\nfor event extraction
-    note right of LLM: Prompt designed to:\n- Identify events\n- Extract date, time, location\n- Handle informal language\n- Return structured JSON
+    WhatsApp ->> MessageQueue: Publish message with details\n(ID, chat ID, sender, body, timestamp)
     
-    alt Event Found
-        LLM --> Backend: Return Event JSON
-        
-        Backend -> Backend: Validate extracted\nevent information
-        
-        Backend -> Database ++: Store Event
-        Database --> Backend: Confirm Storage
+    MessageQueue -> Consumer ++: Consume message
 
-        Backend -> Database: Get Device IDs of Event Owner
-        Database --> Backend --: Return Device IDs
+    Consumer -> Database ++: Get chat history\n(encrypted with WhatsApp messages key)
+    Database --> Consumer --: Return decrypted messages context
+    
+    Consumer -> LLM ++: Analyze with event detection prompt
+    note right of LLM: Prompt analyzes for:\n- Event presence\n- Agreement status\n- Event details\n- Returns status:\n  NO_EVENT\n  HAS_EVENT_BUT_NOT_CONFIRMED\n  HAS_EVENT_AGREED\n  HAS_EVENT_DENIED
+    
+    alt \textit{HAS_EVENT_AGREED}
+        LLM --> Consumer: Return Event JSON
+        Consumer ->> CalendarQueue: Publish event
         
-        Backend -> APN ++: Send "New Event Added" notification
-        APN --> Backend --: Notification Result
+        CalendarQueue -> CalConsumer ++: Consume event
         
-    else No Event Detected
-        LLM --> Backend --: No Event Found
-        deactivate Backend
-        note over WhatsApp: Continue monitoring\nmessages
+        CalConsumer -> Database ++: Get CalDAV credentials\n(encrypted with CalDAV password key)
+        Database --> CalConsumer --: Return decrypted credentials
+        
+        CalConsumer -> Baikal ++: Initialize WhatsApp Events calendar\n(if needed)
+        Baikal --> CalConsumer --: Calendar ready
+        
+        CalConsumer -> Baikal ++: Add event via CalDAV
+        Baikal --> CalConsumer --: Event added
+        
+        CalConsumer -> APN ++: Send event notification
+        APN --> CalConsumer --: Notification sent
+        
+        CalConsumer -> Database ++: Clear chat history
+        Database --> CalConsumer --: Chat cleared
+        deactivate CalConsumer
+        
+    else \textit{HAS_EVENT_DENIED}
+        LLM --> Consumer: Event denied status
+        Consumer -> Database ++: Clear chat history
+        Database --> Consumer --: Chat cleared
+        
+    else \textit{HAS_EVENT_BUT_NOT_CONFIRMED}
+        LLM --> Consumer: Not confirmed status
+        note over Consumer: Continue monitoring chat
+        
+    else \textit{NO_EVENT}
+        LLM --> Consumer --: No event status
+        deactivate Consumer
     end
 end
 
@@ -339,24 +418,29 @@ deactivate User
 
 @startuml View Integrated Calendar
 actor User
-participant Backend
-database Database
+participant "Jadwal App" as App
+participant "EventKit" as EventKit
 
 activate User
 
-User -> Backend ++ : ViewIntegratedCalendar
+User -> App ++ : Open Calendar View
 
-Backend -> Database ++ : FetchAllCalendars
-Database --> Backend -- : IntegratedCalendars
-
-Backend -> Database ++ : FetchAllEvents
-Database --> Backend -- : AllEvents
-
-Backend -> Backend : MergeAndSortEvents
-Backend --> User -- : DisplayIntegratedCalendar
+alt EventKit Access Authorized
+    App -> EventKit ++ : Request Calendars & Events
+    EventKit --> App -- : Return Calendar Data
+    
+    App -> App : Apply view preferences
+    App --> User : Display calendar view
+    
+    note right of App
+      EventKit observer keeps
+      view updated in real-time
+    end note
+else EventKit Access Denied
+    App --> User : Show prompt to\nenable calendar access
+end
 
 deactivate User
-
 @enduml
 
 @startuml Schedule Prayer Times
