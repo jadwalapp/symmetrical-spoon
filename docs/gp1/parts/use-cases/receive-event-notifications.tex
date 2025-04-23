@@ -1,43 +1,39 @@
 \begin{usecase}{Receive Event Notifications}
   \ucbasicinfo{High}{Regular}
   \ucshortdescription{Users receive notifications about upcoming events.}
-  \uctrigger{The UC is triggered when the choosen time of an event's reminder has arrived}
+  \uctrigger{The UC is triggered when the chosen time of an event's reminder has arrived.}
   \ucactors{User}{None}
-  \ucpreconditions{User must be logged into the system and set a reminder of the specific event.}
+  \ucpreconditions{User must be logged into the system and have set a reminder for a specific event.}
   \ucrelationships{N/A}{N/A}{N/A}
   \ucinputsoutputs{
     \begin{itemize}
-      \item \textbf{Time of the event reminder} (Source: User)
+      \item \textbf{Event reminders/alerts} (Source: User)
     \end{itemize}
   }{
     \begin{itemize}
-
-      \item \textbf{Notifications sent to users.} (Destination: System)
+      \item \textbf{Local notifications displayed to the user.} (Destination: System)
     \end{itemize}
   }
   \ucmainflow{
     \begin{enumerate}
-      \item The system checks the alarms set for every event.
-            \ucinfo{The system checks every 1 minute for set alarms for every event.}
-      \item Notifications sent to users.
-            \ucinfo{The user is reminded about the event by sending the notification}
+      \item The system iterates over all events with reminders set.
+      \item For each event, a local notification is scheduled to remind the user.
     \end{enumerate}
   }
   \ucalternateflows{
     \begin{itemize}
-      \item \textbf{If user denys the access to the notification the notifications are not sent.}
+      \item \textbf{If the user denies notification permissions, notifications cannot be sent.}
     \end{itemize}
   }
   \ucexceptions{
     \begin{itemize}
-      \item \textbf{Network issue}
+      \item \textbf{System error or failure to schedule notifications.}
     \end{itemize}
   }
-  \ucconclusion{The system checks for set alarm every 1 minute and if the event is detected the system sends the notification.}
-  \ucpostconditions{Notifications are sent.}
-  \ucspecialrequirements{Notification permission.}
-  \ucbusinessrules{The system has to check every minute for the set alarm.
-  }
+  \ucconclusion{The system schedules local notifications for all events with reminders.}
+  \ucpostconditions{Notifications are displayed to the user at the appropriate time.}
+  \ucspecialrequirements{Notification permissions must be granted by the user.}
+  \ucbusinessrules{The system must ensure notifications are scheduled accurately and on time.}
 \end{usecase}
 
 \begin{figure}[!h]
@@ -47,18 +43,4 @@
   \label{fig:seq/receive-event-notifications}
 \end{figure}
 
-The ``Receive Event Notifications Sequence Diagram'', shown in \textbf{Figure~\ref{fig:seq/receive-event-notifications}}, illustrates Jadwal's continuous event notification monitoring and delivery system. The sequence operates in a continuous polling loop that executes every minute, ensuring timely notification delivery for all scheduled events.
-
-The polling process consists of several key steps:
-\begin{enumerate}
-  \item The System queries the Database for active alarms through regular checks
-  \item For each batch of active alarms found:
-        \begin{itemize}
-          \item Retrieves associated device IDs for notification targets
-          \item Iterates through each event requiring notification
-          \item Dispatches push notifications via Apple Push Notification service (APNs)
-        \end{itemize}
-  \item If no active alarms are found, the system continues its polling cycle
-\end{enumerate}
-
-This robust notification system ensures reliable delivery of event reminders while efficiently managing system resources. The one-minute polling interval provides a balance between timely notifications and system performance, while the batch processing of notifications optimizes the interaction with APNs. The system's ability to handle multiple device IDs per user ensures notifications reach users across all their registered devices.
+The ``Receive Event Notifications Sequence Diagram'', shown in \textbf{Figure~\ref{fig:seq/receive-event-notifications}}, depicts the flow of how local event reminders are scheduled and delivered to the user. When the user sets a reminder for a calendar event, it is saved using EventKit. The application periodically retrieves all upcoming events with reminders from EventKit and schedules local notifications for each of them via the iOS notification system. At the scheduled time, iOS automatically triggers the corresponding local notification, ensuring the user is reminded promptly. This flow assumes the user has granted the necessary notification permissions and is logged into the application.

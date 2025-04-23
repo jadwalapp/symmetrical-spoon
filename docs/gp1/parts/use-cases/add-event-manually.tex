@@ -4,7 +4,7 @@
   \uctrigger{The user clicks add event manually icon or a date on the calendar and adds the events.}
   \ucactors{User}{None}
   \ucpreconditions{The user is logged into the application.}
-  \ucrelationships{Suggest Conflict Resolutions}{N/A}{N/A}
+  \ucrelationships{N/A}{N/A}{N/A}
   \ucinputsoutputs{
     \begin{itemize}
       \item \textbf{Event Name} (Source: User)
@@ -12,7 +12,7 @@
       \item \textbf{Is all day?} (Source: User)
       \item \textbf{Event Date (Start and End)} (Source: User)
       \item \textbf{Event Time (Start and End)} (Source: User)
-      \item \textbf{Event Description} (Source: User)
+      \item \textbf{Note} (Source: User)
       \item \textbf{Notifications/Reminders} (Source: User)
     \end{itemize}
   }{
@@ -23,7 +23,7 @@
   }
   \ucmainflow{
     \begin{enumerate}
-      \item The user clicks the add event manually icon or a date on the calendar.
+      \item The user clicks the add event manually icon in the top corner `+'.
             \ucinfo{The add event manually form is displayed.}
       \item The user sets the details of the event in the respective fields and saves the event.
             \ucinfo{The event is displayed on the calendar with its details.}
@@ -52,25 +52,21 @@
   \label{fig:seq/add-event-manually}
 \end{figure}
 
-The ``Add Event Manually Sequence Diagram'', shown in \textbf{Figure~\ref{fig:seq/add-event-manually}}, illustrates the process flow when a user manually creates a new calendar event. The sequence begins when the user submits event details through the CreateEvent endpoint, triggering a series of validation and storage operations.
+The ``Add Event Manually Sequence Diagram'' illustrates a simple flow of creating a calendar event. The sequence starts with the user filling in event details. The system then performs validation by EventKit:
 
-The Backend first performs comprehensive validation of the event details, checking for:
-\begin{itemize}
-  \item Mandatory fields completion (event name, date, time)
-  \item Temporal logic (end time after start time)
-  \item Format validity of all provided fields
-\end{itemize}
-
-Upon successful validation, the system executes the following steps:
 \begin{enumerate}
-  \item Stores the validated event in the Database
-  \item Performs an automatic conflict check with existing events
-  \item If conflicts are detected:
+  \item If validation succeeds:
         \begin{itemize}
-          \item Retrieves the device IDs associated with the event owner
-          \item Dispatches a "New Conflict Detected" notification via Apple Push Notification service (APNs)
+          \item The Add button becomes enabled
+          \item User can proceed to create the event
+          \item EventKit processes the creation request
+          \item Event creation confirmation is returned
         \end{itemize}
-  \item Returns an EventCreated response to the user
+  \item If validation fails:
+        \begin{itemize}
+          \item The Add button remains disabled
+          \item User must correct the input before proceeding
+        \end{itemize}
 \end{enumerate}
 
-If validation fails, the system immediately returns a ValidationError to the user, preventing invalid data from entering the system. This workflow ensures data integrity while providing immediate feedback about potential scheduling conflicts, maintaining calendar consistency and user awareness of overlapping appointments.
+This straightforward workflow ensures data validation before any attempt to create an event, preventing invalid entries from being submitted to the calendar system.

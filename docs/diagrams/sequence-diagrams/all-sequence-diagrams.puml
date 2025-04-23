@@ -434,31 +434,17 @@ deactivate View
 
 @startuml Add Event Manually
 actor User
-participant Backend
-database Database
-participant "Apple Push Notification service (APNs)" as APN
+participant EventKit
 
 activate User
 
-User -> Backend ++ : CreateEvent(eventDetails)
-
-Backend -> Backend : ValidateEventDetails
+User -> User : Fill eventDetails
 alt Validation Success
-    Backend -> Database ++ : StoreEvent
-    Database --> Backend -- : EventStored
-    
-    Backend -> Backend : CheckForConflicts
-    opt Conflicts Found
-        Backend -> Database ++ : Ask For Device IDs Of Customer Owning Event
-        Database --> Backend -- : Device IDs of Customer Owning Event
-        
-        Backend -> APN ++ : Send Push Notification "New Conflict Detected" to Device IDs
-        APN --> Backend -- : Push Notification Sending Result
-    end
-    
-    Backend --> User : EventCreated
+    User -> User : Add button enabled
+    User -> EventKit ++ : CreateEvent(eventDetails)
+    EventKit --> User -- : EventCreated
 else Validation Failed
-    Backend --> User : ValidationError
+    User -> User : Add button disabled
 end
 
 deactivate User
@@ -494,44 +480,55 @@ deactivate User
 
 @startuml Schedule Prayer Times
 actor User
+participant "App Frontend" as App
 participant Backend
 participant "Prayer Times API" as PrayerTimesAPI
-database Database
 
 activate User
-User -> Backend ++ : EnablePrayerTimeScheduling
+User -> App ++ : Clicks "Enable Prayer Time Scheduling"
 
-Backend -> PrayerTimesAPI ++ : Fetch Prayer Times by User's Timezone
-PrayerTimesAPI --> Backend -- : PrayerTimes
+App -> Backend ++ : SchedulePrayerTimes()
+note right of Backend : Backend determines geo location based on IP Address
 
-Backend -> Database ++ : Create Events to Block Times of Prayer
-Database --> Backend -- : Creation Response
+Backend -> PrayerTimesAPI ++ : Fetch Relevant Prayer Times by geo location
+PrayerTimesAPI --> Backend -- : PrayerTimes iCal Url
 
-Backend --> User : EnablePrayerTimeScheduling Response
+Backend --> App -- : SchedulePrayerTimesResponse(iCalUrl)
+
+App -> User -- : Present Sheet to Download .mobileconfig file
+User -> User : Continue setup in settings app
+deactivate User
 
 @enduml
+
 
 @startuml Receive Event Notifications
-actor System
-database Database
-participant "Apple Push Notification service (APNs)" as APN
 
-activate System
+actor "User" as User
+participant "iOS System" as iOS
+participant "App (Reminder Scheduler)" as App
+database "EventKit (Calendar + Reminders)" as EventKit
 
-loop Poll Every One Minute
-    System -> Database ++ : Check Alarms Set for Events
-    Database --> System : Return Active Alarms
-    alt Active Alarms Found
-        System -> Database : Ask For Device IDs Of Customer Owning Event
-        Database --> System -- : Device IDs of Customer Owning Event
-        
-        loop For Every Event
-            System -> APN ++  : Send Push Notification to Device IDs
-            APN --> System -- : Push Notification Sending Result
-        end
-    else No Active Alarms
-        note over System,Database : Continue Polling
-    end
+User -> App : Set Reminder for Event
+App -> EventKit : Save Event Reminder
+EventKit --> App : Confirmation
+
+== Periodic Reminder Setup ==
+
+activate App
+App -> EventKit : Fetch Events With Reminders
+EventKit --> App : List of Events with Reminder Times
+
+loop For Each Event Reminder
+    App -> iOS : Schedule Local Notification
 end
+deactivate App
+
+== Notification Trigger ==
+
+... Time Passes ...
+
+iOS -> User : Display Local Notification
 
 @enduml
+
