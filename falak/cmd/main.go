@@ -224,7 +224,7 @@ func main() {
 	// ======== LLM CLI ========
 
 	// ======== MSG ANALYZER ========
-	msgAnalyzer := wasappmsganalyzer.NewAnalyzer(llmCli, config.OpenAiModelName)
+	msgAnalyzer := wasappmsganalyzer.NewAnalyzer(&llmCli, config.OpenAiModelName)
 	// ======== MSG ANALYZER ========
 
 	// ======== CALENDAR SERVICE ========
@@ -333,16 +333,16 @@ func main() {
 	mux.Handle(grpcreflect.NewHandlerV1(reflector))
 	mux.Handle(grpcreflect.NewHandlerV1Alpha(reflector))
 
-	authServer := auth.NewService(*pv, *dbStore, tokens, emailerImpl, templates, apiMetadata, googleSvc, baikalCli, config.CalDAVPasswordEncryptionKey)
+	authServer := auth.NewService(pv, *dbStore, tokens, emailerImpl, templates, apiMetadata, googleSvc, baikalCli, config.CalDAVPasswordEncryptionKey)
 	mux.Handle(authv1connect.NewAuthServiceHandler(authServer, interceptorsForServer))
 
-	profileServer := profile.NewService(*pv, *dbStore, apiMetadata)
+	profileServer := profile.NewService(pv, *dbStore, apiMetadata)
 	mux.Handle(profilev1connect.NewProfileServiceHandler(profileServer, interceptorsForServer))
 
-	calendarServer := calendar.NewService(*pv, *dbStore, apiMetadata, geoLocClient, config.CalDAVPasswordEncryptionKey)
+	calendarServer := calendar.NewService(pv, *dbStore, apiMetadata, geoLocClient, config.CalDAVPasswordEncryptionKey)
 	mux.Handle(calendarv1connect.NewCalendarServiceHandler(calendarServer, interceptorsForServer))
 
-	whatsappServer := whatsapp.NewService(*pv, apiMetadata, wasappCli)
+	whatsappServer := whatsapp.NewService(pv, apiMetadata, wasappCli)
 	mux.Handle(whatsappv1connect.NewWhatsappServiceHandler(whatsappServer, interceptorsForServer))
 
 	addr := fmt.Sprintf("0.0.0.0:%s", config.Port)
