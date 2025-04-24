@@ -30,8 +30,8 @@ func (a *analyzer) AnalyzeMessages(ctx context.Context, r *AnalyzeMessagesReques
 		Msg("analyzing messages with LLM")
 
 	chatResp, err := a.llmCli.Chat.Completions.New(ctx, openai.ChatCompletionNewParams{
-		Messages: openai.F(msgs),
-		Model:    openai.F(a.modelName),
+		Messages: msgs,
+		Model:    a.modelName,
 	})
 	if err != nil {
 		logger.Error().Err(err).Msg("failed to analyze messages with LLM")
