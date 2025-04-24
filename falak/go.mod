@@ -1,6 +1,6 @@
 module github.com/jadwalapp/symmetrical-spoon/falak
 
-go 1.23.4
+go 1.24.2
 
 require (
 	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.6-20250423154025-ec0af4932e5e.1
