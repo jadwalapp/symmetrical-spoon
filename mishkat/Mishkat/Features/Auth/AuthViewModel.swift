@@ -99,6 +99,11 @@ class AuthViewModel: ObservableObject {
                     self.initiateEmailState = .loaded(response)
                     self.navigationPath.append(.tokenSent)
                 }
+
+                // hard coded for apple tester, backend knows about it :D
+                if email == "apple-tester@jadwal.app" {
+                    self.completeEmail(token: "77d55f11-320d-4cef-b46c-9476fef1db0d")
+                }
             } catch {
                 await MainActor.run {
                     self.initiateEmailState = .failed(error)

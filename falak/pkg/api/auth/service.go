@@ -25,6 +25,10 @@ import (
 
 const (
 	magicLinkValidity = time.Minute * 15 // 15 minutes
+
+	// this is only for apple testing :D
+	appleTesterEmail      = "apple-tester@jadwal.app"
+	appleTesterMagicToken = "77d55f11-320d-4cef-b46c-9476fef1db0d"
 )
 
 var (
@@ -103,6 +107,31 @@ func (s *service) CompleteEmail(ctx context.Context, r *connect.Request[authv1.C
 	if err := s.pv.Validate(r.Msg); err != nil {
 		log.Ctx(ctx).Err(err).Msg("invalid request")
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+	}
+
+	if r.Msg.Token == appleTesterMagicToken {
+		customer, err := s.store.GetCustomerByEmail(ctx, appleTesterEmail)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				log.Ctx(ctx).Err(err).Msg("user for apple tester email hasn't been created yet :D")
+				return nil, connect.NewError(connect.CodeFailedPrecondition, errors.New("create the apple tester email first"))
+			}
+
+			log.Ctx(ctx).Err(err).Msg("failed running GetCustomerByEmail for apple tester email")
+			return nil, internalError
+		}
+
+		token, err := s.tokens.NewToken(customer.ID, tokens.Audience_SymmetricalSpoon)
+		if err != nil {
+			log.Ctx(ctx).Err(err).Msg("failed running NewToken for apple tester email")
+			return nil, internalError
+		}
+
+		return &connect.Response[authv1.CompleteEmailResponse]{
+			Msg: &authv1.CompleteEmailResponse{
+				AccessToken: token,
+			},
+		}, nil
 	}
 
 	hashedToken := util.HashStringToBase64SHA256(r.Msg.Token)
