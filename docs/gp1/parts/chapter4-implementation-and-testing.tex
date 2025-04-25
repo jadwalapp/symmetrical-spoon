@@ -1,1 +1,45 @@
 \chapter{Implementation and Testing}
+
+Jadwal is a fast, and efficient system. It uses technologies that allows it to deliver those promises. The fact that Golang is the main language and that the language is compiled.
+
+\section{Languages, Technologies, \& Tools}
+
+Jadwal's system is made up of a few components that ensure it is reliable, quick and efficient. The technologies Jadwal's system uses are listed below:
+
+- Golang is the main language used in the backend. Golang is a compiled language, and unlike other languages that compile to bytecode like Java, it compiled to machine code which runs natively on the machine. And for compiling, you don't need to own every architecture to compile for each platform. Golang supports cross-compilation for both architectures and operating systems. This gives us the best of both worlds, we can run on most common systems (macOS, Linux, Windows) and architectures (x86, arm64).
+- TypeScript compiled through `bun.sh' is used for the Wasapp(WhatsApp) service. In this service we use Fastify as our API. It allows the Golang backend to talk to the Wasapp service and control it.
+- Docker - containerization software, enhances developer experience so every team member can run the app anywhere, allows running production and local builds with near 100\% match, everything is running in Docker via a Docker Compose file, both in prod and local devlelopment.
+- Traefik - our reverse proxy/api gateway/loadbalancer, it works well with Docker, it allows us to issue SSL certificates with Let's Encrypt automatically, route traffic to a service by its host (reverse proxy), handles SSL termination, which means our services internally talk via http, which is more efficient, instead of encrypting in a safe environment.
+- PostgreSQL - our database, we save data here :D
+- GitHub - allows for collaboration on the project, our git server, used also as GitOps repo.
+    - GitHub Actions - Our CI baically, we build images here and then push them to GitHub Packages, and another one for deploying basically logs into the server, pulls images we just pushed, and then restarts everything again.
+    - GitHub Packages - the docker registry we use to push our images to, images are pushed by the GitHub Actions we built.
+    - BlackSmith - provides fast CI runners for GitHub Actions, with half the price and twice the speed.
+- Cloudflare -  a service, taht is mostly free, to protect the API from DDoS attacks, and provide really fast DNS service, and allows you to register the domain for cheap prices, they don't take commission.
+- Taskfile - a file that helps you write task that you wanna excute easily by referncuign it with a keyword, written in Golang.
+- ConnectRPC - the RPC framework we use that is our API protocol, it is an efficient way to communicate between backend and frontend, and uses protobuf files to define the API, whcih proides even better developer experience when designing APIs.
+- sqlc - an SQL compiler, usually people use ORMs, but using ORMs is kinda stupid, cuz you have SQL, a powerful language which allows you to anything, and ORMs, is just an abtraction above that, and with SQLC, you can compile the SQL to ensure it runs against your schema when the app runs, so it is type safe, and powerful, the best of both worlds.
+- migrate - a tool to help with migrations running, and generation, it allows you to make the up and down files, and runs them for you, and is written in Golang, so we were able to make it migrate on application startup to easen the process.
+- Beekeeper Studio - a software that allows developers to access the database and look at it, manipulate it, etc\dots
+- Diagrams:
+    - PlantUML - we used plantUML to make the sequence diagrams and class diagrams, as it yields great looking results and allows everything to be tracked in our version control system `git' and synced via GitHub since it is text-based. It also allows you to export PNGs, SVGs, and many other formats.
+    - Mermaid - another text based tool, and we used it to make the gantt chart. it made really good looking gantt chart.
+    - DrawIO - when the text based solutions are limiting in terms of design, we use DrawIO, and the cool thing is that DrawIO is still kind of text based, we can track it in GitHub and it is XML-based, we don't edit the XML, but rather use an extension in the editor we use VS Code.
+    - UMLet - we used this for making the use case diagram, it made really good looking ones with easy visual editing.
+    - People might say many tools are bad, but we try to use the best tool for the job, to ensure we get maintain high quality output.
+- LaTeX - the documentation is written using LaTeX, this allows for us to think about content and leave the type setting to LaTeX, and handles bilbiography, figure references, etc\dots for us easily, without having to deal manually with them. It also allows us to keep it in our version control system. This makes it so that everything is bascially in one place :D, to be exact one Reposisotry on GitHub.
+- Figma - We used Figma to make the logo, make the presentation and design some of the screens.
+- XCode - the IDE provided by Apple to help build iOS apps.
+- SwiftUI - the framework we used in XCode to build the UI of the iOS app.
+- EventKit - the framework we used in our app to read events from the user's device, it is the official way to access events, add new ones and edit already existing ones.
+- JWT - Json Web Token, this is what we used for authentication, stateless one. It allows you to sign a piece of json encoded as base64 to authenticate users. You basically give the user a JWT after they prove they own the account to talk tot other endpoints which need who you are. The JWT usually has the email or user\_id that tells the system which user this is, and he can't change it since it is signed and the system checks its digital signature before trusting it.
+- VS Code - the editor we used, it allows for extensions and can run many things. You can compile LaTeX inside it, manage your `git' repository, push to your origins (GitHub), compare files, search across the project, and basically download extensions for many tools we use to make the life easier.
+- Linear - the project management tool we used for high level planning, we used it at first for micro planning, but we idea change rapidly, so it was better for us if we have the high level defined in a big task and started working on it, and closely working together.
+- Resend - the service that sends emails for us, has a gnerous free-tier and easy to use API.
+- APNs - sending notifications to users on iOS, we basically use Apple's own services to send notifications to our users after we collect the ID that Apple gives to us for the user's device.
+- Encrption of WhatsApp messages - 
+- RabbitMQ - we use RabbitMQ as our message queue to make the whatsapp message extraction robust and resiliant to failaures. It allwosus to decouple the Wasapp service from the Golang backend that talks to LLM APIs to knwo what action to take (ignore, wait til event contifriamot, or add evne dinsce confifred and send notification.).
+- OpenAI-based LLM API, allows for easy swithcing of models when needed, since it is the same interface, and allows us to talk to LLMs.
+- Building the serices we have in a Dockerfile adn running them in a scratch image to increase security, this ensures the image even if it got hacked, has nothign that the attacked can make use of, literally empty, even basic programs don't exist, and that is why we vuils the golang binary as a static binary, to make it runnable by ts wn aywhere, we jus need to make sure ceritifcates are there, otherwse all good.
+- Baikal - the CalDAV server we re-used, it is an opens0uorce PHP-based server that is time-tested and works well fro our requirments.
+- HTTPJ - the web service for anythign that needs to be RESTful based, like downloading .mobileconfig files, in fact that is the only thing we are doing with it rn.
