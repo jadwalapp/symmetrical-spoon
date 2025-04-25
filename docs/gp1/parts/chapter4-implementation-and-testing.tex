@@ -41,8 +41,8 @@ Jadwal is built using a carefully selected stack of languages, technologies, and
 \subsection{Infrastructure, Deployment, and DevOps}
 
 \begin{itemize}
-    \item \textbf{Docker} – Everything runs in containers: backend, Wasapp, CalDAV, etc. This enables consistent environments between dev, staging, and production.
-    \item \textbf{Docker Compose} – Used to orchestrate services locally and during staging. Ensures that every developer gets the same setup out of the box.
+    \item \textbf{Docker} – Everything runs in containers: backend, Wasapp, CalDAV, etc. This enables consistent environments between dev and production.
+    \item \textbf{Docker Compose} – Used to orchestrate services locally and during staging. Ensures that every developer gets the same setup out of the box. We used overlays, to override values between production and local environment along with `.env' files.
     \item \textbf{Traefik} – Our reverse proxy/load balancer/API gateway. It integrates with Docker, automatically issues SSL certs via Let's Encrypt, and handles SSL termination (internal services communicate over HTTP for performance).
     \item \textbf{GitHub} – Our version control system, CI/CD pipeline, and GitOps source of truth.
     \begin{itemize}
@@ -85,9 +85,57 @@ Jadwal is built using a carefully selected stack of languages, technologies, and
 
 \section{System Architecture (Implemented)}
 
+The system architecture, as originally outlined in Figure \ref{fig:architecture}, was implemented using a modular, containerized structure. All core components were packaged as separate services and deployed using Docker Compose on a single host. These include the backend service (Falak), the WhatsApp service (Wasapp), the CalDAV server (Baikal), a PostgreSQL database, and a Traefik proxy for HTTPS termination and service routing.
+
+While the design envisioned a distributed system, the final implementation runs on a single host with isolated containers communicating over internal Docker networks. This setup preserves modularity and mirrors real-world deployment environments, while simplifying development and debugging. Each service is decoupled and can be scaled independently in future production-grade deployments.
+
+The implemented architecture maintained full alignment with the original design, with minor practical adjustments such as unified logging using Grafana + Loki, simplified internal networking, and local queues (RabbitMQ) for event-driven flows. Overall, the implementation delivered on the designed goals of modularity, maintainability, and separation of concerns.
+
+
+\section{Database Implementation}
+
+The original database design, illustrated in Figure~\ref{fig:er-diagram} and Figure~\ref{fig:relational-schema}, was adapted during the actual system implementation. Initially, we planned to manage calendar storage directly within our own database schema. However, during development, we decided to integrate Baikal — an open-source, self-hosted CalDAV server — to handle calendar data following the CalDAV standard.
+
+As a result, several tables from the original ERD were removed or replaced. The Falak backend continues to manage user accounts, authentication methods, WhatsApp message extraction, device IDs, and notification tracking, while Baikal independently handles all calendar-related storage.
+
+The updated database design for the Falak backend, reflecting these changes, is shown in Figure~\ref{fig:updated-er-diagram} and Figure~\ref{fig:updated-relational-schema} below.
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/docs/diagrams/er/new-database/Updated Falak ERD.png}
+    \caption{Updated Entity-Relationship Diagram (Falak)}
+    \label{fig:updated-er-diagram}
+\end{figure}
+
+% TODO: make this a relational one with draw.io, based on the one above :D
+% \begin{figure}[!h]
+%     \centering
+%     \includegraphics[width=\textwidth]{images/updated-database-schema-relational.png}
+%     \caption{Updated Relational Schema (Falak)}
+%     \label{fig:updated-relational-schema}
+% \end{figure}
+
+\subsection{Baikal Database Schema}
+
+To handle calendar event storage, we integrated Baikal directly without modifying its schema. Baikal follows WebDAV and CalDAV standards and manages calendars, events, user principals, and contact address books internally.
+
+The key Baikal tables relevant to Jadwal's functionality are summarized below:
+
+\begin{itemize}
+    \item \textbf{calendars} — Stores metadata for user calendars.
+    \item \textbf{calendarobjects} — Stores individual calendar events in iCalendar format.
+    \item \textbf{calendarinstances} — Links calendars to user principals.
+    \item \textbf{principals} — Represents authenticated users within Baikal.
+\end{itemize}
+
+Other tables related to address books, scheduling, and WebDAV-specific functionality (e.g., locks, subscriptions) were unused in our implementation. Baikal's database provided a mature and reliable backend for event storage without requiring us to reinvent a full calendar system.
+
+
 \section{Implementation of Core Functionalities}
 
 \subsection{Authentication}
+The authentication flow supports both magic links (email-based) and Google OAuth. Users receive a signed JWT upon login, which is used for subsequent requests. We generate access tokens (short-lived) and refresh tokens (long-lived), stored securely on the device. Magic tokens are hashed using SHA-256 before being stored in the database. For added security, we implemented logout by invalidating the refresh token, and all tokens are verified using digital signatures. The login flow is stateless and scalable, and was implemented using ConnectRPC endpoints from the iOS client.
+
 \subsection{Connect WhatsApp}
 \subsection{Calendar Integration}
 \subsection{Prayer Time Scheduling}
@@ -96,6 +144,8 @@ Jadwal is built using a carefully selected stack of languages, technologies, and
 \subsection{Notification System}
 
 \section{Testing Methodology}
+
+We adopted a pragmatic testing methodology focused on verifying key user flows rather than exhaustive unit testing. The most critical paths — such as user login, WhatsApp connection, event parsing, and calendar sync — were tested manually and programmatically during development. We also integrated PostHog for session replay and funnel analytics, which allowed us to observe real user interactions and validate expected behavior. Although full test automation was not implemented, our iterative development approach ensured that all major regressions were caught early.
 
 \section{Tested Features}
 
@@ -109,4 +159,8 @@ Testing is a crucial part of any high quality software. We made sure to test the
 
 \section{Comparison to Original Specification}
 
+During implementation, we made several changes to the original design while keeping the core goals of Jadwal intact. Some functional flows, such as calendar event management, were re-implemented using Baikal instead of a custom schema. Others, like WhatsApp event extraction and prayer time scheduling, were refined to better match technical feasibility and real user needs. While the internal structure of the system evolved significantly, especially in database design and service architecture, all critical functionalities promised in the original specification — authentication, event integration, scheduling, and notifications — were delivered. These changes were necessary to produce a system that is secure, maintainable, and production-ready.
+
 \section{Runtime Evaluation}
+
+Jadwal was built with speed, efficiency, and low-latency user experience in mind. The backend, implemented in Go, is compiled into a single native binary, resulting in fast startup and low memory usage. Our API calls typically respond in under 1 second under normal conditions. Calendar events are fetched and parsed quickly, and WhatsApp message processing is handled asynchronously via RabbitMQ to avoid blocking operations. The use of stateless authentication (JWT) and local caching ensures smooth performance on the mobile app, even in poor network conditions. Overall, the system met or exceeded our original performance expectations.

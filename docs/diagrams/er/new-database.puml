@@ -1,0 +1,101 @@
+@startuml Updated Falak ERD
+
+!define table(x) entity x << (T,#7A8D3A) >>
+!define primary_key(x) <u>x</u>
+!define foreign_key(x) #x#
+
+skinparam linetype ortho
+skinparam roundcorner 5
+skinparam class {
+    BackgroundColor White
+    BorderColor Black
+    ArrowColor Black
+}
+
+table(customer) {
+    primary_key(id): UUID <<PK>>
+    name: VARCHAR
+    email: VARCHAR
+    --
+    created_at: TIMESTAMPTZ
+    updated_at: TIMESTAMPTZ
+}
+
+table(auth_google) {
+    primary_key(id): UUID <<PK>>
+    foreign_key(customer_id): UUID <<FK>>
+    sub: TEXT
+    --
+    created_at: TIMESTAMPTZ
+    updated_at: TIMESTAMPTZ
+}
+
+table(magic_token) {
+    primary_key(id): UUID <<PK>>
+    foreign_key(customer_id): UUID <<FK>>
+    token_hash: BPCHAR
+    expires_at: TIMESTAMPTZ
+    used_at: TIMESTAMPTZ
+    token_type: MAGIC_TOKEN_TYPE
+    --
+    created_at: TIMESTAMPTZ
+    updated_at: TIMESTAMPTZ
+}
+
+table(device) {
+    primary_key(id): UUID <<PK>>
+    foreign_key(customer_id): UUID <<FK>>
+    apns_token: TEXT
+    --
+    created_at: TIMESTAMPTZ
+    updated_at: TIMESTAMPTZ
+}
+
+table(caldav_account) {
+    primary_key(id): UUID <<PK>>
+    foreign_key(customer_id): UUID <<FK>>
+    email: VARCHAR
+    username: VARCHAR
+    password: TEXT
+    --
+    created_at: TIMESTAMPTZ
+    updated_at: TIMESTAMPTZ
+}
+
+table(wasapp_chat) {
+    primary_key(id): UUID <<PK>>
+    foreign_key(customer_id): UUID <<FK>>
+    chat_id: TEXT
+    --
+    created_at: TIMESTAMPTZ
+    updated_at: TIMESTAMPTZ
+}
+
+table(wasapp_message) {
+    primary_key(id): UUID <<PK>>
+    foreign_key(wasapp_chat_id): UUID <<FK>>
+    message_id: TEXT
+    sender_name: TEXT
+    sender_number: TEXT
+    is_sender_me: BOOL
+    body: TEXT
+    timestamp: INT
+    --
+    created_at: TIMESTAMPTZ
+    updated_at: TIMESTAMPTZ
+}
+
+table(schema_migrations) {
+    version: INT
+    dirty: BOOL
+}
+
+' Relationships
+customer ||--o{ auth_google : has
+customer ||--o{ magic_token : uses
+customer ||--o{ device : owns
+customer ||--o{ caldav_account : connects
+customer ||--o{ wasapp_chat : owns
+wasapp_chat ||--o{ wasapp_message : contains
+
+@enduml

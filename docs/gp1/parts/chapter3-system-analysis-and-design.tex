@@ -80,9 +80,9 @@ As part of our commitment to security and privacy, Jadwal will be released as op
 
 \section{System Architecture}
 
-Jadwal implements a modern, distributed architecture leveraging gRPC (Google Remote Procedure Call) for efficient communication between its components. The system is divided into several key services, each responsible for specific functionality while maintaining high performance and reliability.
+Jadwal's system architecture separates functionality into multiple modular services. These include the backend API server, the WhatsApp integration service, a calendar synchronization server, and a centralized relational database. Communication between the iOS frontend and the backend API is handled using ConnectRPC over HTTP/2, ensuring efficient, structured data exchange.
 
-Jadwal implements a modern architecture leveraging \gls{connectrpc} for communication between the backend and the mobile app for efficient communcation. It also enhances the developer experience and makes the developer think about the design of the API before the programming language to use.
+The system design emphasizes modularity, scalability, and maintainability, with clear separation of concerns across components. While initial deployment targets a single environment, the system is designed to allow future horizontal scaling across multiple instances.
 
 \begin{figure}[!h]
     \centering
