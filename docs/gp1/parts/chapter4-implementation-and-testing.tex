@@ -35,11 +35,22 @@ Jadwal's system is made up of a few components that ensure it is reliable, quick
 - JWT - Json Web Token, this is what we used for authentication, stateless one. It allows you to sign a piece of json encoded as base64 to authenticate users. You basically give the user a JWT after they prove they own the account to talk tot other endpoints which need who you are. The JWT usually has the email or user\_id that tells the system which user this is, and he can't change it since it is signed and the system checks its digital signature before trusting it.
 - VS Code - the editor we used, it allows for extensions and can run many things. You can compile LaTeX inside it, manage your `git' repository, push to your origins (GitHub), compare files, search across the project, and basically download extensions for many tools we use to make the life easier.
 - Linear - the project management tool we used for high level planning, we used it at first for micro planning, but we idea change rapidly, so it was better for us if we have the high level defined in a big task and started working on it, and closely working together.
-- Resend - the service that sends emails for us, has a gnerous free-tier and easy to use API.
+- Resend - the service that sends emails for us, has a generous free-tier and easy to use API.
 - APNs - sending notifications to users on iOS, we basically use Apple's own services to send notifications to our users after we collect the ID that Apple gives to us for the user's device.
-- Encrption of WhatsApp messages - 
+- Encryption of WhatsApp messages - we encrypt whastapp messages at rest, to ensure user's privacy is kep intact.
 - RabbitMQ - we use RabbitMQ as our message queue to make the whatsapp message extraction robust and resiliant to failaures. It allwosus to decouple the Wasapp service from the Golang backend that talks to LLM APIs to knwo what action to take (ignore, wait til event contifriamot, or add evne dinsce confifred and send notification.).
-- OpenAI-based LLM API, allows for easy swithcing of models when needed, since it is the same interface, and allows us to talk to LLMs.
-- Building the serices we have in a Dockerfile adn running them in a scratch image to increase security, this ensures the image even if it got hacked, has nothign that the attacked can make use of, literally empty, even basic programs don't exist, and that is why we vuils the golang binary as a static binary, to make it runnable by ts wn aywhere, we jus need to make sure ceritifcates are there, otherwse all good.
+- OpenAI-based LLM API, allows for easy switching of models when needed, since it is the same interface, and allows us to talk to LLMs.
+- Building the services we have in a Dockerfile adn running them in a scratch image to increase security, this ensures the image even if it got hacked, has nothign that the attacked can make use of, literally empty, even basic programs don't exist, and that is why we vuils the golang binary as a static binary, to make it runnable by ts wn aywhere, we jus need to make sure ceritifcates are there, otherwse all good.
 - Baikal - the CalDAV server we re-used, it is an opens0uorce PHP-based server that is time-tested and works well fro our requirments.
 - HTTPJ - the web service for anythign that needs to be RESTful based, like downloading .mobileconfig files, in fact that is the only thing we are doing with it rn.
+- PostHog - a powerful analytics tool that allows us to make funnels, and have session replays. those two tools are powerful when building an app, it allows you to see what the user see without bothering them, you just see how they interacted with the product and can enhance what they receive.
+
+\section{Testing}
+
+Testing is a crucial part of any high quality software. We made sure to test the critical paths of the users making sure they get delivered a high quality experience. We chose to test the authentication flow, the connect WhatsApp flow, the connect calendar flow, the schedule prayer times flow and the WhatsApp event extraction flow. This sums us the important flows in our app. Below each of those flows/features is put through a few tests to ensure quality of the product is what the user expects.
+
+\subsection{Authentication (Email \& Google)}
+\subsection{Connect WhatsApp}
+\subsection{Connect Calendar}
+\subsection{Schedule Prayer Times}
+\subsection{WhatsApp Event Extraction}
