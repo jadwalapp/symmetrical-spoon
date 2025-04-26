@@ -133,80 +133,97 @@ Other tables related to address books, scheduling, and WebDAV-specific functiona
 
 \section{Implementation of Core Functionalities}
 
-\subsection{Authentication}
-\label{subsec:authentication}
-The authentication flow supports both magic links (email-based) and Google OAuth. Users receive a signed JWT upon authentication, which is used for subsequent requests. We call it authenatication since we don't differentiate between making an account and making one. The user just `continues' with a method, either Email with Magic Link or Google OAuth, and if they already have an account we just give them a token, but if they don't have account, we create one for them, send a welcome email, and then give the tokens. 
+\subsection{Authentication} \label{subsec:authentication}
 
-Regarding the tokens, we generate access tokens (short-lived) and refresh tokens (long-lived), stored securely on the device. Magic tokens are hashed using SHA-256 before being stored in the database. For added security, we implemented logout by invalidating the refresh token, and all tokens are verified using digital signatures. The login flow is stateless and scalable, and was implemented using ConnectRPC, so that it is easy to connect to from the iOS client and any other client we would make in the future, even web.
+The authentication flow supports both magic links (email-based) and Google OAuth. Users receive a signed JWT upon authentication, which is used for subsequent requests.
+
+We call it authentication since we don't differentiate between making an account and logging in — the user simply `continues' with a method, either Email with Magic Link or Google OAuth. If they already have an account, we just give them a token; if they don't, we create an account, send a welcome email, and then give them the tokens.
+
+We generate access tokens (short-lived) and refresh tokens (long-lived), which are stored securely on the device. Magic tokens are hashed using SHA-256 before being stored in the database. For added security, we invalidate the refresh token upon logout, and all tokens are verified using digital signatures.
+
+The login flow is fully stateless and scalable. We implemented it using ConnectRPC to ensure it works smoothly not just for iOS but also for future clients like a web app.
 
 \subsection{Connect WhatsApp}
 
-Connecting the user's WhatsApp account is an important feature, it allows Jadwal's system to read the user's messages securely and encrypt them, so that the system can analyze if the messages contain events or agreements to meetings automatically using an LLM, more on that later in Subsection~\ref{subsec:whatsapp-event-extraction}.
+Connecting the user's WhatsApp account is an important feature. It allows Jadwal's system to securely read the user's messages (after encryption) to analyze them for events or meeting agreements using an LLM, more on that in Subsection~\ref{subsec:whatsapp-event-extraction}.
 
-The process starts by the user clicking the `Connect WhatsApp' button in the settings tab in our app. The app asks them for the mobile number of the account, and once provided and submitted, the Falak backend talks to the Wasapp service internally to make a new session for WhatsApp on our server. The user is then shown a 8-character code that they need to enter in the official WhatsApp, and they also get a notification from the WhatsApp to deep link them into the specific screen needed. But if that doesn't happen, the app has clear instructions for what to do to reach that specific screen in WhatsApp. The process is similar to what a person might usually do when they access their WhatsApp account through web, but instead of using a QR Code, it uses a code which makes connecting to the WhatsApp oon the same phone easier than needing to open the page in a different device and scan the code. Then the app polls the backend Falak to see what the status, and if it is successful or failed. If it failed they can retry again. And if it is successful, the app shows a succes screen and telling the user what the backend will do from monitoring messages securely and extracting WhatsApp messages securely.
+The process starts when the user clicks `Connect WhatsApp' in the app. They are asked to enter their mobile number, and once they submit, the Falak backend talks to the Wasapp service to create a new WhatsApp session.
 
-Now that the WhatsApp account is connected securely, we keep the sesssion open and listen to messages and basically produce messages to the RabbitMQ queue named ``wasapp.messages'', which is consumed by Falak, our backend service, and more is described on what happens later in the Subsection~\ref{subsec:whatsapp-event-extraction}.
+The user is shown an 8-character code to enter inside the official WhatsApp app. We also deep-link the user into the correct screen in WhatsApp if possible. If not, the app gives clear instructions on how to manually reach it.
 
-Our server launches a chrome instance and opens the WhatsApp website via the `whatsapp-web.js' library. Our Wasapp service is an abstraction above this library with an API that allows our backend Falak to make sessions, delete them, and get their status. The app talks to Falak, and Falak uses the API provided by Wasapp to communicate connect between our Jadawl mobile app and the Wasapp service and whatever happens.
+This method — using a code instead of QR scanning — makes the experience smoother on the same device. The app polls Falak to check connection status. If it fails, they can retry; if it succeeds, the user sees a success screen explaining that Jadwal is now securely monitoring messages.
+
+On the server side, we launch a Chrome instance using whatsapp-web.js. Our Wasapp service abstracts this with an API that lets Falak create sessions, delete them, and check their status.
+
+When connected, the Wasapp service produces the received messages into a RabbitMQ queue (wasapp.messages), ready for backend processing (see Subsection~\ref{subsec:whatsapp-event-extraction}).
 
 \subsection{View Integrated Calendar}
 
-When the user access the Jadawl app for the first time, they are prompted to give access to their calendars on their device. This is what allows the app to show the integrated calendar view. This way is more efficient than implementing a full CalDAV server and client. Implementing both in the time frame we have is not feasible, as the spec for it is too big and little resources exist on the internet. So we decided to use Baikal server as our CalDAV server and create accounts for our users, and make them connect to it through the iOS calendar accounts systems, which is already robust and battle and time tested, more on that later in the Subsection~\ref{subsec:connect-calendar}.
+When a user first opens Jadwal, they are asked for permission to access their on-device calendars. This allows us to show an integrated calendar view, month by month, without building a full CalDAV server and client — which would have been too ambitious for the time frame and hard due to limited online resources.
 
-The user can view all calendars on their phone in a simple view which shows the events by each month by default, and if they click a day, the day view is shown to them. The day view shows a timeline with events on it. The user can add and edit events to any calendar on their phone including Jadwal's using a familiar experience to the native app provided app by Apple. This ensures the users don't face difficulities in using our app.
+Instead, we used Baikal as a ready CalDAV server. We create accounts for users and let iOS handle syncing via its already battle-tested Calendar app integration (more about setup later in Subsection~\ref{subsec:connect-calendar}).
 
-\subsection{Prayer Time Scheduling}
-\label{subsec:schedule-prayer-times}
-This feature is or the Muslim users of our app, and since Alhamdulillah all of the authors of this project are Muslims and live in a Muslim country, it is something tailored to our community which is usually not focused on by product makers world wide.
+Users can view, add, and edit events directly inside the Jadwal app with a familiar native-like experience, ensuring ease of use.
 
-The user simply clicks a button in the settings tab of app and they are guided on how to add the `.mobileconfig' to their device that sets up the prayer times subscription calendar based on their IP address. The app basically calls this RPC we made and gets the `ical' url based on the user's IP address. The `ical' url that the app gets, is then sent to our \texttt{HTTPJ} service to a url that generates a `.mobileconfig' file for adding a subscription calendar based on the url provided.
+\subsection{Prayer Time Scheduling} \label{subsec:schedule-prayer-times}
 
-The flow from here is basically that the user gets a dialog asking them to download the profile, they then are redirected to the settings app on their phone to continue installing the mobile provisioning profile. Once installed, the schedule is shown under the subscribed calendars section in the native calendar app and in our Jadwal app.
+This feature is designed for our Muslim users — and since Alhamdulillah all project authors are Muslim and live in a Muslim country, it was something important for our community, which is often ignored by global apps.
 
-\subsection{WhatsApp Event Extraction}
-\label{subsec:whatsapp-event-extraction}
-WhatsApp event extraction is our main feature where we use an LLM to extract event related messages without you needing to manually tell our system. After you connect your WhatsApp account, Jadwal's system starts receiving the messages in the \texttt{Wasapp} service written in Typescript and using `whatsapp-web.js' and producing them to a message queue in RabbitMQ along with the customer ID. A consumer on the other side, in Golang, reads the messages from RabbitMQ message queue and uses the LLM to check the messages thread status til now and based on it take action:
-\begin{itemize}
-    \item \textbf{No Event:} The system just adds it and waits, and keeps the messages in the DB til an event is detected. This helps in having more context and making a better detailed event in the calendar.
-    \item \textbf{Has Event but Not Confirmed:} 
-    \item \textbf{Has Event and Rejected:} The encrypted messages thread get deleted to ensure privacy of user messages, since we already know the event has been rejected in this specific thread.
-    \item \textbf{Has Event and Agreed:} The encrypted messages thread is deleted here also, but only after producing a message to the RabbitMQ queue called `wasapp.calendar.events', which then a consumer in Golang also reads and adds the event along with its details to the calendar account of the user under a calendar named `\texttt{Phone Emoji} WhatsApp Events'. After that happens, the system sends two notifications, an alert notification which tells the user an event has been added, and another `silent notification' which wakes the app up to start the scheduling conflicts checking, more on that later in the Subsection~\ref{subsec:conflict-resolution}.
-\end{itemize}
+The user clicks Schedule Prayer Times' inside the Settings tab. The app requests a generated .mobileconfig` profile based on the user's IP address to subscribe them automatically to a local prayer times calendar.
 
-The LLM we chose is `gemini-2.0-flash' made by Google. It is both fast and cheap, like during our testing and demos, we literally get the notification from our system detecting an event, before even the message notification is received on the phone of the receiver via WhatsApp. This LLM made our system process messages way faster.
+The user downloads the profile, installs it via Settings, and now their device automatically syncs prayer times into their calendar — visible both in the native Calendar app and inside Jadwal.
 
-\subsection{Conflict Resolution}
-\label{subsec:conflict-resolution}
+\subsection{WhatsApp Event Extraction} \label{subsec:whatsapp-event-extraction}
 
-Once a user receives a notification saying they have a conflict, or access the `Scheduling Conflicts' sheet in the app via the `alert triangle' icon button in the top bar, they can see the conflicts if they exist and manage them. Conflicts are raised when our system adds an event to the `\texttt{Phone Emoji} WhatsApp Events' calendar. This is because for manual entry, the user is already in the calendar and already knows if a conflcit is going to happen instantly after adding that event and can edit it instantly. But when our systems adds it, it happens the moment they agree or the other party agrees to the event, and since that is in the WhatsApp app, they can't really know if a conflict exists or not.
+This is Jadwal's main innovation: automatic event extraction from WhatsApp messages using an LLM.
 
-The user is presented with three options to manage the conflicts in the app if they exist:
-\begin{itemize}
-    \item \textbf{Keep New/Conflicting Event:} This means the user acknowledges that the conflict exists, and they are okay with it staying like this.
-    \item \textbf{Move New/Conflicting Event:} This means the user wants to change the time, the date or both regarding the event. The app makes it easy by showing the old and new times and dates in a preview in the top half of the screen that allows them to manage the conflict with events around the 
-    \item \textbf{Delete New/Conflicting Event:} This means the user wants to delete the conflicting event.
-\end{itemize}
+After the user connects their WhatsApp account, the Wasapp service (written in TypeScript with whatsapp-web.js) streams messages to RabbitMQ. A Golang consumer reads the messages and uses the LLM to analyze the thread context to classify it:
 
-\subsection{Connect Calendar}
-\label{subsec:connect-calendar}
+\begin{itemize} \item \textbf{No Event:} Messages are stored encrypted in the DB while waiting for more context. \item \textbf{Has Event but Not Confirmed:} [Placeholder to describe more if needed] \item \textbf{Has Event and Rejected:} Encrypted messages are deleted immediately to protect privacy. \item \textbf{Has Event and Agreed:} Before deleting the thread, a new event is produced to the wasapp.calendar.events queue. The consumer then creates an event under the user’s special \texttt{Phone Emoji} WhatsApp Events calendar. \end{itemize}
 
-This feature makes the user's life much easier. It allows the user to add their CalDAV account to the iOS calendar accounts database without needing to fiddle around in the database. If this didn't exist, the user would to enter the credentials of the CalDAV server manually, the URL, their username, and their password, and hope they didn't any mistake in the technical settings they have to enter. We make this process less error prone by using `.mobileconfig' files similar to what we did in Scheduling Prayer Times in Subsection~\ref{subsec:schedule-prayer-times}. We make a mobile provisioning profile the user can download securely to their device and then through the automatic redirection to the settings app, they can install the profile which installs the CalDAV account easily in the user's device.
+After adding the event, we send two notifications: an alert to inform the user, and a silent notification to trigger conflict checking (described next).
 
-The flow for the user is basically that they click a button in the `Settings' tab that says `Easy Setup' with content around it that mentions it is the calendar account with connection status. This starts a multi-step sheet that allows the user to download the mobile provisioning profile and install it. We ensure that only the user can get access by generating a `Magic Token' like the one used in the Authentication, more in the Subsection~\ref{subsec:authentication}. This `Magic Token' has a type of `CalDAV`, making it only usable for this specific use case. Also it is short-lived, it only lasts 15 minutes, and it is a one-time use only. If the user wants to download the `.mobileconfig' again, they have to issue another one. O fcourse this is done in the app without the user's knowledge, they just are presented with a secure and easy setup process. Magic tokens are hashed using SHA-256 before being stored in the database similarly, they are the same ones, but web basically added a type after wanting to use it for more than Authentication.
+We chose Google’s gemini-2.0-flash model, which is both fast and cost-effective. During demos, the system detected events faster than WhatsApp notifications arrived on phones!
+
+\subsection{Conflict Resolution} \label{subsec:conflict-resolution}
+
+Whenever a new event is added automatically by Jadwal, conflicts are checked.
+
+Conflicts only matter for auto-added events (from WhatsApp) — because when users manually add events through the calendar view, they already notice conflicts directly.
+
+Users can resolve conflicts through three actions: \begin{itemize} \item \textbf{Keep New/Conflicting Event:} Acknowledge the conflict but keep it. \item \textbf{Move New/Conflicting Event:} Adjust the event timing. \item \textbf{Delete New/Conflicting Event:} Remove the new event. \end{itemize}
+
+The app presents a clean conflict resolution UI, showing side-by-side comparison of the old and new times for clarity.
+
+\subsection{Connect Calendar} \label{subsec:connect-calendar}
+
+This feature makes it very easy for users to add the Jadwal CalDAV account to their phone.
+
+Instead of manually typing the server URL, username, and password — risking mistakes — we let users click a button to download a .mobileconfig file, install it, and have everything configured automatically.
+
+The flow: \begin{itemize} \item Click Easy Setup inside the app Settings. \item A short-lived (15-min) magic token is generated. \item The app opens a secure download of the mobile provisioning profile. \item The profile installs a CalDAV account automatically. \end{itemize}
+
+Magic tokens are hashed securely using SHA-256 and are one-time use only. The user barely notices all this complexity — for them, it’s just a smooth "click and go" experience.
 
 \section{Our Journey in Getting to Baikal}
 
-We tried a few CalDav servers before using Baikal, we tried at first to implement our own, but then we realized how abmitious that was given our resources and time frame for the project. So we decided to with an open-source CalDAV server. We tried first Radicale, written in Python, by French people, but it didn't have an admin API we can use to create users, so we didn't go with it. But then we found Baikal, which is written in PHP, and large projects like NextCloud use it for their own project. It is based on SabreDAV, which is a WebDAV project in PHP, and one of its plugins/examples/proejcts so to speak is the Baikal server, which implements CalDAV which is an extension to WebDAV, and has an admin dashboard. It fitted our use case well, so we went with it, and deployed in a Docker container so it is easy to manage, we found some community driven docker container and we used it.
+Originally, we thought about building our own CalDAV server — but quickly realized it was too ambitious given the time frame and how complex the CalDAV spec is.
 
-We used the dashboard made by them, and used the API there to make a client, our backend Falak can use, and make an account for our users when they make an account with us. The credentials are encrypted at rest in the database. This is what we bundle in Connect Calendar, as we mentioned and what we send for the user, like the user cans see it in the app if they want to do it manually, we can't not allow him :D.
+We tried Radicale first (written in Python) but it lacked admin APIs we needed for user creation. Then we found Baikal, based on SabreDAV (a PHP WebDAV library) and used by serious projects like Nextcloud.
+
+Baikal had everything we needed: CalDAV compatibility, admin dashboard, easy API, and Docker images ready. So we integrated it into our system, wrapped its API into our backend Falak service, and encrypted user credentials at rest.
+
+When users connect their calendars via Easy Setup, they are actually connecting securely to Baikal through iOS’s native CalDAV system.
 
 \section{More Security}
 
-All traffic is encrypted via HTTPS, between the server and client. The API Gateway we use is Traefik, and it is what basically termiants the SSL, and also routes traffic internally as a reverse proxy. It also acts as a load balancer, though we didn't use scaling so this doesn't apply.
+All communication between devices and servers is encrypted over HTTPS.
 
-It is well suited for docekr, like works well, and especially with docker compose, it is easy to mangea via labels. Labels in Docker are like key-value things that we attach to a container. Traefik container can then read them and route traffic and based on it like the rules, the load balancers, the protocosl, etc\dots.
+Our API Gateway is Traefik, which handles SSL termination, acts as a reverse proxy, and even load-balances traffic (even though we didn't scale yet).
 
-The database, and things like thr rabbitmq, wasapp service, and internal tools like grafana, and loki as a data source to like see logs.
+Traefik fits perfectly into Docker Compose via labels, making management super easy. It routes backend services like Falak, Wasapp, Baikal, and others internally.
+
+Internally, sensitive systems like the PostgreSQL database, RabbitMQ, Loki, and Grafana are isolated inside the Docker private network — not exposed to the public internet.
 
 \section{Testing Methodology}
 
