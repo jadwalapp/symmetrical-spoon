@@ -91,6 +91,21 @@ While the design envisioned a distributed system, the final implementation runs 
 
 The implemented architecture maintained full alignment with the original design, with minor practical adjustments such as unified logging using Grafana + Loki, simplified internal networking, and local queues (RabbitMQ) for event-driven flows. Overall, the implementation delivered on the designed goals of modularity, maintainability, and separation of concerns.
 
+\section{Controlled Libraries}
+
+In Jadwal, we intentionally selected controlled libraries and frameworks to ensure reliability, maintainability, and performance across the system. These libraries were carefully evaluated before integration to align with the project’s goals and security requirements. The following were key controlled libraries used:
+
+\begin{itemize}
+    \item \textbf{ConnectRPC} – For designing type-safe APIs between the backend and the mobile app.
+    \item \textbf{sqlc} – For generating safe database access code from raw SQL queries.
+    \item \textbf{whatsapp-web.js} – For handling WhatsApp web sessions and receiving messages programmatically.
+    \item \textbf{Baikal} – As the controlled CalDAV server to manage calendars and events according to WebDAV standards.
+    \item \textbf{RabbitMQ} – For handling asynchronous communication between services via message queues.
+    \item \textbf{PostHog} – For session replay, funnel analysis, and usage tracking in a self-hosted, secure way.
+\end{itemize}
+
+The careful selection of these controlled libraries ensured that Jadwal maintained full control over its critical functionality while leveraging proven open-source technologies.
+
 
 \section{Database Implementation}
 

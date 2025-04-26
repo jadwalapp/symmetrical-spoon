@@ -166,22 +166,25 @@
 \addcontentsline{toc}{chapter}{Conclusion}
 \markboth{Conclusion}{}
 
-In a fast-paced and interconnected world, everyone struggles to manage their time efficiently, especially for someone who has multiple tasks every day. Jadwal addresses all these challenges by introducing features that help to bridge all the gaps that other platforms are unable to offer. Jadwal ensures a user-friendly interface for the user to manage their schedule and avoid missing any events.
+In a fast-paced and interconnected world, everyone struggles to manage their time efficiently, especially for someone who has multiple tasks every day. Jadwal addresses all these challenges by introducing features that help bridge gaps left by existing calendar applications. Jadwal ensures a user-friendly interface for users to manage their schedules and avoid missing important events.
 
-Jadwal integrates with CalDAV, a standardized protocol that facilitates seamless synchronization across various calendar platforms. This allows users to effortlessly connect and manage their calendars from different devices and applications, such as Apple Calendar and Google Calendar, making everything in one ecosystem.
+Jadwal integrates with CalDAV, a standardized protocol that facilitates seamless synchronization across various calendar platforms. This enables users to effortlessly connect and manage their calendars from different devices and applications, such as Apple Calendar and Google Calendar, bringing everything together into a unified ecosystem.
 
-Jadwal's state-of-the-art LLM WhatsApp event extraction feature enhances the application by extracting events from WhatsApp, which is an informal communication channel that people most likely use for discussing events. This creates a gap that could lead to missing or conflicting events, and Jadwal aims to solve this problem.
+A standout feature is Jadwal's use of a state-of-the-art LLM for WhatsApp event extraction. By analyzing informal conversations where events are often agreed upon, Jadwal ensures that no appointment or commitment is missed — even those that happen casually through chat.
 
-The feature of scheduling prayer times highlights Jadwal as unique, and Jadwal sees it as important since it is a daily activity. Clearing and holding a place for this event would help the user to manage their day more efficiently.
+The scheduling of prayer times highlights Jadwal's sensitivity to user culture and daily priorities. By making prayer times first-class citizens in the calendar, Jadwal empowers users to plan their day around their values.
 
-The feature that makes Jadwal stand out is managing events effectively by offering features like suggesting conflict resolution and integrating other calendars. This would reduce the chances of the user missing any events.
+Conflict management is another feature that enhances user control, offering clear options for resolving overlapping events, thereby minimizing the risk of missed or mishandled appointments. By integrating and managing all calendars under one roof, Jadwal simplifies time management in a way few other applications achieve.
 
-Integration with CalDAV allows Jadwal to connect all the calendars that the user has and bring them to one platform, which helps a lot in managing the day. Why do we separate calendars to organize one day for one person?
+Throughout the project, we adopted a systematic approach. Detailed use cases mapped user interactions clearly, covering core flows like account setup, WhatsApp integration, calendar connection, prayer scheduling, and conflict resolution. The database design and system architecture provided a solid technical backbone, ensuring scalability, security, and maintainability.
 
-Throughout the project, a systematic approach was taken in developing Jadwal. The use cases clearly define how users interact with the system, covering all the features like Continue with Email, Resolve Conflicts, WhatsApp Integration, Scheduling Prayer Time, and many more. The database architecture and system design showcase the backbone of Jadwal, illustrating how the system works and how the data is managed perfectly. These technical aspects ensure that Jadwal is well-structured and easy to understand, making it simple to track everything happening in the backend.
+However, the journey was not without challenges. Initially, we planned to build a custom calendar storage system, but deeper research revealed the complexities of the CalDAV standard. Pivoting to integrating Baikal was a critical learning moment that taught us the importance of adaptability, pragmatic engineering choices, and working with open standards.
 
-In conclusion, Jadwal stands out from all the existing solutions and provides an innovative calendar application that bridges the gaps and helps the user to manage their day more efficiently. With its comprehensive features, user-friendly interface, and robust technical foundation, Jadwal is poised to revolutionize the way individuals manage their time in today's fast-paced world.
+Technically, we gained hands-on experience across a wide range of areas: mobile-first design with SwiftUI, backend systems with Golang and ConnectRPC, scalable messaging with RabbitMQ, CI/CD workflows with Docker and Traefik, and security best practices throughout.
 
+Looking ahead, Jadwal can evolve even further. Potential improvements include real-time calendar updates when WhatsApp messages change, deep-linking users directly into new event details, and onboarding flows that fully automate setup. With more resources, Jadwal could expand to Android and web platforms, becoming a complete cross-device scheduling assistant.
+
+In conclusion, Jadwal stands as a unique and innovative calendar solution that bridges real-world scheduling gaps. It combines technical rigor with user-centric design to empower individuals to manage their time more effectively. We are proud of what we achieved and hope Jadwal becomes an inspiration for creating digital tools that respect users' daily realities, cultural values, and personal goals.
 
 % Bibliography
 \bibliography{references}
