@@ -15,6 +15,8 @@
 \usepackage{ragged2e}
 \usepackage{emptypage}
 \usepackage[style=long]{glossaries}
+\usepackage{listings}
+\usepackage{xcolor}
 
 \definecolor{lightgrey}{RGB}{120,120,120}
 
@@ -27,6 +29,19 @@
 \renewcommand{\chaptermark}[1]{\markboth{Chapter \thechapter: #1}{}}
 \renewcommand{\headrulewidth}{0.4pt}
 \renewcommand{\headrule}{\hbox to\headwidth{\color{lightgrey}\leaders\hrule height \headrulewidth\hfill}}
+
+\lstset{
+  basicstyle=\ttfamily\footnotesize,
+  breaklines=true,
+  breakatwhitespace=true,
+  columns=fullflexible,
+  frame=single,
+  backgroundcolor=\color[RGB]{248,248,248},
+  keywordstyle=\color{blue},
+  commentstyle=\color{gray},
+  stringstyle=\color{orange},
+  showstringspaces=false
+}
 
 \doublespacing
 
@@ -189,5 +204,7 @@ In conclusion, Jadwal stands as a unique and innovative calendar solution that b
 % Bibliography
 \bibliography{references}
 \bibliographystyle{apalike}
+
+\include{parts/appendix}
 
 \end{document}

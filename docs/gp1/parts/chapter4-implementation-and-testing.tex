@@ -1,6 +1,6 @@
 \chapter{Implementation and Testing}
 
-Jadwal is a fast, and efficient system. It uses technologies that allows it to deliver those promises. The fact that Golang is the main language and that the language is compiled.
+This chapter presents how the Jadwal system was implemented, detailing the technologies, services, and components that make up the deployed system. It also covers the security strategies, database adjustments, and testing practices used to ensure performance and reliability.
 
 \section{Technologies and Tools Used}
 
@@ -41,6 +41,7 @@ Jadwal is built using a carefully selected stack of languages, technologies, and
 \subsection{Infrastructure, Deployment, and DevOps}
 
 \begin{itemize}
+    \item \textbf{Hetzner Cloud} - Cheap VPS provider in Europe with reliable service. We were able to run our project on a server with \textit{4 vCPU} and \textit{8gb ram} for \textit{€5.99/month}!
     \item \textbf{Docker} – Everything runs in containers: backend, Wasapp, CalDAV, etc. This enables consistent environments between dev and production.
     \item \textbf{Docker Compose} – Used to orchestrate services locally and during staging. Ensures that every developer gets the same setup out of the box. We used overlays, to override values between production and local environment along with `.env' files.
     \item \textbf{Traefik} – Our reverse proxy/load balancer/API gateway. It integrates with Docker, automatically issues SSL certs via Let's Encrypt, and handles SSL termination (internal services communicate over HTTP for performance).
@@ -83,13 +84,20 @@ Jadwal is built using a carefully selected stack of languages, technologies, and
     \item \textbf{PostHog} – A powerful analytics tool that tracks usage funnels, sessions, and user behavior. It enabled us to see session replays and understand user flows without asking users directly.
 \end{itemize}
 
-\section{System Architecture (Implemented)}
+\section{System Architecture Realization}
 
-The system architecture, as originally outlined in Figure \ref{fig:architecture}, was implemented using a modular, containerized structure. All core components were packaged as separate services and deployed using Docker Compose on a single host. These include the backend service (Falak), the WhatsApp service (Wasapp), the CalDAV server (Baikal), a PostgreSQL database, and a Traefik proxy for HTTPS termination and service routing.
+The system architecture realization, compared to the architecture in \textbf{Figure~\ref{fig:architecture}}, was implemented using a modular, containerized structure. As shown in \textbf{Figure~\ref{fig:architecture-realization}}, all core components were packaged as separate services and deployed using Docker Compose on a single host. These include the backend service (Falak), the WhatsApp service (Wasapp), the CalDAV server (Baikal), a PostgreSQL database, and a Traefik proxy for HTTPS termination and service routing.
 
 While the design envisioned a distributed system, the final implementation runs on a single host with isolated containers communicating over internal Docker networks. This setup preserves modularity and mirrors real-world deployment environments, while simplifying development and debugging. Each service is decoupled and can be scaled independently in future production-grade deployments.
 
 The implemented architecture maintained full alignment with the original design, with minor practical adjustments such as unified logging using Grafana + Loki, simplified internal networking, and local queues (RabbitMQ) for event-driven flows. Overall, the implementation delivered on the designed goals of modularity, maintainability, and separation of concerns.
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/system-architecture-realization.png}
+    \caption{System Architecture Realization of Jadwal}
+    \label{fig:architecture-realization}
+\end{figure}
 
 \section{Controlled Libraries}
 
@@ -230,15 +238,20 @@ Baikal had everything we needed: CalDAV compatibility, admin dashboard, easy API
 
 When users connect their calendars via Easy Setup, they are actually connecting securely to Baikal through iOS’s native CalDAV system.
 
-\section{More Security}
+\section{System Security}
 
-All communication between devices and servers is encrypted over HTTPS.
+Security was a core consideration throughout Jadwal's development. The system is designed to protect user data both in transit and at rest, reduce attack surface, and isolate critical services from external access. The following measures were implemented to uphold a strong security posture:
 
-Our API Gateway is Traefik, which handles SSL termination, acts as a reverse proxy, and even load-balances traffic (even though we didn't scale yet).
+\begin{itemize}
+    \item \textbf{HTTPS Everywhere} – All traffic between mobile clients and servers is encrypted using TLS to ensure confidentiality and prevent tampering.
+    \item \textbf{API Gateway with Traefik} – Traefik handles SSL termination, reverse proxying, and internal routing. It also supports automatic certificate renewal via Let's Encrypt.
+    \item \textbf{Internal-Only Networking} – Core services like PostgreSQL, RabbitMQ, and monitoring tools are exposed only on the private Docker network, fully isolated from the internet.
+    \item \textbf{Minimal Docker Images} – The Go backend is compiled into static binaries and run inside `FROM scratch` containers, resulting in extremely small, dependency-free images with no shell or package manager.
+    \item \textbf{JWT-Based Stateless Authentication} – All requests are authenticated via signed JSON Web Tokens that include expiry and identity claims. Tokens are verified on every request via a middleware or interceptor.
+    \item \textbf{Encrypted WhatsApp Messages} – WhatsApp messages are encrypted before being saved to the database to protect sensitive information in case of unauthorized access.
+    \item \textbf{DNS \& DDoS Protection} – Cloudflare is used to manage DNS, enforce HTTPS, and provide protection against common web threats including DDoS and bot abuse.
+\end{itemize}
 
-Traefik fits perfectly into Docker Compose via labels, making management super easy. It routes backend services like Falak, Wasapp, Baikal, and others internally.
-
-Internally, sensitive systems like the PostgreSQL database, RabbitMQ, Loki, and Grafana are isolated inside the Docker private network — not exposed to the public internet.
 
 \section{Testing Methodology}
 
