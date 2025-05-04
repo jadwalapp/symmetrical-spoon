@@ -14,6 +14,12 @@ public protocol Calendar_V1_CalendarServiceClientInterface: Sendable {
 
     @available(iOS 13, *)
     func `getCalDavAccount`(request: Calendar_V1_GetCalDavAccountRequest, headers: Connect.Headers) async -> ResponseMessage<Calendar_V1_GetCalDavAccountResponse>
+
+    @discardableResult
+    func `schedulePrayerTimes`(request: Calendar_V1_SchedulePrayerTimesRequest, headers: Connect.Headers, completion: @escaping @Sendable (ResponseMessage<Calendar_V1_SchedulePrayerTimesResponse>) -> Void) -> Connect.Cancelable
+
+    @available(iOS 13, *)
+    func `schedulePrayerTimes`(request: Calendar_V1_SchedulePrayerTimesRequest, headers: Connect.Headers) async -> ResponseMessage<Calendar_V1_SchedulePrayerTimesResponse>
 }
 
 /// Concrete implementation of `Calendar_V1_CalendarServiceClientInterface`.
@@ -34,9 +40,20 @@ public final class Calendar_V1_CalendarServiceClient: Calendar_V1_CalendarServic
         return await self.client.unary(path: "/calendar.v1.CalendarService/GetCalDavAccount", idempotencyLevel: .unknown, request: request, headers: headers)
     }
 
+    @discardableResult
+    public func `schedulePrayerTimes`(request: Calendar_V1_SchedulePrayerTimesRequest, headers: Connect.Headers = [:], completion: @escaping @Sendable (ResponseMessage<Calendar_V1_SchedulePrayerTimesResponse>) -> Void) -> Connect.Cancelable {
+        return self.client.unary(path: "/calendar.v1.CalendarService/SchedulePrayerTimes", idempotencyLevel: .unknown, request: request, headers: headers, completion: completion)
+    }
+
+    @available(iOS 13, *)
+    public func `schedulePrayerTimes`(request: Calendar_V1_SchedulePrayerTimesRequest, headers: Connect.Headers = [:]) async -> ResponseMessage<Calendar_V1_SchedulePrayerTimesResponse> {
+        return await self.client.unary(path: "/calendar.v1.CalendarService/SchedulePrayerTimes", idempotencyLevel: .unknown, request: request, headers: headers)
+    }
+
     public enum Metadata {
         public enum Methods {
             public static let getCalDavAccount = Connect.MethodSpec(name: "GetCalDavAccount", service: "calendar.v1.CalendarService", type: .unary)
+            public static let schedulePrayerTimes = Connect.MethodSpec(name: "SchedulePrayerTimes", service: "calendar.v1.CalendarService", type: .unary)
         }
     }
 }

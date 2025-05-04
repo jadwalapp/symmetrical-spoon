@@ -6,7 +6,8 @@
 //
 
 import SwiftUI
-import UIKit
+import UIKi
+import PostHog
 
 class AuthViewModel: ObservableObject {
     enum AuthState {
@@ -68,6 +69,7 @@ class AuthViewModel: ObservableObject {
             do {
                 // TODO: Implement Google Sign-In
                 let response = try await authRepository.useGoogle(googleToken: "googleToken")
+                PostHogSDK.shared.identify(response.userID)
                 await MainActor.run {
                     KeychainManager.shared.saveToken(response.accessToken)
                     self.isAuthenticated = true
@@ -124,6 +126,7 @@ class AuthViewModel: ObservableObject {
             
             do {
                 let response = try await authRepository.completeEmail(token: token)
+                PostHogSDK.shared.identify(response.userID)
                 await MainActor.run {
                     KeychainManager.shared.saveToken(response.accessToken)
                     self.isAuthenticated = true

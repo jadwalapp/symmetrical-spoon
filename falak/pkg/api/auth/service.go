@@ -216,6 +216,7 @@ func (s *service) CompleteEmail(ctx context.Context, r *connect.Request[authv1.C
 	return &connect.Response[authv1.CompleteEmailResponse]{
 		Msg: &authv1.CompleteEmailResponse{
 			AccessToken: token,
+			UserId:      magicToken.CustomerID.String(),
 		},
 	}, nil
 }
@@ -297,6 +298,7 @@ func (s *service) UseGoogle(ctx context.Context, r *connect.Request[authv1.UseGo
 	return &connect.Response[authv1.UseGoogleResponse]{
 		Msg: &authv1.UseGoogleResponse{
 			AccessToken: token,
+			UserId:      customer.ID.String(),
 		},
 	}, nil
 }

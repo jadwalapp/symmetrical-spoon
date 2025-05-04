@@ -95,6 +95,8 @@ public struct Auth_V1_CompleteEmailResponse: Sendable {
 
   public var accessToken: String = String()
 
+  public var userID: String = String()
+
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   public init() {}
@@ -118,6 +120,8 @@ public struct Auth_V1_UseGoogleResponse: Sendable {
   // methods supported on all messages.
 
   public var accessToken: String = String()
+
+  public var userID: String = String()
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -246,6 +250,7 @@ extension Auth_V1_CompleteEmailResponse: SwiftProtobuf.Message, SwiftProtobuf._M
   public static let protoMessageName: String = _protobuf_package + ".CompleteEmailResponse"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "access_token"),
+    2: .standard(proto: "user_id"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -255,6 +260,7 @@ extension Auth_V1_CompleteEmailResponse: SwiftProtobuf.Message, SwiftProtobuf._M
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
       case 1: try { try decoder.decodeSingularStringField(value: &self.accessToken) }()
+      case 2: try { try decoder.decodeSingularStringField(value: &self.userID) }()
       default: break
       }
     }
@@ -264,11 +270,15 @@ extension Auth_V1_CompleteEmailResponse: SwiftProtobuf.Message, SwiftProtobuf._M
     if !self.accessToken.isEmpty {
       try visitor.visitSingularStringField(value: self.accessToken, fieldNumber: 1)
     }
+    if !self.userID.isEmpty {
+      try visitor.visitSingularStringField(value: self.userID, fieldNumber: 2)
+    }
     try unknownFields.traverse(visitor: &visitor)
   }
 
   public static func ==(lhs: Auth_V1_CompleteEmailResponse, rhs: Auth_V1_CompleteEmailResponse) -> Bool {
     if lhs.accessToken != rhs.accessToken {return false}
+    if lhs.userID != rhs.userID {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
@@ -310,6 +320,7 @@ extension Auth_V1_UseGoogleResponse: SwiftProtobuf.Message, SwiftProtobuf._Messa
   public static let protoMessageName: String = _protobuf_package + ".UseGoogleResponse"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "access_token"),
+    2: .standard(proto: "user_id"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -319,6 +330,7 @@ extension Auth_V1_UseGoogleResponse: SwiftProtobuf.Message, SwiftProtobuf._Messa
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
       case 1: try { try decoder.decodeSingularStringField(value: &self.accessToken) }()
+      case 2: try { try decoder.decodeSingularStringField(value: &self.userID) }()
       default: break
       }
     }
@@ -328,11 +340,15 @@ extension Auth_V1_UseGoogleResponse: SwiftProtobuf.Message, SwiftProtobuf._Messa
     if !self.accessToken.isEmpty {
       try visitor.visitSingularStringField(value: self.accessToken, fieldNumber: 1)
     }
+    if !self.userID.isEmpty {
+      try visitor.visitSingularStringField(value: self.userID, fieldNumber: 2)
+    }
     try unknownFields.traverse(visitor: &visitor)
   }
 
   public static func ==(lhs: Auth_V1_UseGoogleResponse, rhs: Auth_V1_UseGoogleResponse) -> Bool {
     if lhs.accessToken != rhs.accessToken {return false}
+    if lhs.userID != rhs.userID {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
