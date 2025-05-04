@@ -11,7 +11,7 @@ import SafariServices
 struct SettingsView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
     @EnvironmentObject var profileViewModel: ProfileViewModel
-    @StateObject var settingsViewModel = SettingsViewModel()
+    @EnvironmentObject var settingsViewModel: SettingsViewModel
     
     var body: some View {
         List {

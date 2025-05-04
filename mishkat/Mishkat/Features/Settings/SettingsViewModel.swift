@@ -25,7 +25,10 @@ class SettingsViewModel: ObservableObject {
     private let userDefaults = UserDefaults.standard
     private static let prayerTimesSetupKey = "isPrayerTimesSetupComplete"
     
-    init() {
+    private var calendarRepository: CalendarRepository
+    
+    init(calendarRepository: CalendarRepository) {
+        self.calendarRepository = calendarRepository
         // Load initial setup status from UserDefaults
         self.isPrayerTimesSetupComplete = userDefaults.bool(forKey: Self.prayerTimesSetupKey)
     }
@@ -34,20 +37,27 @@ class SettingsViewModel: ObservableObject {
     func setupPrayerTimesCalendar() {
         isPrayerTimesLoading = true
         
-        // Use a small delay to prevent UI hanging due to multiple state changes
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            // Hardcoded prayer times URL (TODO: Replace with real URL)
-            let prayerTimesURL = "https://example.com/prayer-times.ics"
-            
-            // Direct URL for webcal setup
-            let urlString = "https://falak.jadwal.app/httpj/mobile-config/webcal?url=\(prayerTimesURL)"
-            
-            if let url = URL(string: urlString) {
-                self.prayerTimesSetupURL = url
-                self.showPrayerTimesSetupWebView = true
-                self.isPrayerTimesLoading = false
-            } else {
-                debugPrint("Failed to create prayer times URL")
+        Task {
+            do {
+                let schedulePrayerTimesRes = try await calendarRepository.schedulePrayerTimes()
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    let prayerTimesURL = schedulePrayerTimesRes.icalURL
+                    
+                    // Direct URL for webcal setup
+                    let urlString = "https://falak.jadwal.app/httpj/mobile-config/webcal?url=\(prayerTimesURL)"
+                    
+                    if let url = URL(string: urlString) {
+                        self.prayerTimesSetupURL = url
+                        self.showPrayerTimesSetupWebView = true
+                        self.isPrayerTimesLoading = false
+                    } else {
+                        debugPrint("Failed to create prayer times URL")
+                        self.isPrayerTimesLoading = false
+                    }
+                }
+            } catch {
+                debugPrint("Failed to get prayer times URL")
                 self.isPrayerTimesLoading = false
             }
         }

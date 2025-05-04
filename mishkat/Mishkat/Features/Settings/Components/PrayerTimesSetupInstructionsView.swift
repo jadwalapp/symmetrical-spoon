@@ -410,7 +410,9 @@ struct PrayerFeatureRow: View {
 
 #Preview {
     PrayerTimesSetupInstructionsView()
-        .environmentObject(SettingsViewModel())
+        .environmentObject(SettingsViewModel(
+            calendarRepository: DependencyContainer.shared.calendarRepository
+        ))
 }
 
 #Preview("Download Step") {

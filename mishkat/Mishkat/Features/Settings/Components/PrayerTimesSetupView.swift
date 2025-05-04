@@ -98,7 +98,7 @@ struct PrayerTimesSetupView: View {
         }
     }
     .environmentObject({
-        let vm = SettingsViewModel()
+        let vm = SettingsViewModel(calendarRepository: DependencyContainer.shared.calendarRepository)
         vm.isPrayerTimesSetupComplete = false
         return vm
     }())
@@ -111,7 +111,7 @@ struct PrayerTimesSetupView: View {
         }
     }
     .environmentObject({
-        let vm = SettingsViewModel()
+        let vm = SettingsViewModel(calendarRepository: DependencyContainer.shared.calendarRepository)
         vm.isPrayerTimesSetupComplete = true
         return vm
     }())

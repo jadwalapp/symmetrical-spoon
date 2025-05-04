@@ -26,4 +26,16 @@ class CalendarRepository {
             throw CalendarRepositoryError.unknown
         }
     }
+    
+    func schedulePrayerTimes() async throws -> Calendar_V1_SchedulePrayerTimesResponse {
+        do {
+            let req = Calendar_V1_SchedulePrayerTimesRequest()
+            
+            let resp = await calendarClient.schedulePrayerTimes(request: req, headers: [:])
+            return try resp.result.get()
+        } catch {
+            debugPrint("things went south running schedulePrayerTimes: \(error)")
+            throw CalendarRepositoryError.unknown
+        }
+    }
 }
