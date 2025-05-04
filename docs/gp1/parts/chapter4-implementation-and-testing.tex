@@ -252,20 +252,252 @@ Security was a core consideration throughout Jadwal's development. The system is
     \item \textbf{DNS \& DDoS Protection} – Cloudflare is used to manage DNS, enforce HTTPS, and provide protection against common web threats including DDoS and bot abuse.
 \end{itemize}
 
+\section{Test}
+
+\subsection*{Test Design for Initiate Email Authentication feature}
+
+\begin{enumerate}
+    \item Method Authentication (String email)
+    \item Input parameter:
+    \begin{itemize}
+        \item Email
+    \end{itemize}
+    \item Characteristics:
+\end{enumerate}
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|}
+    \hline
+    \textbf{} & \textbf{Block 1} & \textbf{Block 2} & \textbf{Block 3}  \\
+    \hline
+    \textbf{} & \textbf{A1} & \textbf{A2} & \textbf{A3}  \\
+    \hline
+    \textbf{Email} & Valid format & Invalid format & Empty \\
+    \hline
+    \end{tabular}
+    \end{table}
+    
+
+\begin{enumerate}[resume]
+    \item \textbf{Choosing combinations of values}
+\end{enumerate}
+
+\noindent
+We chose ECC (Each Choice Coverage) because there is no interaction between email and password or other parameter. We have only one parameter. Testing each block once is sufficient to validate behaviour.
+
+\begin{enumerate}[resume]
+    \item \textbf{Number of Test Cases:}
+\end{enumerate}
+
+\noindent
+Test-case: \#Test cases: 3 test cases
+
+\begin{enumerate}[resume]
+    \item \textbf{Test-case:}
+\end{enumerate}
+
+\begin{longtable}{|p{1cm}|p{2cm}|p{3cm}|p{2.5cm}|p{3cm}|p{1.5cm}|}
+\hline
+\textbf{Test Case Id} & \textbf{Combination } & \textbf{Description} & \textbf{Expected Output} & \textbf{Actual Output} & \textbf{Status} \\
+\hline
+\textbf{1} & \textbf{A1} & \textbf{Valid Format} & \textbf{Success} & \textbf{Success to log-in} & \textbf{Success} \\
+\hline
+\textbf{2} & \textbf{A2} & \textbf{Invalid Format} & \textbf{Fail} & \textbf{Please enter a valid email} & \textbf{Fail} \\
+\hline
+\textbf{3} & \textbf{A3} & \textbf{Empty} & \textbf{Fail} & \textbf{Please fill the format} & \textbf{Fail} \\
+\hline
+\end{longtable}
+
+\subsection*{Test cases for Continue Email Authentication feature}
+
+\begin{enumerate}
+    \item Method Authentication (String Magic-Token)
+    \item Input parameter:
+    \begin{itemize}
+        \item Magic-Token
+    \end{itemize}
+    \item Characteristics:
+\end{enumerate}
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|}
+    \hline
+    \textbf{} & \textbf{Block 1} & \textbf{Block 2} & \textbf{Block 3}  \\
+    \hline
+    \textbf{} & \textbf{A1} & \textbf{A2} & \textbf{A3}  \\
+    \hline
+    \textbf{Magic-Token} & Valid Token & Invalid Token & Empty \\
+    \hline
+    \end{tabular}
+    \end{table}
+    
+
+\begin{enumerate}[resume]
+    \item \textbf{Choosing combinations of values}
+\end{enumerate}
+
+\noindent
+Using BCC because it chooses the important blocks rather than PWC. We test all possible cases of inputs in an organized and concise way by exploring the base case and other test cases.
+
+\begin{enumerate}[resume]
+    \item \textbf{Number of Test Cases:}
+\end{enumerate}
+
+\noindent
+Test-case: \#Test cases: 3 test cases
+
+\begin{enumerate}[resume]
+    \item \textbf{Test-case:}
+\end{enumerate}
+
+\begin{longtable}{|p{1cm}|p{2cm}|p{3cm}|p{2.5cm}|p{3cm}|p{1.5cm}|}
+\hline
+\textbf{Test Case Id} & \textbf{Combination} & \textbf{Description} & \textbf{Expected Output} & \textbf{Actual Output} & \textbf{Status} \\
+\hline
+\textbf{1} & \textbf{A1} & \textbf{Valid Token} & \textbf{Success} & \textbf{Success to log-in} & \textbf{Success} \\
+\hline
+\textbf{2} & \textbf{A1} & \textbf{Invalid Token} & \textbf{Fail} & \textbf{Fail to log-in} & \textbf{Fail} \\
+\hline
+\textbf{3} & \textbf{A1} & \textbf{Empty} & \textbf{Fail} & \textbf{Cannot to log-in} & \textbf{Fail} \\
+\hline
+\end{longtable}
+
+
+\subsection*{Test cases for Google Authentication feature}
+
+\begin{enumerate}
+    \item Method Authentication (String email)
+    \item Input parameter:
+    \begin{itemize}
+        \item Google account
+    \end{itemize}
+    \item Characteristics:
+\end{enumerate}
+
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|}
+    \hline
+    \textbf{} & \textbf{Block 1} & \textbf{Block 2} & \textbf{Block 3}  \\
+    \hline
+    \textbf{} & \textbf{A1} & \textbf{A2} & \textbf{A3}  \\
+    \hline
+    \textbf{Google account} & Valid Token & Invalid Token & Empty \\
+    \hline
+    \end{tabular}
+    \end{table}
+    
+
+\begin{enumerate}[resume]
+    \item \textbf{Choosing combinations of values}
+\end{enumerate}
+
+\noindent
+We have chosen PWC because of the interaction between Google and password. So it is easy to detect the error or bugs and it is the most used criteria for the feature login. And less more than All combination.
+
+\begin{enumerate}[resume]
+    \item \textbf{Number of Test Cases:}
+\end{enumerate}
+
+\noindent
+Test-case: \#Test cases: 3 test cases
+
+\begin{enumerate}[resume]
+    \item \textbf{Test-case:}
+\end{enumerate}
+
+\begin{longtable}{|p{1cm}|p{2cm}|p{3cm}|p{2.5cm}|p{3cm}|p{1.5cm}|}
+\hline
+\textbf{Test Case Id} & \textbf{Combination} & \textbf{Description} & \textbf{Expected output} & \textbf{Actual output} & \textbf{Status} \\
+\hline
+\textbf{1} & \textbf{A1} & \textbf{Valid Token} & \textbf{Success} & \textbf{Success} & \textbf{Success} \\
+\hline
+\textbf{2} & \textbf{A2} & \textbf{Invalid Token} & \textbf{Fail} & \textbf{Fail to sign-in} & \textbf{Fail} \\
+\hline
+\textbf{3} & \textbf{A3} & \textbf{Empty} & \textbf{Fail} & \textbf{Fail to sign-in} & \textbf{Fail} \\
+\hline
+\end{longtable}
+
+\subsection*{Test cases for Whatsapp connection feature}
+
+\begin{enumerate}
+    \item Method Authentication (String email, String Password)
+    \item Input parameter:
+    \begin{itemize}
+        \item Phone number
+    \end{itemize}
+    \item Characteristics:
+\end{enumerate}
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{|c|c|c|c|}
+    \hline
+    \textbf{} & \textbf{Block 1} & \textbf{Block 2} & \textbf{Block 3} \\
+    \hline
+    \textbf{} & \textbf{A1} & \textbf{A2} & \textbf{A3} \\
+    \hline
+    \textbf{Phone number format} & Valid international format & Invalid format & Empty \\
+    \hline
+    \textbf{} & \textbf{B1} & \textbf{B2} & \textbf{B3} \\
+    \hline
+    \textbf{Password Phone number format} & Exactly 13 digit & Less 13 digit & More than 13 digit \\
+    \hline
+    \end{tabular}
+\end{table}
+
+
+\begin{enumerate}[resume]
+    \item \textbf{Choosing combinations of values}
+\end{enumerate}
+
+\noindent
+We have chosen PWC because it chooses the main important character. PWC is same as ACOC. Interaction between Phone number format and password phone number format. So it is easy to detect the error or bugs and it is the most used criteria for the feature login.
+
+\begin{enumerate}[resume]
+    \item \textbf{Number of Test Cases:}
+\end{enumerate}
+
+\noindent
+Test-case: \#Test cases: Max(3) $\times$ Max(3) = 3$\times$3 = 9 test cases
+
+\begin{enumerate}[resume]
+    \item \textbf{Test-case:}
+\end{enumerate}
+
+\begin{longtable}{|p{1cm}|p{2cm}|p{3.5cm}|p{2.5cm}|p{2.5cm}|p{1.5cm}|}
+\hline
+\textbf{Test Case Id} & \textbf{Combination} & \textbf{Description} & \textbf{Expected output} & \textbf{Actual output} & \textbf{Status} \\
+\hline
+\textbf{1} & \textbf{A1B1} & \textbf{Valid international format + Exactly 13 digit} & \textbf{Connection Successfully} & \textbf{Connection Successfully} & \textbf{Success} \\
+\hline
+\textbf{2} & \textbf{A1B2} & \textbf{Valid international format + Less 13 digit} & \textbf{Fail} & \textbf{Connection Failed} & \textbf{Fail} \\
+\hline
+\textbf{3} & \textbf{A1B3} & \textbf{Valid international format + More than 13 digit} & \textbf{Fail} & \textbf{Connection Failed} & \textbf{Fail} \\
+\hline
+\textbf{4} & \textbf{A2B1} & \textbf{Invalid Format + Exactly 13 digit} & \textbf{Fail} & \textbf{Connection Failed} & \textbf{Fail} \\
+\hline
+\textbf{5} & \textbf{A2B2} & \textbf{Invalid Format + Less 13 digit} & \textbf{Fail} & \textbf{Connection Failed} & \textbf{Fail} \\
+\hline
+\textbf{6} & \textbf{A2B3} & \textbf{Invalid Format + More than 13 digit} & \textbf{Fail} & \textbf{Connection Failed} & \textbf{Fail} \\
+\hline
+\textbf{7} & \textbf{A3B1} & \textbf{Empty + Exactly 13 digit} & \textbf{Fill the format} & \textbf{Please fill the format} & \textbf{Fail} \\
+\hline
+\textbf{8} & \textbf{A3B2} & \textbf{Empty + Less 13 digit} & \textbf{Fill the format} & \textbf{Please fill the format} & \textbf{Fail} \\
+\hline
+\textbf{9} & \textbf{A3B3} & \textbf{Empty + More than 13 digit} & \textbf{Fill the format} & \textbf{Please fill the format} & \textbf{Fail} \\
+\hline
+\end{longtable}
+
 
 \section{Testing Methodology}
 
 We adopted a pragmatic testing methodology focused on verifying key user flows rather than exhaustive unit testing. The most critical paths — such as user login, WhatsApp connection, event parsing, and calendar sync — were tested manually and programmatically during development. We also integrated PostHog for session replay and funnel analytics, which allowed us to observe real user interactions and validate expected behavior. Although full test automation was not implemented, our iterative development approach ensured that all major regressions were caught early.
 
-\section{Tested Features}
 
-Testing is a crucial part of any high quality software. We made sure to test the critical paths of the users making sure they get delivered a high quality experience. We chose to test the authentication flow, the connect WhatsApp flow, the connect calendar flow, the schedule prayer times flow and the WhatsApp event extraction flow. This sums us the important flows in our app. Below each of those flows/features is put through a few tests to ensure quality of the product is what the user expects.
-
-\subsection{Authentication (Email \& Google)}
-\subsection{Connect WhatsApp}
-\subsection{Connect Calendar}
-\subsection{Schedule Prayer Times}
-\subsection{WhatsApp Event Extraction}
 
 \section{Comparison to Original Specification}
 
