@@ -8,6 +8,7 @@
 import SwiftUI
 import UserNotifications
 import EventKit
+import GoogleSignIn
 
 @MainActor
 class MishkatAppDelegate: NSObject, UIApplicationDelegate, ObservableObject {
@@ -43,6 +44,17 @@ class MishkatAppDelegate: NSObject, UIApplicationDelegate, ObservableObject {
         } else {
             print("User not authenticated when token received, registration will happen after login.")
         }
+    }
+    
+    func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
+        var handled: Bool
+
+          handled = GIDSignIn.sharedInstance.handle(url)
+          if handled {
+            return true
+          }
+
+          return false
     }
     
     private func askForNotificationsPermission() {

@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		650921332CC68C9800E8332B /* Connect in Frameworks */ = {isa = PBXBuildFile; productRef = 650921322CC68C9800E8332B /* Connect */; };
+		652F31FF2DC720C600DC2010 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 652F31FE2DC720C600DC2010 /* GoogleSignIn */; };
+		652F32012DC720C600DC2010 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 652F32002DC720C600DC2010 /* GoogleSignInSwift */; };
 		6592A5F42D8C5AE30061B48C /* PostHog in Frameworks */ = {isa = PBXBuildFile; productRef = 6592A5F32D8C5AE30061B48C /* PostHog */; };
 /* End PBXBuildFile section */
 
@@ -43,6 +45,8 @@
 			files = (
 				650921332CC68C9800E8332B /* Connect in Frameworks */,
 				6592A5F42D8C5AE30061B48C /* PostHog in Frameworks */,
+				652F31FF2DC720C600DC2010 /* GoogleSignIn in Frameworks */,
+				652F32012DC720C600DC2010 /* GoogleSignInSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -87,6 +91,8 @@
 			packageProductDependencies = (
 				650921322CC68C9800E8332B /* Connect */,
 				6592A5F32D8C5AE30061B48C /* PostHog */,
+				652F31FE2DC720C600DC2010 /* GoogleSignIn */,
+				652F32002DC720C600DC2010 /* GoogleSignInSwift */,
 			);
 			productName = Mishkat;
 			productReference = 6564DBC72CC3E88C005FB2F3 /* Mishkat.app */;
@@ -119,6 +125,7 @@
 			packageReferences = (
 				650921312CC68C9800E8332B /* XCRemoteSwiftPackageReference "connect-swift" */,
 				6592A5F22D8C5AE30061B48C /* XCRemoteSwiftPackageReference "posthog-ios" */,
+				652F31FD2DC720C600DC2010 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 6564DBC82CC3E88C005FB2F3 /* Products */;
@@ -372,6 +379,14 @@
 				minimumVersion = 0.14.0;
 			};
 		};
+		652F31FD2DC720C600DC2010 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.0.0;
+			};
+		};
 		6592A5F22D8C5AE30061B48C /* XCRemoteSwiftPackageReference "posthog-ios" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/PostHog/posthog-ios.git";
@@ -387,6 +402,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 650921312CC68C9800E8332B /* XCRemoteSwiftPackageReference "connect-swift" */;
 			productName = Connect;
+		};
+		652F31FE2DC720C600DC2010 /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 652F31FD2DC720C600DC2010 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
+		};
+		652F32002DC720C600DC2010 /* GoogleSignInSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 652F31FD2DC720C600DC2010 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignInSwift;
 		};
 		6592A5F32D8C5AE30061B48C /* PostHog */ = {
 			isa = XCSwiftPackageProductDependency;

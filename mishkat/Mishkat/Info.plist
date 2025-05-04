@@ -2,6 +2,19 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>GIDServerClientID</key>
+	<string>345023217894-3jt25lrrlrjb0ahnk0q2u5h49qa9gsa4.apps.googleusercontent.com</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+	  <dict>
+	    <key>CFBundleURLSchemes</key>
+	    <array>
+	      <string>com.googleusercontent.apps.345023217894-lc53a49u9ig543qpfpk8p4lkdd0uhjtn</string>
+	    </array>
+	  </dict>
+	</array>
+	<key>GIDClientID</key>
+	<string>345023217894-lc53a49u9ig543qpfpk8p4lkdd0uhjtn.apps.googleusercontent.com</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>LSApplicationQueriesSchemes</key>
@@ -13,7 +26,7 @@
 		<string>App-prefs</string>
 	</array>
 	<key>NSCalendarsFullAccessUsageDescription</key>
-	<string>Jadwal needs full access to your calendars to allow you to manage them through Jadwal's app. No data will be transmitted, we just show it in the app.</string>
+	<string>Jadwal needs full access to your calendars to allow you to manage them through Jadwal&apos;s app. No data will be transmitted, we just show it in the app.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>

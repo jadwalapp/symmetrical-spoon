@@ -7,6 +7,8 @@
 
 
 import SwiftUI
+import GoogleSignInSwift
+import GoogleSignIn
 
 struct OnboardingView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
@@ -94,11 +96,17 @@ struct OnboardingView: View {
                     }
                     
                     VStack(spacing: 12) {
-                        OButton(
-                            icon: .brandGoogle,
-                            label: "Continue with Google"
-                        ) {
-                            authViewModel.useGoogle()
+                        PresenterResolverWrapper { controller in
+                            OButton(
+                                icon: .brandGoogle,
+                                label: "Continue with Google"
+                            ) {
+                                Task {
+                                    let googleResult = try await GIDSignIn.sharedInstance.signIn(withPresenting: controller)
+                                    
+                                    authViewModel.useGoogle(googleToken: googleResult.user.idToken?.tokenString ?? "")
+                                }
+                            }
                         }
                         
                         OButton(

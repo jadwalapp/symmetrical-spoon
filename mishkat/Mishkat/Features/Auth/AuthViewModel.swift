@@ -6,8 +6,9 @@
 //
 
 import SwiftUI
-import UIKi
+import UIKit
 import PostHog
+import GoogleSignIn
 
 class AuthViewModel: ObservableObject {
     enum AuthState {
@@ -60,15 +61,14 @@ class AuthViewModel: ObservableObject {
         }
     }
     
-    func useGoogle() {
+    func useGoogle(googleToken: String) {
         Task {
             await MainActor.run {
                 useGoogleState = .loading
             }
             
             do {
-                // TODO: Implement Google Sign-In
-                let response = try await authRepository.useGoogle(googleToken: "googleToken")
+                let response = try await authRepository.useGoogle(googleToken: googleToken)
                 PostHogSDK.shared.identify(response.userID)
                 await MainActor.run {
                     KeychainManager.shared.saveToken(response.accessToken)
@@ -142,6 +142,7 @@ class AuthViewModel: ObservableObject {
     }
     
     func logout() {
+        GIDSignIn.sharedInstance.signOut()
         KeychainManager.shared.deleteToken()
         isAuthenticated = false
         navigationPath.removeAll()
