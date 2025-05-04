@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import PostHog
 
 struct EmailInputView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
@@ -129,6 +130,7 @@ struct EmailInputView: View {
                         isLoading: authViewModel.initiateEmailState == .loading,
                         isDisabled: !isValidEmail || email.isEmpty
                     ) {
+                        PostHogSDK.shared.capture("continue_with_email_continue_clicked")
                         authViewModel.initiateEmail(email: email)
                     }
                     .entranceAnimation(delay: 0.5)
@@ -139,6 +141,7 @@ struct EmailInputView: View {
         }
         .onAppear {
             emailFieldFocused = true
+            PostHogSDK.shared.capture("continue_with_email_view_entered")
         }
     }
     

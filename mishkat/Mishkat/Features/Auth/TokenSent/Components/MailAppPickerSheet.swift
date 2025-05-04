@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import PostHog
 
 struct MailAppPickerSheet: View {
     @Environment(\.dismiss) private var dismiss
@@ -81,9 +82,17 @@ struct MailAppPickerSheet: View {
         }
         .presentationDragIndicator(.visible)
         .presentationDetents([.height(contentHeight)])
+        .onAppear {
+            PostHogSDK.shared.capture("mail_app_picker_sheet_shown")
+        }
     }
     
     private func openMailApp(_ app: (name: String, urlScheme: String, icon: String)) {
+        PostHogSDK.shared.capture("open_mail_app_triggered", properties: [
+            "app_name": app.name,
+            "app_url_scheme": app.urlScheme,
+            "icon_name": app.icon
+        ])
         if app.urlScheme == "mailto:" {
             if let url = URL(string: "mailto:") {
                 UIApplication.shared.open(url)

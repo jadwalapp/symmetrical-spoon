@@ -70,6 +70,7 @@ class AuthViewModel: ObservableObject {
             do {
                 let response = try await authRepository.useGoogle(googleToken: googleToken)
                 PostHogSDK.shared.identify(response.userID)
+                PostHogSDK.shared.capture("continue_with_google_success")
                 await MainActor.run {
                     KeychainManager.shared.saveToken(response.accessToken)
                     self.isAuthenticated = true
@@ -97,6 +98,7 @@ class AuthViewModel: ObservableObject {
             
             do {
                 let response = try await authRepository.initiateEmail(email: email)
+                PostHogSDK.shared.capture("continue_with_email_initiate_success")
                 await MainActor.run {
                     self.initiateEmailState = .loaded(response)
                     self.navigationPath.append(.tokenSent)
@@ -127,6 +129,7 @@ class AuthViewModel: ObservableObject {
             do {
                 let response = try await authRepository.completeEmail(token: token)
                 PostHogSDK.shared.identify(response.userID)
+                PostHogSDK.shared.capture("continue_with_email_complete_success")
                 await MainActor.run {
                     KeychainManager.shared.saveToken(response.accessToken)
                     self.isAuthenticated = true
@@ -143,6 +146,8 @@ class AuthViewModel: ObservableObject {
     
     func logout() {
         GIDSignIn.sharedInstance.signOut()
+        PostHogSDK.shared.capture("logout")
+        PostHogSDK.shared.reset()
         KeychainManager.shared.deleteToken()
         isAuthenticated = false
         navigationPath.removeAll()

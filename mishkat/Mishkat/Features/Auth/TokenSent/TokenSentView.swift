@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import PostHog
 
 struct TokenSentView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
@@ -113,6 +114,7 @@ struct TokenSentView: View {
                                 style: .primary,
                                 isDisabled: isLoading
                             ) {
+                                PostHogSDK.shared.capture("try_again_after_failed_complete_email_clicked")
                                 authViewModel.initiateEmail(email: authViewModel.email)
                             }
                             .entranceAnimation(delay: 0.5)
@@ -136,6 +138,7 @@ struct TokenSentView: View {
                                 isLoading: authViewModel.initiateEmailState == .loading,
                                 isDisabled: isLoading
                             ) {
+                                PostHogSDK.shared.capture("resend_email_button_clicked")
                                 withAnimation {
                                     showResendFeedback = true
                                 }
@@ -168,6 +171,9 @@ struct TokenSentView: View {
         }
         .sheet(isPresented: $showMailAppPicker) {
             MailAppPickerSheet()
+        }
+        .onAppear {
+            PostHogSDK.shared.capture("token_sent_view_entered")
         }
     }
     

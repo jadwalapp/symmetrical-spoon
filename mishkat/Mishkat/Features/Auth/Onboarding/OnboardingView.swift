@@ -9,6 +9,7 @@
 import SwiftUI
 import GoogleSignInSwift
 import GoogleSignIn
+import PostHog
 
 struct OnboardingView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
@@ -101,6 +102,7 @@ struct OnboardingView: View {
                                 icon: .brandGoogle,
                                 label: "Continue with Google"
                             ) {
+                                PostHogSDK.shared.capture("continue_with_google_clicked")
                                 Task {
                                     let googleResult = try await GIDSignIn.sharedInstance.signIn(withPresenting: controller)
                                     
@@ -113,6 +115,7 @@ struct OnboardingView: View {
                             icon: .mail,
                             label: "Continue with Email"
                         ) {
+                            PostHogSDK.shared.capture("continue_with_email_clicked")
                             authViewModel.continueWithEmail()
                         }
                     }
