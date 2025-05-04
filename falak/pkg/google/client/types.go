@@ -1,6 +1,8 @@
 package client
 
-import "context"
+import (
+	"context"
+)
 
 type TokenInfoRequest struct {
 	IdToken string `json:"id_token"`
@@ -12,7 +14,7 @@ type TokenInfoResponse struct {
 	Aud           string `json:"aud"`
 	Sub           string `json:"sub"`
 	Email         string `json:"email"`
-	EmailVerified bool   `json:"email_verified"`
+	EmailVerified bool   `json:"-"`
 	AtHash        string `json:"at_hash"`
 	Nonce         string `json:"nonce"`
 	Name          string `json:"name"`
@@ -25,6 +27,7 @@ type TokenInfoResponse struct {
 	Kid           string `json:"kid"`
 	Typ           string `json:"typ"`
 }
+
 type Client interface {
 	GetTokenInfo(context.Context, *TokenInfoRequest) (*TokenInfoResponse, error)
 }
