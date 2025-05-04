@@ -27,7 +27,7 @@ message CompleteEmailResponse {
 }
 
 message UseGoogleRequest {
-    string google_token = 1 [(buf.validate.field).string.uuid = true];
+    string google_token = 1;
 }
 
 message UseGoogleResponse {
