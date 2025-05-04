@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SafariServices
+import PostHog
 
 struct PrayerTimesSetupInstructionsView: View {
     @EnvironmentObject var settingsViewModel: SettingsViewModel
@@ -80,6 +81,7 @@ struct PrayerTimesSetupInstructionsView: View {
         Group {
             if currentStep == 1 {
                 PrayerDownloadStepView(onDownload: {
+                    PostHogSDK.shared.capture("prayer_times_setup__download_step__download_clicked")
                     debugPrint("Beginning prayer times download")
                     // Provide haptic feedback
                     let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
@@ -87,8 +89,12 @@ struct PrayerTimesSetupInstructionsView: View {
                     
                     settingsViewModel.setupPrayerTimesCalendar()
                 })
+                .onAppear {
+                    PostHogSDK.shared.capture("prayer_times_setup__download_step__shown")
+                }
             } else if currentStep == 2 {
                 PrayerInstallStepView(onOpenSettings: {
+                    PostHogSDK.shared.capture("prayer_times_setup__install_step__open_settings_clicked")
                     debugPrint("Opening settings, will move to step 3")
                     // Provide haptic feedback
                     let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
@@ -99,16 +105,22 @@ struct PrayerTimesSetupInstructionsView: View {
                         currentStep = 3
                     }
                 })
+                .onAppear {
+                    PostHogSDK.shared.capture("prayer_times_setup__install_step_shown")
+                }
             } else if currentStep == 3 {
                 PrayerCompleteStepView(
-                    onOpenSettings: { 
+                    onOpenSettings: {
+                        PostHogSDK.shared.capture("prayer_times_setup__complete_step__open_settings_clicked")
                         // Provide haptic feedback
                         let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
                         impactFeedback.impactOccurred()
                         
                         settingsViewModel.openSettingsApp() 
                     },
-                    onDone: { 
+                    onDone: {
+                        PostHogSDK.shared.capture("prayer_times_setup__complete_step__done_clicked")
+                        
                         // Provide success haptic feedback
                         let notificationFeedback = UINotificationFeedbackGenerator()
                         notificationFeedback.notificationOccurred(.success)
@@ -121,7 +133,9 @@ struct PrayerTimesSetupInstructionsView: View {
                             dismiss() 
                         }
                     }
-                )
+                ).onAppear {
+                    PostHogSDK.shared.capture("prayer_times_setup__complete_step_shown")
+                }
             }
         }
     }

@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import PostHog
 
 struct CalDAVCredentialsView: View {
     @EnvironmentObject var profileViewModel: ProfileViewModel
@@ -177,6 +178,7 @@ struct CalDAVCredentialsView: View {
         VStack(spacing: 20) {
             // Easy setup button (primary)
             Button {
+                PostHogSDK.shared.capture("caldav_easy_setup_clicked")
                 showingEasySetupInstructions = true
             } label: {
                 Label("Easy Setup", systemImage: "wand.and.stars")
@@ -248,6 +250,7 @@ struct CalDAVCredentialsView: View {
                 Spacer()
                 
                 Button {
+                    PostHogSDK.shared.capture("caldav_credentials_copy_clicked", properties: ["copied_field": title])
                     UIPasteboard.general.string = value
                     copiedField = title
                     DispatchQueue.main.asyncAfter(deadline: .now() + 2) {

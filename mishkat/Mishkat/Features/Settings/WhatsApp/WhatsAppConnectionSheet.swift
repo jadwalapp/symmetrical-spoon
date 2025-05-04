@@ -1,4 +1,5 @@
 import SwiftUI
+import PostHog
 
 struct WhatsappConnectionSheet: View {
     @Environment(\.dismiss) private var dismiss
@@ -114,6 +115,7 @@ struct WhatsappConnectionSheet: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Cancel") {
+                        PostHogSDK.shared.capture("whatsapp_connect_sheet__cancel_clicked")
                         dismiss()
                     }
                     .disabled(viewModel.isLoading)
@@ -121,11 +123,13 @@ struct WhatsappConnectionSheet: View {
             }
             .confirmationDialog("Are You Sure?", isPresented: $showAreYouSureAlert, titleVisibility: .visible) {
                 Button("Continue", role: .none) {
+                    PostHogSDK.shared.capture("whatsapp_connect_sheet__are_you_sure_continue_phone_number_whatsapp_clicked")
                     isPhoneFieldFocused = false
                     viewModel.connectWhatsapp()
                 }
                 
                 Button("Edit Number", role: .cancel) {
+                    PostHogSDK.shared.capture("whatsapp_connect_sheet__are_you_sure_edit_phone_number_whatsapp_clicked")
                     isPhoneFieldFocused = true
                 }
             } message: {
@@ -194,6 +198,7 @@ struct WhatsappConnectionSheet: View {
                 isLoading: viewModel.isLoading,
                 isDisabled: !viewModel.isValidPhoneNumber || viewModel.isLoading
             ) {
+                PostHogSDK.shared.capture("whatsapp_connect_sheet__connect_whatsapp_button_clicked")
                 showAreYouSureAlert = true
             }
             .padding()
@@ -261,6 +266,7 @@ struct WhatsappConnectionSheet: View {
                     VStack(spacing: 12) {
                         // Copy button
                         Button {
+                            PostHogSDK.shared.capture("whatsapp_connect_sheet__copy_button_clicked")
                             UIPasteboard.general.string = pairingCode
                             withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
                                 isCopied = true
@@ -300,6 +306,7 @@ struct WhatsappConnectionSheet: View {
 
                         // Reset button
                         Button {
+                            PostHogSDK.shared.capture("whatsapp_connect_sheet__reset_button_clicked")
                             refreshCode()
                         } label: {
                             HStack {
@@ -470,6 +477,9 @@ struct WhatsappConnectionSheet: View {
             }
             .entranceAnimation(delay: 0.3)
         }
+        .onAppear {
+            PostHogSDK.shared.capture("whatsapp_connect_sheet__completed_successfully")
+        }
     }
 
     private func failedSection(error: Error) -> some View {
@@ -497,6 +507,9 @@ struct WhatsappConnectionSheet: View {
                 viewModel.reset()
             }
             .entranceAnimation(delay: 0.3)
+        }
+        .onAppear {
+            PostHogSDK.shared.capture("whatsapp_connect_sheet__completed_with_failure")
         }
     }
 

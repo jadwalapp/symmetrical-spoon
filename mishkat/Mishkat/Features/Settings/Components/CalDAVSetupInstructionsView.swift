@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SafariServices
+import PostHog
 
 struct CalDAVSetupInstructionsView: View {
     @EnvironmentObject var profileViewModel: ProfileViewModel
@@ -73,30 +74,46 @@ struct CalDAVSetupInstructionsView: View {
         Group {
             if currentStep == 1 {
                 DownloadStepView(onDownload: {
+                    PostHogSDK.shared.capture("caldav_setup__download_step__initiate_download")
                     debugPrint("Beginning download")
                     profileViewModel.initiateEasyCalDavSetup()
                 })
+                .onAppear {
+                    PostHogSDK.shared.capture("caldav_setup__download_step_shown")
+                }
             } else if currentStep == 2 {
                 InstallStepView(onOpenSettings: {
+                    PostHogSDK.shared.capture("caldav_setup__install_step__open_settings_clicked")
                     debugPrint("Opening settings, will move to step 3")
                     profileViewModel.openSettingsApp()
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                         currentStep = 3
                     }
                 })
+                .onAppear {
+                    PostHogSDK.shared.capture("caldav_setup__install_step_shown")
+                }
             } else if currentStep == 3 {
                 CompleteStepView(
                     isDetected: profileViewModel.isDeviceCalDavAccountDetected,
                     isChecking: isCheckingStatus,
                     countdown: countdown,
-                    onCheckNow: { 
+                    onCheckNow: {
+                        PostHogSDK.shared.capture("caldav_setup__complete_step__check_now_clicked")
                         debugPrint("Manual check initiated")
                         checkCalDAVStatus() 
                     },
-                    onOpenSettings: { profileViewModel.openSettingsApp() },
-                    onDone: { dismiss() }
+                    onOpenSettings: {
+                        PostHogSDK.shared.capture("caldav_setup__complete_step__open_settings_clicked")
+                        profileViewModel.openSettingsApp()
+                    },
+                    onDone: {
+                        PostHogSDK.shared.capture("caldav_setup__complete_step__done_clicked")
+                        dismiss()
+                    }
                 )
-                .onAppear { 
+                .onAppear {
+                    PostHogSDK.shared.capture("caldav_setup__complete_step_shown")
                     debugPrint("Step 3 appeared, starting timer")
                     startTimerIfNeeded() 
                 }

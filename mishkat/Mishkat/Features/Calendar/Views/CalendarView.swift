@@ -7,6 +7,7 @@
 
 import SwiftUI
 import EventKit
+import PostHog
 
 struct CalendarView: View {
     @EnvironmentObject var viewModel: CalendarViewModel
@@ -64,6 +65,7 @@ struct CalendarView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     HStack(spacing: 16) {
                         Button {
+                            PostHogSDK.shared.capture("today_toolbar_item_clicked")
                             viewModel.selectedDate = Date()
                             if !isMonthView {
                                 viewModel.fetchDailyEvents(for: Date())
@@ -74,6 +76,7 @@ struct CalendarView: View {
                         }
                         
                         Button {
+                            PostHogSDK.shared.capture("calendars_toolbar_item_clicked")
                             showingCalendarsSheet.toggle()
                         } label: {
                             Image(systemName: "calendar")
@@ -81,6 +84,7 @@ struct CalendarView: View {
                         }
                         
                         Button {
+                            PostHogSDK.shared.capture("scheduled_conflicts_toolbar_item_clicked")
                             conflictManager.showConflictsView = true
                         } label: {
                             let unresolvedCount = conflictManager.conflicts.filter { !$0.resolved }.count
@@ -102,6 +106,7 @@ struct CalendarView: View {
                         }
                         
                         Button {
+                            PostHogSDK.shared.capture("add_event_toolbar_item_clicked")
                             showingAddEventSheet = true
                         } label: {
                             Image(systemName: "plus.circle.fill")

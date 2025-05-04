@@ -8,6 +8,7 @@
 import SwiftUI
 import EventKit
 import EventKitUI
+import PostHog
 
 /// View for displaying the daily events.
 struct DayView: View {
@@ -54,6 +55,7 @@ struct DayView: View {
                                 .foregroundColor(.secondary)
                             
                             Button {
+                                PostHogSDK.shared.capture("add_event_in_day_view_clicked")
                                 showingEventEditor = true
                                 selectedEvent = nil  // Ensure we're creating a new event, not editing
                             } label: {
@@ -71,6 +73,7 @@ struct DayView: View {
                         .padding(.top, 40)
                     } else {
                         TimelineView(eventWrappers: generateEventWrappers(timedEvents), onEventTap: { event in
+                            PostHogSDK.shared.capture("day_view_event_clicked")
                             selectedEvent = event
                             showingEventEditor = true
                         })

@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import PostHog
 
 struct PrayerTimesSetupView: View {
     @EnvironmentObject var settingsViewModel: SettingsViewModel
@@ -15,6 +16,8 @@ struct PrayerTimesSetupView: View {
     
     var body: some View {
         Button {
+            PostHogSDK.shared.capture("prayer_times_setup__schedule_prayer_times_clicked")
+            
             // Disable the button to prevent multiple taps
             isButtonDisabled = true
             
@@ -71,6 +74,7 @@ struct PrayerTimesSetupView: View {
         .contextMenu {
             // Long-press menu for resetting the status
             Button(role: .destructive) {
+                PostHogSDK.shared.capture("schedule_prayer_times_reset_button_clicked")
                 showResetConfirmation = true
             } label: {
                 Label("Reset Setup Status", systemImage: "arrow.triangle.2.circlepath")
@@ -78,9 +82,12 @@ struct PrayerTimesSetupView: View {
         }
         .alert("Reset Prayer Times Setup", isPresented: $showResetConfirmation) {
             Button("Reset", role: .destructive) {
+                PostHogSDK.shared.capture("schedule_prayer_times_reset_button_confirmation_clicked")
                 settingsViewModel.resetPrayerTimesSetup()
             }
-            Button("Cancel", role: .cancel) { }
+            Button("Cancel", role: .cancel) {
+                PostHogSDK.shared.capture("schedule_prayer_times_reset_button_cancel_clicked")
+            }
         } message: {
             Text("This will reset the prayer times calendar setup status, allowing you to set it up again. Note that this doesn't remove the calendar subscription - it only resets the app's knowledge of whether it was set up.")
         }

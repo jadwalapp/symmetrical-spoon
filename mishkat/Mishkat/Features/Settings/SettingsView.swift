@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SafariServices
+import PostHog
 
 struct SettingsView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
@@ -54,6 +55,7 @@ struct SettingsView: View {
                                 Spacer()
                                 Menu {
                                     Button(role: .destructive) {
+                                        PostHogSDK.shared.capture("disconnect_whatsapp_clicked")
                                         profileViewModel.disconnectWhatsapp()
                                     } label: {
                                         Label("Disconnect", systemImage: "xmark.circle")
@@ -88,6 +90,7 @@ struct SettingsView: View {
                         .padding(.vertical, 4)
                     } else if whatsappAccount.status == "WAITING_FOR_PAIRING" {
                         Button {
+                            PostHogSDK.shared.capture("complete_whatsapp_clicked")
                             profileViewModel.showWhatsappSheet = true
                         } label: {
                             HStack {
@@ -110,6 +113,7 @@ struct SettingsView: View {
                         }
                     } else {
                         Button {
+                            PostHogSDK.shared.capture("connect_whatsapp_clicked")
                             profileViewModel.showWhatsappSheet = true
                         } label: {
                             HStack {
