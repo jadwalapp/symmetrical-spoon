@@ -227,7 +227,7 @@ func (s *service) UseGoogle(ctx context.Context, r *connect.Request[authv1.UseGo
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 
-	userInfo, err := s.googleSvc.GetUserInfoByToken(ctx, r.Msg.GoogleToken)
+	tokenInfo, err := s.googleSvc.GetUserInfoByToken(ctx, r.Msg.GoogleToken)
 	if err != nil {
 		if err == googlesvc.ErrInvalidToken {
 			log.Ctx(ctx).Err(err).Msg("got invalid token error running GetUserInfoByToken")
@@ -237,14 +237,14 @@ func (s *service) UseGoogle(ctx context.Context, r *connect.Request[authv1.UseGo
 		log.Ctx(ctx).Err(err).Msg("failed running GetUserInfoByToken")
 		return nil, internalError
 	}
-	if !userInfo.EmailVerified {
+	if !tokenInfo.EmailVerified {
 		log.Ctx(ctx).Info().Msg("unverified email, we shouldn't trust it")
 		return nil, connect.NewError(connect.CodeFailedPrecondition, errors.New("unverified email"))
 	}
 
 	customer, err := s.store.CreateCustomerIfNotExists(ctx, store.CreateCustomerIfNotExistsParams{
-		Name:  userInfo.GivenName + " " + userInfo.FamilyName,
-		Email: userInfo.Email,
+		Name:  tokenInfo.GivenName + " " + tokenInfo.FamilyName,
+		Email: tokenInfo.Email,
 	})
 	if err != nil {
 		log.Ctx(ctx).Err(err).Msg("failed running CreateCustomerIfNotExists")

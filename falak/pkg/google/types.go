@@ -7,5 +7,5 @@ import (
 )
 
 type GoogleSvc interface {
-	GetUserInfoByToken(ctx context.Context, token string) (*googleClient.UserInfoResponse, error)
+	GetUserInfoByToken(ctx context.Context, token string) (*googleClient.TokenInfoResponse, error)
 }
