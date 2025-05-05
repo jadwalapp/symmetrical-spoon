@@ -193,6 +193,9 @@ func main() {
 		config.RabbitMqPort,
 	)
 	amqpConfig := amqp.NewDurableQueueConfig(amqpUrl)
+	amqpConfig.Queue.AutoDelete = false
+	amqpConfig.Queue.Exclusive = false
+	amqpConfig.Queue.Durable = true
 
 	amqpSubscriber, err := amqp.NewSubscriber(amqpConfig, watermill.NewStdLogger(true, true))
 	if err != nil {

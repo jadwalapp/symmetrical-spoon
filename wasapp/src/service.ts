@@ -170,6 +170,8 @@ export class WasappService {
 
         await this.amqpChannel.assertQueue(this.wasappMessagesQueueName, {
           durable: true,
+          autoDelete: false,
+          exclusive: false,
         });
         this.amqpChannel.sendToQueue(
           this.wasappMessagesQueueName,
