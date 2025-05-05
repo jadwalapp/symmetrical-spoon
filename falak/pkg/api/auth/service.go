@@ -353,6 +353,33 @@ func (s *service) GenerateMagicToken(ctx context.Context, r *connect.Request[aut
 	}, nil
 }
 
+func (s *service) RefreshTokens(ctx context.Context, r *connect.Request[authv1.RefreshTokensRequest]) (*connect.Response[authv1.RefreshTokensResponse], error) {
+	if err := s.pv.Validate(r.Msg); err != nil {
+		log.Ctx(ctx).Err(err).Msg("invalid request")
+		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+	}
+
+	tokenClaims, ok := s.apiMetadata.GetClaims(ctx)
+	if !ok {
+		log.Ctx(ctx).Error().Msg("failed running GetClaims")
+		return nil, internalError
+	}
+
+	token, err := s.tokens.NewToken(tokenClaims.Payload.CustomerId, tokens.Audience_SymmetricalSpoon)
+	if err != nil {
+		log.Ctx(ctx).Err(err).Msg("failed running NewToken")
+		return nil, internalError
+	}
+
+	return &connect.Response[authv1.RefreshTokensResponse]{
+		Msg: &authv1.RefreshTokensResponse{
+			AccessToken: token,
+			// TODO: the refresh token brother :D
+			RefreshToken: "",
+		},
+	}, nil
+}
+
 func NewService(pv protovalidate.Validator, store store.Queries, tokens tokens.Tokens, emailer emailer.Emailer, templates template.Templates, apiMetadata apimetadata.ApiMetadata, googleSvc googlesvc.GoogleSvc, baikalCli baikalclient.Client, calDAVPasswordEncryptionKey string) authv1connect.AuthServiceHandler {
 	return &service{
 		pv:                          pv,

@@ -23,7 +23,8 @@ message CompleteEmailRequest {
 
 message CompleteEmailResponse {
     string access_token = 1;
-    string user_id = 2;
+    string refresh_token = 2;
+    string user_id = 3;
 }
 
 message UseGoogleRequest {
@@ -32,7 +33,8 @@ message UseGoogleRequest {
 
 message UseGoogleResponse {
     string access_token = 1;
-    string user_id = 2;
+    string refresh_token = 2;
+    string user_id = 3;
 }
 
 enum MagicTokenType {
@@ -48,9 +50,19 @@ message GenerateMagicTokenResponse {
     string magic_token = 1;
 }
 
+message RefreshTokensRequest {
+    string refresh_token = 1;
+}
+
+message RefreshTokensResponse {
+    string access_token = 1;
+    string refresh_token = 2;
+}
+
 service AuthService {
     rpc InitiateEmail(InitiateEmailRequest) returns (InitiateEmailResponse);
     rpc CompleteEmail(CompleteEmailRequest) returns (CompleteEmailResponse);
     rpc UseGoogle(UseGoogleRequest) returns (UseGoogleResponse);
     rpc GenerateMagicToken(GenerateMagicTokenRequest) returns (GenerateMagicTokenResponse);
+    rpc RefreshTokens(RefreshTokensRequest) returns (RefreshTokensResponse);
 }
