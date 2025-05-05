@@ -25,7 +25,6 @@ async function main() {
     port: cfg.rabbitmq.port,
     username: cfg.rabbitmq.username,
     password: cfg.rabbitmq.password,
-    frameMax: 128 * 1024 /* 128KB */,
   });
   const amqpChannel = await amqpConn.createChannel();
 
