@@ -5,11 +5,12 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/ThreeDotsLabs/watermill-amqp/v3/pkg/amqp"
+	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/google/uuid"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/services/calendarsvc"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/services/notificationsvc"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/store"
-	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/rs/zerolog/log"
 )
 
@@ -21,7 +22,7 @@ const (
 )
 
 type consumer struct {
-	channel                     *amqp.Channel
+	subscriber                  *amqp.Subscriber
 	calendarEventsQueueName     string
 	store                       store.Queries
 	calendarSvc                 calendarsvc.Svc
@@ -30,32 +31,11 @@ type consumer struct {
 }
 
 func (c *consumer) Start(ctx context.Context) error {
-	log.Ctx(ctx).Info().Msgf("starting calendar consumer for queue: %s", c.calendarEventsQueueName)
+	log.Ctx(ctx).Info().Msgf("starting calendar consumer for topic: %s", c.calendarEventsQueueName)
 
-	_, err := c.channel.QueueDeclare(
-		c.calendarEventsQueueName,
-		true,  // durable
-		false, // delete when unused
-		false, // exclusive
-		false, // no-wait
-		nil,   // arguments
-	)
+	msgsChan, err := c.subscriber.Subscribe(ctx, c.calendarEventsQueueName)
 	if err != nil {
-		return fmt.Errorf("failed to declare queue: %w", err)
-	}
-
-	msgsChan, err := c.channel.Consume(
-		c.calendarEventsQueueName, // queue
-		consumerTag,               // consumer
-		false,                     // autoAck
-		false,                     // exclusive
-		false,                     // noLocal
-		false,                     // noWait
-		nil,                       // args
-	)
-	if err != nil {
-		log.Ctx(ctx).Err(err).Msgf("failed to consume queue: %s", c.calendarEventsQueueName)
-		return err
+		return fmt.Errorf("failed to subscribe to topic: %w", err)
 	}
 
 	log.Ctx(ctx).Info().Msg("successfully started consuming calendar messages")
@@ -80,14 +60,13 @@ func (c *consumer) Start(ctx context.Context) error {
 	return nil
 }
 
-func (c *consumer) processMessage(ctx context.Context, msg amqp.Delivery) {
+func (c *consumer) processMessage(ctx context.Context, msg *message.Message) {
 	var eventData CalendarEventData
-	if err := json.Unmarshal(msg.Body, &eventData); err != nil {
+	if err := json.Unmarshal(msg.Payload, &eventData); err != nil {
 		log.Ctx(ctx).Err(err).Msg("failed to unmarshal calendar event")
-		_ = msg.Nack(
-			false, // multiple
-			true,  // requeue for retry
-		)
+		if didNotSendAck := msg.Nack(); didNotSendAck {
+			log.Ctx(ctx).Err(err).Msg("failed to Nack the message, cuz Ack already sent")
+		}
 		return
 	}
 
@@ -107,10 +86,9 @@ func (c *consumer) processMessage(ctx context.Context, msg amqp.Delivery) {
 	})
 	if err != nil {
 		logger.Err(err).Msg("failed to get customer credentials")
-		_ = msg.Nack(
-			false, // multiple
-			true,  // requeue for retry
-		)
+		if didNotSendAck := msg.Nack(); didNotSendAck {
+			log.Ctx(ctx).Err(err).Msg("failed to Nack the message, cuz Ack already sent")
+		}
 		return
 	}
 
@@ -126,10 +104,9 @@ func (c *consumer) processMessage(ctx context.Context, msg amqp.Delivery) {
 	})
 	if err != nil {
 		logger.Err(err).Msg("failed to initialize WhatsApp calendar")
-		_ = msg.Nack(
-			false, // multiple
-			true,  // requeue for retry
-		)
+		if didNotSendAck := msg.Nack(); didNotSendAck {
+			log.Ctx(ctx).Err(err).Msg("failed to Nack the message, cuz Ack already sent")
+		}
 		return
 	}
 
@@ -145,10 +122,9 @@ func (c *consumer) processMessage(ctx context.Context, msg amqp.Delivery) {
 	})
 	if err != nil {
 		logger.Err(err).Msg("failed to add event to calendar")
-		_ = msg.Nack(
-			false, // multiple
-			true,  // requeue for retry
-		)
+		if didNotSendAck := msg.Nack(); didNotSendAck {
+			log.Ctx(ctx).Err(err).Msg("failed to Nack the message, cuz Ack already sent")
+		}
 		return
 	}
 
@@ -178,8 +154,8 @@ func (c *consumer) processMessage(ctx context.Context, msg amqp.Delivery) {
 		logger.Debug().Msg("sent push notification successfully")
 	}
 
-	if err := msg.Ack(false); err != nil {
-		logger.Err(err).Msg("failed to acknowledge message")
+	if didNotSendNack := msg.Ack(); didNotSendNack {
+		logger.Err(err).Msg("failed to acknowledge message, cuz Nack was already sent")
 	} else {
 		logger.Debug().Msg("acknowledged message successfully")
 	}
@@ -187,17 +163,17 @@ func (c *consumer) processMessage(ctx context.Context, msg amqp.Delivery) {
 
 func (c *consumer) Stop(ctx context.Context) error {
 	log.Ctx(ctx).Info().Msg("stopping calendar consumer")
-	if err := c.channel.Close(); err != nil {
-		log.Ctx(ctx).Err(err).Msg("failed to close the channel")
-		return err
-	}
+	// if err := c.channel.Close(); err != nil {
+	// 	log.Ctx(ctx).Err(err).Msg("failed to close the channel")
+	// 	return err
+	// }
 	return nil
 }
 
-func NewConsumer(channel *amqp.Channel, calendarEventsQueueName string, store store.Queries, calendarSvc calendarsvc.Svc,
+func NewConsumer(subscriber *amqp.Subscriber, calendarEventsQueueName string, store store.Queries, calendarSvc calendarsvc.Svc,
 	calDAVPasswordEncryptionKey string, notificationSvc notificationsvc.Svc) Consumer {
 	return &consumer{
-		channel:                     channel,
+		subscriber:                  subscriber,
 		calendarEventsQueueName:     calendarEventsQueueName,
 		store:                       store,
 		calendarSvc:                 calendarSvc,

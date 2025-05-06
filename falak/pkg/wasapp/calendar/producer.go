@@ -5,50 +5,28 @@ import (
 	"encoding/json"
 	"fmt"
 
-	amqp "github.com/rabbitmq/amqp091-go"
+	"github.com/ThreeDotsLabs/watermill"
+	"github.com/ThreeDotsLabs/watermill-amqp/v3/pkg/amqp"
+	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/rs/zerolog/log"
 )
 
 type producer struct {
-	channel                 *amqp.Channel
+	publisher               *amqp.Publisher
 	calendarEventsQueueName string
 }
 
 func (p *producer) PublishEvent(ctx context.Context, event CalendarEventData) error {
-	// Ensure the queue exists
-	_, err := p.channel.QueueDeclare(
-		p.calendarEventsQueueName,
-		true,  // durable
-		false, // delete when unused
-		false, // exclusive
-		false, // no-wait
-		nil,   // arguments
-	)
-	if err != nil {
-		return fmt.Errorf("failed to declare queue: %w", err)
-	}
-
-	// Convert event to JSON
-	eventJSON, err := json.Marshal(event)
+	eventJsonBytes, err := json.Marshal(event)
 	if err != nil {
 		return fmt.Errorf("failed to marshal event: %w", err)
 	}
 
-	// Publish the event
-	err = p.channel.PublishWithContext(
-		ctx,
-		"",                        // exchange
-		p.calendarEventsQueueName, // routing key
-		false,                     // mandatory
-		false,                     // immediate
-		amqp.Publishing{
-			ContentType:  "application/json",
-			Body:         eventJSON,
-			DeliveryMode: amqp.Persistent, // Make message persistent
-		})
+	msg := message.NewMessage(watermill.NewUUID(), eventJsonBytes)
 
+	err = p.publisher.Publish(p.calendarEventsQueueName, msg)
 	if err != nil {
-		return fmt.Errorf("failed to publish event: %w", err)
+		return fmt.Errorf("failed to publish message: %w", err)
 	}
 
 	log.Ctx(ctx).Info().
@@ -59,9 +37,9 @@ func (p *producer) PublishEvent(ctx context.Context, event CalendarEventData) er
 	return nil
 }
 
-func NewProducer(channel *amqp.Channel, calendarEventsQueueName string) Producer {
+func NewProducer(publisher *amqp.Publisher, calendarEventsQueueName string) Producer {
 	return &producer{
-		channel:                 channel,
+		publisher:               publisher,
 		calendarEventsQueueName: calendarEventsQueueName,
 	}
 }

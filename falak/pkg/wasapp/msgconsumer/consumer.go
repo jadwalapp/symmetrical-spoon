@@ -3,16 +3,17 @@ package wasappmsgconsumer
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 
+	"github.com/ThreeDotsLabs/watermill-amqp/v3/pkg/amqp"
 	"github.com/jadwalapp/symmetrical-spoon/falak/pkg/store"
 	wasappcalendar "github.com/jadwalapp/symmetrical-spoon/falak/pkg/wasapp/calendar"
 	wasappmsganalyzer "github.com/jadwalapp/symmetrical-spoon/falak/pkg/wasapp/msganalyzer"
-	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/rs/zerolog/log"
 )
 
 type consumer struct {
-	channel                       *amqp.Channel
+	subscriber                    *amqp.Subscriber
 	wasappMessagesQueueName       string
 	store                         store.Queries
 	msgAnalyzer                   wasappmsganalyzer.Analyzer
@@ -23,27 +24,9 @@ type consumer struct {
 func (c *consumer) Start(ctx context.Context) error {
 	log.Ctx(ctx).Info().Msgf("starting consumer for queue: %s", c.wasappMessagesQueueName)
 
-	c.channel.QueueDeclare(
-		c.wasappMessagesQueueName,
-		true,  // durable
-		false, // delete when unused
-		false, // exclusive
-		false, // no-wait
-		nil,   // arguments
-	)
-
-	msgsChan, err := c.channel.Consume(
-		c.wasappMessagesQueueName, // queue
-		"falak",                   // consumer
-		false,                     // autoAck
-		false,                     // exclusive
-		false,                     // noLocal
-		false,                     // noWait
-		nil,                       // args
-	)
+	msgsChan, err := c.subscriber.Subscribe(ctx, c.wasappMessagesQueueName)
 	if err != nil {
-		log.Ctx(ctx).Err(err).Msgf("failed to consume queue: %s", c.wasappMessagesQueueName)
-		return err
+		return fmt.Errorf("failed to subscribe to topic: %w", err)
 	}
 
 	log.Ctx(ctx).Info().Msg("successfully started consuming messages")
@@ -61,14 +44,10 @@ func (c *consumer) Start(ctx context.Context) error {
 				}
 
 				var wasappMsg WasappMessage
-				if err := json.Unmarshal(msg.Body, &wasappMsg); err != nil {
+				if err := json.Unmarshal(msg.Payload, &wasappMsg); err != nil {
 					log.Ctx(ctx).Err(err).Msg("failed to unmarshall the wasapp message in the body")
-					err = msg.Nack(
-						false, // multiple
-						true,  // requeue
-					)
-					if err != nil {
-						log.Ctx(ctx).Err(err).Msg("failed to Nack the message")
+					if didNotSendAck := msg.Nack(); didNotSendAck {
+						log.Ctx(ctx).Err(err).Msg("failed to Nack the message, cuz Ack already sent")
 					}
 					continue
 				}
@@ -156,12 +135,8 @@ func (c *consumer) Start(ctx context.Context) error {
 							log.Ctx(ctx).Err(err).
 								Str("chat_id", chatID).
 								Msg("failed running store.DeleteChat")
-							err = msg.Nack(
-								false, // multiple
-								true,  // requeue
-							)
-							if err != nil {
-								log.Ctx(ctx).Err(err).Msg("failed to Nack the message")
+							if didNotSendAck := msg.Nack(); didNotSendAck {
+								log.Ctx(ctx).Err(err).Msg("failed to Nack the message, cuz Ack already sent")
 							}
 							continue
 						}
@@ -177,12 +152,8 @@ func (c *consumer) Start(ctx context.Context) error {
 							log.Ctx(ctx).Err(err).
 								Str("chat_id", chatID).
 								Msg("failed running store.DeleteChat")
-							err = msg.Nack(
-								false, // multiple
-								true,  // requeue
-							)
-							if err != nil {
-								log.Ctx(ctx).Err(err).Msg("failed to Nack the message")
+							if didNotSendAck := msg.Nack(); didNotSendAck {
+								log.Ctx(ctx).Err(err).Msg("failed to Nack the message, cuz Ack already sent")
 							}
 							continue
 						}
@@ -198,13 +169,10 @@ func (c *consumer) Start(ctx context.Context) error {
 					}
 				}
 
-				err = msg.Ack(
-					false, // multiple
-				)
-				if err != nil {
-					log.Ctx(ctx).Err(err).Msg("failed to Ack the message")
+				if didNotSendNack := msg.Ack(); didNotSendNack {
+					log.Ctx(ctx).Err(err).Msg("failed to Ack message, cuz Nack was already sent")
 				} else {
-					log.Ctx(ctx).Debug().Msg("successfully acknowledged message")
+					log.Ctx(ctx).Debug().Msg("acknowledged message successfully")
 				}
 			}
 		}
@@ -215,17 +183,17 @@ func (c *consumer) Start(ctx context.Context) error {
 
 func (c *consumer) Stop(ctx context.Context) error {
 	log.Ctx(ctx).Info().Msg("stopping consumer")
-	if err := c.channel.Close(); err != nil {
-		log.Ctx(ctx).Err(err).Msg("failed to close the channel")
-		return err
-	}
+	// if err := c.channel.Close(); err != nil {
+	// 	log.Ctx(ctx).Err(err).Msg("failed to close the channel")
+	// 	return err
+	// }
 	log.Ctx(ctx).Info().Msg("consumer stopped successfully")
 	return nil
 }
 
-func NewConsumer(channel *amqp.Channel, wasappMessagesQueueName string, store store.Queries, msgAnalyzer wasappmsganalyzer.Analyzer, calendarProducer wasappcalendar.Producer, whatsappMessagesEncryptionKey string) Consumer {
+func NewConsumer(subscriber *amqp.Subscriber, wasappMessagesQueueName string, store store.Queries, msgAnalyzer wasappmsganalyzer.Analyzer, calendarProducer wasappcalendar.Producer, whatsappMessagesEncryptionKey string) Consumer {
 	return &consumer{
-		channel:                       channel,
+		subscriber:                    subscriber,
 		wasappMessagesQueueName:       wasappMessagesQueueName,
 		store:                         store,
 		msgAnalyzer:                   msgAnalyzer,

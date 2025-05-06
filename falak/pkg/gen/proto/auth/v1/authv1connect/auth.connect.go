@@ -44,6 +44,9 @@ const (
 	// AuthServiceGenerateMagicTokenProcedure is the fully-qualified name of the AuthService's
 	// GenerateMagicToken RPC.
 	AuthServiceGenerateMagicTokenProcedure = "/auth.v1.AuthService/GenerateMagicToken"
+	// AuthServiceRefreshTokensProcedure is the fully-qualified name of the AuthService's RefreshTokens
+	// RPC.
+	AuthServiceRefreshTokensProcedure = "/auth.v1.AuthService/RefreshTokens"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
@@ -53,6 +56,7 @@ var (
 	authServiceCompleteEmailMethodDescriptor      = authServiceServiceDescriptor.Methods().ByName("CompleteEmail")
 	authServiceUseGoogleMethodDescriptor          = authServiceServiceDescriptor.Methods().ByName("UseGoogle")
 	authServiceGenerateMagicTokenMethodDescriptor = authServiceServiceDescriptor.Methods().ByName("GenerateMagicToken")
+	authServiceRefreshTokensMethodDescriptor      = authServiceServiceDescriptor.Methods().ByName("RefreshTokens")
 )
 
 // AuthServiceClient is a client for the auth.v1.AuthService service.
@@ -61,6 +65,7 @@ type AuthServiceClient interface {
 	CompleteEmail(context.Context, *connect.Request[v1.CompleteEmailRequest]) (*connect.Response[v1.CompleteEmailResponse], error)
 	UseGoogle(context.Context, *connect.Request[v1.UseGoogleRequest]) (*connect.Response[v1.UseGoogleResponse], error)
 	GenerateMagicToken(context.Context, *connect.Request[v1.GenerateMagicTokenRequest]) (*connect.Response[v1.GenerateMagicTokenResponse], error)
+	RefreshTokens(context.Context, *connect.Request[v1.RefreshTokensRequest]) (*connect.Response[v1.RefreshTokensResponse], error)
 }
 
 // NewAuthServiceClient constructs a client for the auth.v1.AuthService service. By default, it uses
@@ -97,6 +102,12 @@ func NewAuthServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 			connect.WithSchema(authServiceGenerateMagicTokenMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
+		refreshTokens: connect.NewClient[v1.RefreshTokensRequest, v1.RefreshTokensResponse](
+			httpClient,
+			baseURL+AuthServiceRefreshTokensProcedure,
+			connect.WithSchema(authServiceRefreshTokensMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -106,6 +117,7 @@ type authServiceClient struct {
 	completeEmail      *connect.Client[v1.CompleteEmailRequest, v1.CompleteEmailResponse]
 	useGoogle          *connect.Client[v1.UseGoogleRequest, v1.UseGoogleResponse]
 	generateMagicToken *connect.Client[v1.GenerateMagicTokenRequest, v1.GenerateMagicTokenResponse]
+	refreshTokens      *connect.Client[v1.RefreshTokensRequest, v1.RefreshTokensResponse]
 }
 
 // InitiateEmail calls auth.v1.AuthService.InitiateEmail.
@@ -128,12 +140,18 @@ func (c *authServiceClient) GenerateMagicToken(ctx context.Context, req *connect
 	return c.generateMagicToken.CallUnary(ctx, req)
 }
 
+// RefreshTokens calls auth.v1.AuthService.RefreshTokens.
+func (c *authServiceClient) RefreshTokens(ctx context.Context, req *connect.Request[v1.RefreshTokensRequest]) (*connect.Response[v1.RefreshTokensResponse], error) {
+	return c.refreshTokens.CallUnary(ctx, req)
+}
+
 // AuthServiceHandler is an implementation of the auth.v1.AuthService service.
 type AuthServiceHandler interface {
 	InitiateEmail(context.Context, *connect.Request[v1.InitiateEmailRequest]) (*connect.Response[v1.InitiateEmailResponse], error)
 	CompleteEmail(context.Context, *connect.Request[v1.CompleteEmailRequest]) (*connect.Response[v1.CompleteEmailResponse], error)
 	UseGoogle(context.Context, *connect.Request[v1.UseGoogleRequest]) (*connect.Response[v1.UseGoogleResponse], error)
 	GenerateMagicToken(context.Context, *connect.Request[v1.GenerateMagicTokenRequest]) (*connect.Response[v1.GenerateMagicTokenResponse], error)
+	RefreshTokens(context.Context, *connect.Request[v1.RefreshTokensRequest]) (*connect.Response[v1.RefreshTokensResponse], error)
 }
 
 // NewAuthServiceHandler builds an HTTP handler from the service implementation. It returns the path
@@ -166,6 +184,12 @@ func NewAuthServiceHandler(svc AuthServiceHandler, opts ...connect.HandlerOption
 		connect.WithSchema(authServiceGenerateMagicTokenMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
+	authServiceRefreshTokensHandler := connect.NewUnaryHandler(
+		AuthServiceRefreshTokensProcedure,
+		svc.RefreshTokens,
+		connect.WithSchema(authServiceRefreshTokensMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/auth.v1.AuthService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case AuthServiceInitiateEmailProcedure:
@@ -176,6 +200,8 @@ func NewAuthServiceHandler(svc AuthServiceHandler, opts ...connect.HandlerOption
 			authServiceUseGoogleHandler.ServeHTTP(w, r)
 		case AuthServiceGenerateMagicTokenProcedure:
 			authServiceGenerateMagicTokenHandler.ServeHTTP(w, r)
+		case AuthServiceRefreshTokensProcedure:
+			authServiceRefreshTokensHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -199,4 +225,8 @@ func (UnimplementedAuthServiceHandler) UseGoogle(context.Context, *connect.Reque
 
 func (UnimplementedAuthServiceHandler) GenerateMagicToken(context.Context, *connect.Request[v1.GenerateMagicTokenRequest]) (*connect.Response[v1.GenerateMagicTokenResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("auth.v1.AuthService.GenerateMagicToken is not implemented"))
+}
+
+func (UnimplementedAuthServiceHandler) RefreshTokens(context.Context, *connect.Request[v1.RefreshTokensRequest]) (*connect.Response[v1.RefreshTokensResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("auth.v1.AuthService.RefreshTokens is not implemented"))
 }

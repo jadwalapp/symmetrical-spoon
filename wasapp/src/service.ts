@@ -45,7 +45,7 @@ export class WasappService {
       authStrategy: new LocalAuth({
         clientId: customerId,
       }),
-      webVersion: "2.3000.1019739601",
+      // webVersion: "2.3000.1019739601",
       puppeteer: {
         headless: this.makeHeadlessClients,
         executablePath: this.puppeteerExecutablePath,
@@ -170,6 +170,8 @@ export class WasappService {
 
         await this.amqpChannel.assertQueue(this.wasappMessagesQueueName, {
           durable: true,
+          autoDelete: false,
+          exclusive: false,
         });
         this.amqpChannel.sendToQueue(
           this.wasappMessagesQueueName,

@@ -46,7 +46,6 @@ import (
 	wasappmsgconsumer "github.com/jadwalapp/symmetrical-spoon/falak/pkg/wasapp/msgconsumer"
 	"github.com/openai/openai-go"
 	openaioption "github.com/openai/openai-go/option"
-	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/resendlabs/resend-go"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -54,6 +53,9 @@ import (
 	apns2token "github.com/sideshow/apns2/token"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
+
+	"github.com/ThreeDotsLabs/watermill"
+	"github.com/ThreeDotsLabs/watermill-amqp/v3/pkg/amqp"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
@@ -183,25 +185,28 @@ func main() {
 	wasappCli := wasappclient.NewClient(wasappHttpCli, config.WasappBaseUrl)
 	// ======== BAIKAL CLIENT ========
 
-	// ======== AMQP CHAN ========
+	// ======== WATERMILL CONFIG ========
 	amqpUrl := util.CreateAmqpSource(
 		config.RabbitMqUser,
 		config.RabbitMqPass,
 		config.RabbitMqHost,
 		config.RabbitMqPort,
 	)
-	amqpConn, err := amqp.Dial(amqpUrl)
+	amqpConfig := amqp.NewDurableQueueConfig(amqpUrl)
+	amqpConfig.Queue.AutoDelete = false
+	amqpConfig.Queue.Exclusive = false
+	amqpConfig.Queue.Durable = true
+
+	amqpSubscriber, err := amqp.NewSubscriber(amqpConfig, watermill.NewStdLogger(true, true))
 	if err != nil {
-		log.Fatal().Msgf("failed to dial amqp: %v", err)
+		log.Fatal().Msgf("Failed to create a amqp subscriber: %v", err)
 	}
 
-	amqpChan, err := amqpConn.Channel()
+	amqpPublisher, err := amqp.NewPublisher(amqpConfig, watermill.NewStdLogger(true, true))
 	if err != nil {
-		log.Fatal().Msgf("failed to open an amqp channel: %v", err)
+		log.Fatal().Msgf("Failed to create a amqp subscriber: %v", err)
 	}
-	defer amqpChan.Close()
-	defer amqpConn.Close()
-	// ======== AMQP CHAN ========
+	// ======== WATERMILL CONFIG ========
 
 	// ======== LLM CLI ========
 	llmHttpiCli := &http.Client{}
@@ -232,7 +237,7 @@ func main() {
 	// ======== CALENDAR SERVICE ========
 
 	// ======== WASAPP CALENDAR PRODUCER ========
-	wasappCalendarProducer := wasappcalendar.NewProducer(amqpChan, config.WasappCalendarEventsQueueName)
+	wasappCalendarProducer := wasappcalendar.NewProducer(amqpPublisher, config.WasappCalendarEventsQueueName)
 	// ======== WASAPP CALENDAR PRODUCER ========
 
 	// ======== APNS ========
@@ -266,7 +271,7 @@ func main() {
 	calendarConsumerCtx := context.Background()
 	calendarConsumerCtx = log.Logger.WithContext(calendarConsumerCtx)
 
-	calendarConsumer := wasappcalendar.NewConsumer(amqpChan, config.WasappCalendarEventsQueueName, *dbStore, calendarService, config.CalDAVPasswordEncryptionKey, notificationSvc)
+	calendarConsumer := wasappcalendar.NewConsumer(amqpSubscriber, config.WasappCalendarEventsQueueName, *dbStore, calendarService, config.CalDAVPasswordEncryptionKey, notificationSvc)
 	err = calendarConsumer.Start(calendarConsumerCtx)
 	if err != nil {
 		log.Fatal().Msgf("failed to start calendar consumer: %v", err)
@@ -279,7 +284,7 @@ func main() {
 	wasappConsumerCtx = log.Logger.WithContext(wasappConsumerCtx)
 
 	wasappConsumer := wasappmsgconsumer.NewConsumer(
-		amqpChan,
+		amqpSubscriber,
 		config.WasappMessagesQueueName,
 		*dbStore,
 		msgAnalyzer,

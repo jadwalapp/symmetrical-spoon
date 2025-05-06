@@ -88,8 +88,8 @@ func main() {
 
 	gmtPlus3 := time.FixedZone("GMT+3", 3*60*60)
 
-	eventStartDate := time.Date(2025, 3, 30, 4, 0, 0, 0, gmtPlus3)
-	eventEndDate := time.Date(2025, 3, 30, 5, 0, 0, 0, gmtPlus3)
+	eventStartDate := time.Date(2025, 5, 01, 7, 0, 0, 0, gmtPlus3)
+	eventEndDate := time.Date(2025, 5, 01, 9, 0, 0, 0, gmtPlus3)
 
 	err = notifSvc.SendNotificationToCustomerDevices(ctx, &notificationsvc.SendNotificationToCustomerDevicesRequest{
 		CustomerId: customerId,
