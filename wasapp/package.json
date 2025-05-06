@@ -18,7 +18,7 @@
     "whatsapp-web.js": "https://github.com/jadwalapp/whatsapp-web.js.git#main"
   },
   "devDependencies": {
-    "@types/amqplib": "^0.10.6",
+    "@types/amqplib": "^0.10.7",
     "@types/bun": "latest"
   }
 }
