@@ -198,15 +198,24 @@ The user downloads the profile, installs it via Settings, and now their device a
 
 \subsection{WhatsApp Event Extraction} \label{subsec:whatsapp-event-extraction}
 
-This is Jadwal's main innovation: automatic event extraction from WhatsApp messages using an LLM.
+This is Jadwal's main innovation: automatic event extraction from WhatsApp messages using an LLM-powered classification pipeline.
 
-After the user connects their WhatsApp account, the Wasapp service (written in TypeScript with whatsapp-web.js) streams messages to RabbitMQ. A Golang consumer reads the messages and uses the LLM to analyze the thread context to classify it:
+Once a user connects their WhatsApp account, the Wasapp service (written in TypeScript with \texttt{whatsapp-web.js}) streams received messages to a RabbitMQ queue. A Golang consumer reads from this queue and sends the conversation context to an LLM — specifically, Google’s \textit{gemini-2.0-flash} model — which analyzes the thread to determine whether an event exists.
 
-\begin{itemize} \item \textbf{No Event:} Messages are stored encrypted in the DB while waiting for more context. \item \textbf{Has Event but Not Confirmed:} [Placeholder to describe more if needed] \item \textbf{Has Event and Rejected:} Encrypted messages are deleted immediately to protect privacy. \item \textbf{Has Event and Agreed:} Before deleting the thread, a new event is produced to the wasapp.calendar.events queue. The consumer then creates an event under the user’s special \texttt{Phone Emoji} WhatsApp Events calendar. \end{itemize}
+The prompt sent to the LLM includes the full message history wrapped in structured tags along with metadata such as current date and time. The prompt enforces strict constraints and expects a machine-readable JSON response with one of four statuses:
 
-After adding the event, we send two notifications: an alert to inform the user, and a silent notification to trigger conflict checking (described next).
+\begin{itemize}
+    \item \texttt{NO\_EVENT}: No event detected.
+    \item \texttt{HAS\_EVENT\_BUT\_NOT\_CONFIRMED}: An event was suggested but not confirmed.
+    \item \texttt{HAS\_EVENT\_DENIED}: An event was suggested but rejected.
+    \item \texttt{HAS\_EVENT\_AGREED}: An event was confirmed; additional fields like title, dates, and location are returned.
+\end{itemize}
 
-We chose Google’s gemini-2.0-flash model, which is both fast and cost-effective. During demos, the system detected events faster than WhatsApp notifications arrived on phones!
+When an event is confirmed, it is published to the \texttt{wasapp.calendar.events} queue and added under the user’s special WhatsApp Events calendar. We also send an alert notification to inform the user, and a silent one to trigger conflict detection (see Section~\ref{subsec:conflict-resolution}).
+
+The LLM integration is stateless and fully abstracted behind a Go service. During our testing, the system processed and extracted events faster than the original WhatsApp notifications arrived on the device.
+
+For the full prompt template and formatting details, refer to Appendix~\ref{appendix:llm-prompt}.
 
 \subsection{Conflict Resolution} \label{subsec:conflict-resolution}
 
@@ -214,17 +223,33 @@ Whenever a new event is added automatically by Jadwal, conflicts are checked.
 
 Conflicts only matter for auto-added events (from WhatsApp) — because when users manually add events through the calendar view, they already notice conflicts directly.
 
-Users can resolve conflicts through three actions: \begin{itemize} \item \textbf{Keep New/Conflicting Event:} Acknowledge the conflict but keep it. \item \textbf{Move New/Conflicting Event:} Adjust the event timing. \item \textbf{Delete New/Conflicting Event:} Remove the new event. \end{itemize}
+Users can resolve conflicts through three actions:
+\begin{itemize}
+    \item \textbf{Keep New/Conflicting Event:} Acknowledge the conflict but keep it.
+    \item \textbf{Move New/Conflicting Event:} Adjust the event timing.
+    \item \textbf{Delete New/Conflicting Event:} Remove the new event.
+\end{itemize}
 
-The app presents a clean conflict resolution UI, showing side-by-side comparison of the old and new times for clarity.
+The app presents a clean conflict resolution UI, showing side-by-side comparison of the old and new times for clarity. All UI, backend logic, and data handling for this feature were implemented successfully.
+
+\textbf{Limitation:} The backend relies on a silent push notification to trigger conflict detection via the “Suggest Conflict Resolutions” use case. However, iOS's EventKit framework does let you \textbf{force fetch} the calendar's latest events when request, it just tries and sometimes is delayed by up to 5 minutes from our testing. This makes the feature unreliable in real-world usage and prevents us from reliably displaying the conflict resolution UI during testing.
+
+\textbf{Future Work:} To overcome this, we need to implement a proprietary Apple protocol that is not public, but big companies use it. It allows the server to ``push'' updates to the client, in this case the iOS CalDAV implementation exposed via EventKit.
 
 \subsection{Connect Calendar} \label{subsec:connect-calendar}
 
 This feature makes it very easy for users to add the Jadwal CalDAV account to their phone.
 
-Instead of manually typing the server URL, username, and password — risking mistakes — we let users click a button to download a .mobileconfig file, install it, and have everything configured automatically.
+Instead of manually typing the server URL, username, and password — risking mistakes — we let users click a button to download a \textit{.mobileconfig} file, install it, and have everything configured automatically.
 
-The flow: \begin{itemize} \item Click Easy Setup inside the app Settings. \item A short-lived (15-min) magic token is generated. \item The app opens a secure download of the mobile provisioning profile. \item The profile installs a CalDAV account automatically. \end{itemize}
+The flow:
+
+\begin{itemize}
+    \item Click Easy Setup inside the app Settings.
+    \item A short-lived (15-min) magic token is generated.
+    \item The app opens a secure download of the mobile provisioning profile.
+    \item The profile installs a CalDAV account automatically.
+\end{itemize}
 
 Magic tokens are hashed securely using SHA-256 and are one-time use only. The user barely notices all this complexity — for them, it’s just a smooth "click and go" experience.
 
@@ -252,20 +277,185 @@ Security was a core consideration throughout Jadwal's development. The system is
     \item \textbf{DNS \& DDoS Protection} – Cloudflare is used to manage DNS, enforce HTTPS, and provide protection against common web threats including DDoS and bot abuse.
 \end{itemize}
 
-
 \section{Testing Methodology}
 
-We adopted a pragmatic testing methodology focused on verifying key user flows rather than exhaustive unit testing. The most critical paths — such as user login, WhatsApp connection, event parsing, and calendar sync — were tested manually and programmatically during development. We also integrated PostHog for session replay and funnel analytics, which allowed us to observe real user interactions and validate expected behavior. Although full test automation was not implemented, our iterative development approach ensured that all major regressions were caught early.
+Our testing methodology followed a black-box approach, emphasizing critical user flows such as email-based authentication, Google sign-in, and WhatsApp pairing. We relied on input space partitioning (ISP) for unit-level test design and used graph-based modeling for integration-level coverage.
 
-\section{Tested Features}
+PostHog was integrated to capture real user session flows and validate behavioral expectations. While full automation was not achieved, manual and programmatic testing throughout development helped us detect and resolve regressions early.
 
-Testing is a crucial part of any high quality software. We made sure to test the critical paths of the users making sure they get delivered a high quality experience. We chose to test the authentication flow, the connect WhatsApp flow, the connect calendar flow, the schedule prayer times flow and the WhatsApp event extraction flow. This sums us the important flows in our app. Below each of those flows/features is put through a few tests to ensure quality of the product is what the user expects.
+\section{Test Design}
 
-\subsection{Authentication (Email \& Google)}
-\subsection{Connect WhatsApp}
-\subsection{Connect Calendar}
-\subsection{Schedule Prayer Times}
-\subsection{WhatsApp Event Extraction}
+\subsection*{Unit Test Design}
+
+\subsubsection*{1. \texttt{InitiateEmail(String email)}}
+
+\textbf{Description:} Validates the user’s email and sends a magic login link.  
+\textbf{Test Technique:} Input Space Partitioning (ISP)
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{Block} & \textbf{A1} & \textbf{A2} & \textbf{A3} \\
+\hline
+\textbf{Email} & Valid format & Invalid format & Empty \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsubsection*{2. \texttt{CompleteEmail(String token)}}
+
+\textbf{Description:} Accepts a magic token from the link and authenticates the user.  
+\textbf{Test Technique:} Input Space Partitioning (ISP)
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{Block} & \textbf{B1} & \textbf{B2} & \textbf{B3} \\
+\hline
+\textbf{Magic Token} & Valid & Expired or Invalid & Empty \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsubsection*{3. \texttt{GoogleAuthentication(String idToken)}}
+
+\textbf{Description:} Accepts a Google OAuth ID token and verifies it.  
+\textbf{Test Technique:} Input Space Partitioning (ISP)
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+\textbf{Block} & \textbf{C1} & \textbf{C2} & \textbf{C3} & \textbf{C4} \\
+\hline
+\textbf{idToken} & Valid & Expired & Malformed & Empty \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsubsection*{4. \texttt{StartWhatsAppConnection(String phoneNumber)}}
+
+\textbf{Description:} Starts the pairing process by accepting the user’s phone number.  
+\textbf{Test Technique:} Input Space Partitioning (ISP)
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{Block} & \textbf{D1} & \textbf{D2} & \textbf{D3} \\
+\hline
+\textbf{Phone Number} & Valid format & Invalid format & Empty \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsubsection*{5. \texttt{CheckWhatsAppConnectionStatus(String phoneNumber)}}
+
+\textbf{Description:} Polls WhatsApp pairing status for a phone number.  
+\textbf{Test Technique:} Input Space Partitioning (ISP)
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+\textbf{Block} & \textbf{E1} & \textbf{E2} & \textbf{E3} & \textbf{E4} \\
+\hline
+\textbf{Connection Status} & Linked & Pending & Failed & Expired \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection*{Integration Test Design}
+
+\subsubsection*{Email Authentication Flow}
+
+The flow for email-based authentication is illustrated in Figure~\ref{fig:email-auth-flow}. The process begins when the user enters their email address into the app. The backend then triggers the \texttt{InitiateEmail} method, which sends a one-time magic link via email. When the user clicks the link, they are redirected back into the app, which captures the token embedded in the link. This token is then sent to the backend's \texttt{CompleteEmail} endpoint for validation. If valid, the backend issues access and refresh tokens, completing the login process.
+
+\begin{figure}[h!]
+    \centering
+    \begin{tikzpicture}[node distance=2cm, every node/.style={draw, align=center, minimum width=2.5cm}]
+    \node (start) {Start};
+    \node (enterEmail) [below of=start] {User enters email};
+    \node (initiate) [below of=enterEmail] {\texttt{InitiateEmail}};
+    \node (clickLink) [below of=initiate] {User clicks magic link};
+    \node (complete) [below of=clickLink] {\texttt{CompleteEmail}};
+    \node (success) [below of=complete] {Login Success};
+    
+    \draw[->] (start) -- (enterEmail);
+    \draw[->] (enterEmail) -- (initiate);
+    \draw[->] (initiate) -- (clickLink);
+    \draw[->] (clickLink) -- (complete);
+    \draw[->] (complete) -- (success);
+    \end{tikzpicture}
+    \caption{Email-Based Authentication Flow}
+    \label{fig:email-auth-flow}
+\end{figure}    
+
+\subsubsection*{WhatsApp Connection Flow}
+
+The WhatsApp connection flow is shown in Figure~\ref{fig:whatsapp-flow}. The user starts by entering their phone number, which is sent to the backend to initiate a pairing session using \texttt{StartWhatsAppConnection}. A unique pairing code is generated and displayed to the user. Meanwhile, the app begins polling the backend using \texttt{CheckStatus} to monitor the session state. The outcome of this polling could be one of three states: successful connection, still pending, or failure (e.g., user did not enter the code or session expired).
+
+\begin{figure}[h!]
+    \centering
+    \begin{tikzpicture}[node distance=2cm, every node/.style={draw, align=center, minimum width=3cm}]
+    \node (enterPhone) {Enter Phone Number};
+    \node (start) [below of=enterPhone] {\texttt{StartWhatsAppConnection}};
+    \node (showCode) [below of=start] {Show Pairing Code};
+    \node (poll) [below of=showCode] {\texttt{CheckStatus} (poll)};
+    \node (linked) [right of=poll, xshift=4cm] {Linked};
+    \node (waiting) [below of=poll] {Still Waiting};
+    \node (fail) [left of=poll, xshift=-4cm] {Failed};
+    
+    \draw[->] (enterPhone) -- (start);
+    \draw[->] (start) -- (showCode);
+    \draw[->] (showCode) -- (poll);
+    \draw[->] (poll) -- (linked);
+    \draw[->] (poll) -- (waiting);
+    \draw[->] (poll) -- (fail);
+    \end{tikzpicture}
+    \caption{WhatsApp Pairing and Polling Flow}
+    \label{fig:whatsapp-flow}
+\end{figure}
+    
+
+\subsection*{OAuth 2.0 Flow for Google Authentication}
+
+Figure~\ref{fig:oauth-flow} illustrates the OAuth 2.0 login flow used for Google authentication. The mobile app initiates the flow by redirecting the user to Google's consent screen. Upon user approval, Google returns an \texttt{idToken} to the app. The app then forwards this token to the backend, which verifies it using Google's public keys and extracts the authenticated user's identity. This flow ensures secure, federated login without requiring the app to handle passwords directly.
+
+\begin{figure}[h!]
+    \centering
+    \begin{tikzpicture}[node distance=2cm, every node/.style={draw, align=center, minimum width=3.5cm}]
+    \node (app) {Mobile App};
+    \node (google) [right of=app, xshift=5cm] {Google OAuth Server};
+    \node (backend) [below of=app, yshift=-3.5cm] {Backend};
+    
+    \draw[->] (app) -- node[above] {Redirect for consent} (google);
+    \draw[->] (google) -- node[below] {\texttt{idToken}} (app);
+    \draw[->] (app) -- node[left] {\texttt{idToken}} (backend);
+    \draw[->] (backend) -- node[below] {Verify with Google} ++(3.5,0);
+    \end{tikzpicture}
+    \caption{Google OAuth 2.0 Flow with idToken Exchange}
+    \label{fig:oauth-flow}
+\end{figure}
+    
+
+\textbf{Why it matters:} The \texttt{idToken} is a signed JWT. We test it for validity, expiration, and structural integrity.
+
+\subsection*{Integration Test Execution}
+
+Each integration flow was tested end-to-end using a simulated user input and backend inspection.
+
+\begin{itemize}
+    \item \textbf{Email Authentication:} We verified that submitting an email via the app triggered a magic link via Resend, and that clicking the link opened the app and authenticated the user using the correct token. Failure cases were also tested using expired or tampered tokens.
+    \item \textbf{WhatsApp Pairing:} After submitting a phone number, we confirmed that a pairing code was generated and exposed via API. We verified that polling detected the linked session and updated the UI accordingly. Error cases were simulated by expiring codes or intentionally triggering session errors.
+    \item \textbf{Google OAuth:} The flow was tested using real Google test accounts. We confirmed that the app received a valid `idToken` and that the backend verified the token using Google's public keys. Failure cases included expired tokens, malformed tokens, and empty inputs.
+\end{itemize}
+
+In each flow, PostHog was used to observe real-time user actions, allowing us to validate the actual experience and detect any discrepancies between backend and frontend states.
+
+For full test case executions and their actual outcomes, please refer to Appendix~\ref{appendix:test-execution}.
 
 \section{Comparison to Original Specification}
 
