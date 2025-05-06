@@ -129,7 +129,10 @@ func (s *service) CompleteEmail(ctx context.Context, r *connect.Request[authv1.C
 
 		return &connect.Response[authv1.CompleteEmailResponse]{
 			Msg: &authv1.CompleteEmailResponse{
-				AccessToken: token,
+				AccessToken:  token,
+				Email:        customer.Email,
+				RefreshToken: "",
+				UserId:       customer.ID.String(),
 			},
 		}, nil
 	}
@@ -213,10 +216,18 @@ func (s *service) CompleteEmail(ctx context.Context, r *connect.Request[authv1.C
 		return nil, internalError
 	}
 
+	customer, err := s.store.GetCustomerById(ctx, magicToken.CustomerID)
+	if err != nil {
+		log.Ctx(ctx).Err(err).Msg("failed running GetCustomerById")
+		return nil, internalError
+	}
+
 	return &connect.Response[authv1.CompleteEmailResponse]{
 		Msg: &authv1.CompleteEmailResponse{
-			AccessToken: token,
-			UserId:      magicToken.CustomerID.String(),
+			AccessToken:  token,
+			UserId:       customer.ID.String(),
+			RefreshToken: "",
+			Email:        customer.Email,
 		},
 	}, nil
 }

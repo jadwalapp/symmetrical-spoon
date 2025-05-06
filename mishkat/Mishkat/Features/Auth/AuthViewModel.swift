@@ -128,7 +128,7 @@ class AuthViewModel: ObservableObject {
             
             do {
                 let response = try await authRepository.completeEmail(token: token)
-                PostHogSDK.shared.identify(response.userID)
+                PostHogSDK.shared.identify(response.userID, userProperties: ["email": response.email])
                 PostHogSDK.shared.capture("continue_with_email_complete_success")
                 await MainActor.run {
                     KeychainManager.shared.saveToken(response.accessToken)
