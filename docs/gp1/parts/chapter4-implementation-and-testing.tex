@@ -117,11 +117,11 @@ The careful selection of these controlled libraries ensured that Jadwal maintain
 
 \section{Database Implementation}
 
-The original database design, illustrated in Figure~\ref{fig:er-diagram} and Figure~\ref{fig:relational-schema}, was adapted during the actual system implementation. Initially, we planned to manage calendar storage directly within our own database schema. However, during development, we decided to integrate Baikal — an open-source, self-hosted CalDAV server — to handle calendar data following the CalDAV standard.
+The original database design, illustrated in \textbf{Figure~\ref{fig:er-diagram}} and \textbf{Figure~\ref{fig:relational-schema},} was adapted during the actual system implementation. Initially, we planned to manage calendar storage directly within our own database schema. However, during development, we decided to integrate Baikal — an open-source, self-hosted CalDAV server — to handle calendar data following the CalDAV standard.
 
 As a result, several tables from the original ERD were removed or replaced. The Falak backend continues to manage user accounts, authentication methods, WhatsApp message extraction, device IDs, and notification tracking, while Baikal independently handles all calendar-related storage.
 
-The updated database design for the Falak backend, reflecting these changes, is shown in Figure~\ref{fig:updated-er-diagram} and Figure~\ref{fig:updated-relational-schema} below.
+The updated database design for the Falak backend, reflecting these changes, is shown in \textbf{Figure~\ref{fig:updated-er-diagram}} and \textbf{Figure~\ref{fig:updated-relational-schema}} below.
 
 \begin{figure}[!h]
     \centering
@@ -156,35 +156,51 @@ Other tables related to address books, scheduling, and WebDAV-specific functiona
 
 \section{Implementation of Core Functionalities}
 
-\subsection{Authentication} \label{subsec:authentication}
+\subsection{Authentication and Sending Welcome Email} \label{subsec:authentication}
 
-The authentication flow supports both magic links (email-based) and Google OAuth. Users receive a signed JWT upon authentication, which is used for subsequent requests.
+Jadwal supports two authentication methods: \textbf{Email Magic Link} and \textbf{Google OAuth}. Both methods follow a stateless, token-based flow that returns a signed JWT (access + refresh token) after identity is verified.
 
-We call it authentication since we don't differentiate between making an account and logging in — the user simply `continues' with a method, either Email with Magic Link or Google OAuth. If they already have an account, we just give them a token; if they don't, we create an account, send a welcome email, and then give them the tokens.
+\textbf{Continue with Email.} When a user enters their email, the app calls the \texttt{InitiateEmail} RPC.
+The backend creates the customer (if new), generates a magic token, and stores its SHA-256 hash.
+A magic link is constructed and sent using the Resend email service. When the user clicks the link, the app captures the token and calls \texttt{CompleteEmail}.The backend verifies the token, and if valid, issues access and refresh tokens. This flow is shown in \textbf{Figure~\ref{fig:seq/continue-with-email}}.
 
-We generate access tokens (short-lived) and refresh tokens (long-lived), which are stored securely on the device. Magic tokens are hashed using SHA-256 before being stored in the database. For added security, we invalidate the refresh token upon logout, and all tokens are verified using digital signatures.
+To check if the user is logging in for the first time, we run the following SQL query during \texttt{CompleteEmail}:
 
-The login flow is fully stateless and scalable. We implemented it using ConnectRPC to ensure it works smoothly not just for iOS but also for future clients like a web app.
+\begin{lstlisting}[language=SQL, caption={Check for First Login}, label={lst:is-first-login}]
+-- name: IsCustomerFirstLogin :one
+SELECT (
+  NOT EXISTS (
+    SELECT 1 FROM magic_token WHERE customer_id = $1 AND used_at IS NOT NULL
+  )
+  AND NOT EXISTS (
+    SELECT 1 FROM auth_google WHERE customer_id = $1
+  )
+) AS is_customer_first_login;
+\end{lstlisting}
+
+\textbf{Continue with Google.} For Google sign-in, the app performs an OAuth flow, retrieves an \texttt{idToken}, and calls \texttt{UseGoogle} RPC. The backend verifies the token with Google's servers, fetches the user's profile, and either links or creates a customer record. After successful authentication, the backend issues the JWT tokens. This flow is shown in \textbf{Figure~\ref{fig:seq/continue-with-google}}.
+
+\textbf{Send Welcome Email.} If the user is identified as new (based on the query in \textbf{Listing~\ref{lst:is-first-login}}), we trigger a welcome email via a unified \texttt{emailer} interface. For production, we used the Resend implementation; for local testing, we used a stdout-based mock. This interface-driven design allowed us to switch implementations easily. The sequence is shown in \textbf{Figure~\ref{fig:seq/send-welcome-email}}.
 
 \subsection{Connect WhatsApp}
 
-Connecting the user's WhatsApp account is an important feature. It allows Jadwal's system to securely read the user's messages (after encryption) to analyze them for events or meeting agreements using an LLM, more on that in Subsection~\ref{subsec:whatsapp-event-extraction}.
+Connecting the user's WhatsApp account is an important feature. It allows Jadwal's system to securely read the user's messages (after encryption) to analyze them for events or meeting agreements using an LLM, more on that in \textbf{Subsection~\ref{subsec:whatsapp-event-extraction}}.
 
 The process starts when the user clicks `Connect WhatsApp' in the app. They are asked to enter their mobile number, and once they submit, the Falak backend talks to the Wasapp service to create a new WhatsApp session.
 
-The user is shown an 8-character code to enter inside the official WhatsApp app. We also deep-link the user into the correct screen in WhatsApp if possible. If not, the app gives clear instructions on how to manually reach it.
+The user is shown an 8-character code to enter inside the official WhatsApp app. The user usually gets a conflict . If not, the app gives clear instructions on how to manually reach it.
 
 This method — using a code instead of QR scanning — makes the experience smoother on the same device. The app polls Falak to check connection status. If it fails, they can retry; if it succeeds, the user sees a success screen explaining that Jadwal is now securely monitoring messages.
 
 On the server side, we launch a Chrome instance using whatsapp-web.js. Our Wasapp service abstracts this with an API that lets Falak create sessions, delete them, and check their status.
 
-When connected, the Wasapp service produces the received messages into a RabbitMQ queue (wasapp.messages), ready for backend processing (see Subsection~\ref{subsec:whatsapp-event-extraction}).
+When connected, the Wasapp service produces the received messages into a RabbitMQ queue (wasapp.messages), ready for backend processing (see \textbf{Subsection~\ref{subsec:whatsapp-event-extraction}}).
 
 \subsection{View Integrated Calendar}
 
 When a user first opens Jadwal, they are asked for permission to access their on-device calendars. This allows us to show an integrated calendar view, month by month, without building a full CalDAV server and client — which would have been too ambitious for the time frame and hard due to limited online resources.
 
-Instead, we used Baikal as a ready CalDAV server. We create accounts for users and let iOS handle syncing via its already battle-tested Calendar app integration (more about setup later in Subsection~\ref{subsec:connect-calendar}).
+Instead, we used Baikal as a ready CalDAV server. We create accounts for users and let iOS handle syncing via its already battle-tested Calendar app integration (more about setup later in \textbf{Subsection~\ref{subsec:connect-calendar}}).
 
 Users can view, add, and edit events directly inside the Jadwal app with a familiar native-like experience, ensuring ease of use.
 
@@ -211,11 +227,11 @@ The prompt sent to the LLM includes the full message history wrapped in structur
     \item \texttt{HAS\_EVENT\_AGREED}: An event was confirmed; additional fields like title, dates, and location are returned.
 \end{itemize}
 
-When an event is confirmed, it is published to the \texttt{wasapp.calendar.events} queue and added under the user’s special WhatsApp Events calendar. We also send an alert notification to inform the user, and a silent one to trigger conflict detection (see Section~\ref{subsec:conflict-resolution}).
+When an event is confirmed, it is published to the \texttt{wasapp.calendar.events} queue and added under the user’s special WhatsApp Events calendar. We also send an alert notification to inform the user, and a silent one to trigger conflict detection (see \textbf{Section~\ref{subsec:conflict-resolution}}).
 
 The LLM integration is stateless and fully abstracted behind a Go service. During our testing, the system processed and extracted events faster than the original WhatsApp notifications arrived on the device.
 
-For the full prompt template and formatting details, refer to Appendix~\ref{appendix:llm-prompt}.
+For the full prompt template and formatting details, refer to \textbf{Appendix~\ref{appendix:llm-prompt}}.
 
 \subsection{Conflict Resolution} \label{subsec:conflict-resolution}
 
@@ -275,6 +291,8 @@ Security was a core consideration throughout Jadwal's development. The system is
     \item \textbf{JWT-Based Stateless Authentication} – All requests are authenticated via signed JSON Web Tokens that include expiry and identity claims. Tokens are verified on every request via a middleware or interceptor.
     \item \textbf{Encrypted WhatsApp Messages} – WhatsApp messages are encrypted before being saved to the database to protect sensitive information in case of unauthorized access.
     \item \textbf{DNS \& DDoS Protection} – Cloudflare is used to manage DNS, enforce HTTPS, and provide protection against common web threats including DDoS and bot abuse.
+    \item \textbf{Environment Variables} – Secrets such as API keys, passwords, and config values are never committed to version control. Instead, we use a \texttt{.env} file (ignored by Git) to manage them. A companion \texttt{.env.example} file in our repository documents all required keys for local or production environments. In production, we SSH into the server to edit the real \texttt{.env} file manually as needed — especially when deploying features that depend on new variables. This separation ensures safety while allowing GitHub Actions to pick up changes without code rewrites.
+
 \end{itemize}
 
 \section{Testing Methodology}
@@ -371,7 +389,7 @@ PostHog was integrated to capture real user session flows and validate behaviora
 
 \subsubsection*{Email Authentication Flow}
 
-The flow for email-based authentication is illustrated in Figure~\ref{fig:email-auth-flow}. The process begins when the user enters their email address into the app. The backend then triggers the \texttt{InitiateEmail} method, which sends a one-time magic link via email. When the user clicks the link, they are redirected back into the app, which captures the token embedded in the link. This token is then sent to the backend's \texttt{CompleteEmail} endpoint for validation. If valid, the backend issues access and refresh tokens, completing the login process.
+The flow for email-based authentication is illustrated in \textbf{Figure~\ref{fig:email-auth-flow}}. The process begins when the user enters their email address into the app. The backend then triggers the \texttt{InitiateEmail} method, which sends a one-time magic link via email. When the user clicks the link, they are redirected back into the app, which captures the token embedded in the link. This token is then sent to the backend's \texttt{CompleteEmail} endpoint for validation. If valid, the backend issues access and refresh tokens, completing the login process.
 
 \begin{figure}[h!]
     \centering
@@ -395,7 +413,7 @@ The flow for email-based authentication is illustrated in Figure~\ref{fig:email-
 
 \subsubsection*{WhatsApp Connection Flow}
 
-The WhatsApp connection flow is shown in Figure~\ref{fig:whatsapp-flow}. The user starts by entering their phone number, which is sent to the backend to initiate a pairing session using \texttt{StartWhatsAppConnection}. A unique pairing code is generated and displayed to the user. Meanwhile, the app begins polling the backend using \texttt{CheckStatus} to monitor the session state. The outcome of this polling could be one of three states: successful connection, still pending, or failure (e.g., user did not enter the code or session expired).
+The WhatsApp connection flow is shown in \textbf{Figure~\ref{fig:whatsapp-flow}}. The user starts by entering their phone number, which is sent to the backend to initiate a pairing session using \texttt{StartWhatsAppConnection}. A unique pairing code is generated and displayed to the user. Meanwhile, the app begins polling the backend using \texttt{CheckStatus} to monitor the session state. The outcome of this polling could be one of three states: successful connection, still pending, or failure (e.g., user did not enter the code or session expired).
 
 \begin{figure}[h!]
     \centering
@@ -422,7 +440,7 @@ The WhatsApp connection flow is shown in Figure~\ref{fig:whatsapp-flow}. The use
 
 \subsection*{OAuth 2.0 Flow for Google Authentication}
 
-Figure~\ref{fig:oauth-flow} illustrates the OAuth 2.0 login flow used for Google authentication. The mobile app initiates the flow by redirecting the user to Google's consent screen. Upon user approval, Google returns an \texttt{idToken} to the app. The app then forwards this token to the backend, which verifies it using Google's public keys and extracts the authenticated user's identity. This flow ensures secure, federated login without requiring the app to handle passwords directly.
+\textbf{Figure~\ref{fig:oauth-flow}} illustrates the OAuth 2.0 login flow used for Google authentication. The mobile app initiates the flow by redirecting the user to Google's consent screen. Upon user approval, Google returns an \texttt{idToken} to the app. The app then forwards this token to the backend, which verifies it using Google's public keys and extracts the authenticated user's identity. This flow ensures secure, federated login without requiring the app to handle passwords directly.
 
 \begin{figure}[h!]
     \centering
@@ -455,7 +473,7 @@ Each integration flow was tested end-to-end using a simulated user input and bac
 
 In each flow, PostHog was used to observe real-time user actions, allowing us to validate the actual experience and detect any discrepancies between backend and frontend states.
 
-For full test case executions and their actual outcomes, please refer to Appendix~\ref{appendix:test-execution}.
+For full test case executions and their actual outcomes, please refer to \textbf{Appendix~\ref{appendix:test-execution}}.
 
 \section{Comparison to Original Specification}
 
