@@ -69,7 +69,7 @@ class AuthViewModel: ObservableObject {
             
             do {
                 let response = try await authRepository.useGoogle(googleToken: googleToken)
-                PostHogSDK.shared.identify(response.userID)
+                PostHogSDK.shared.identify(response.userID, userProperties: ["email": response.email])
                 PostHogSDK.shared.capture("continue_with_google_success")
                 await MainActor.run {
                     KeychainManager.shared.saveToken(response.accessToken)
