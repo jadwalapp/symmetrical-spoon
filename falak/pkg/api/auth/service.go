@@ -308,8 +308,10 @@ func (s *service) UseGoogle(ctx context.Context, r *connect.Request[authv1.UseGo
 
 	return &connect.Response[authv1.UseGoogleResponse]{
 		Msg: &authv1.UseGoogleResponse{
-			AccessToken: token,
-			UserId:      customer.ID.String(),
+			AccessToken:  token,
+			UserId:       customer.ID.String(),
+			RefreshToken: "",
+			Email:        customer.Email,
 		},
 	}, nil
 }
