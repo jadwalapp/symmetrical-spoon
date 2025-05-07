@@ -183,25 +183,30 @@
 \addcontentsline{toc}{chapter}{Conclusion}
 \markboth{Conclusion}{}
 
-In a fast-paced and interconnected world, everyone struggles to manage their time efficiently, especially for someone who has multiple tasks every day. Jadwal addresses all these challenges by introducing features that help bridge gaps left by existing calendar applications. Jadwal ensures a user-friendly interface for users to manage their schedules and avoid missing important events.
+In a fast-paced and interconnected world, everyone struggles to manage their time efficiently, especially for someone who has multiple tasks every day. Jadwal addresses these challenges by introducing features that bridge the gaps left by existing calendar applications. It offers a user-friendly interface for managing schedules and reducing the risk of missing important events.
 
-Jadwal integrates with CalDAV, a standardized protocol that facilitates seamless synchronization across various calendar platforms. This enables users to effortlessly connect and manage their calendars from different devices and applications, such as Apple Calendar and Google Calendar, bringing everything together into a unified ecosystem.
+Jadwal integrates with CalDAV, a standardized protocol that facilitates seamless synchronization across calendar platforms. This allows users to connect and manage their calendars from various devices and applications, such as Apple Calendar and Google Calendar, bringing everything together into a unified ecosystem.
 
-A standout feature is Jadwal's use of a state-of-the-art LLM for WhatsApp event extraction. By analyzing informal conversations where events are often agreed upon, Jadwal ensures that no appointment or commitment is missed — even those that happen casually through chat.
+A standout feature of Jadwal is its use of a state-of-the-art LLM to extract events from WhatsApp conversations. By analyzing informal chats where events are often agreed upon, Jadwal ensures that no appointment or commitment is overlooked — even those made casually.
 
-The scheduling of prayer times highlights Jadwal's sensitivity to user culture and daily priorities. By making prayer times first-class citizens in the calendar, Jadwal empowers users to plan their day around their values.
+The system also prioritizes cultural needs by supporting prayer time scheduling, empowering users to plan their day around their values. Conflict management enhances user control, providing clear options to resolve overlapping events and minimizing scheduling issues.
 
-Conflict management is another feature that enhances user control, offering clear options for resolving overlapping events, thereby minimizing the risk of missed or mishandled appointments. By integrating and managing all calendars under one roof, Jadwal simplifies time management in a way few other applications achieve.
+From a technical perspective, Jadwal applies modern software practices across mobile and backend systems: SwiftUI for front-end development, Golang and ConnectRPC for backend services, RabbitMQ for messaging, and Docker with Traefik for deployment and CI/CD automation. Throughout the project, a focus on security, modularity, and maintainability was maintained.
 
-Throughout the project, we adopted a systematic approach. Detailed use cases mapped user interactions clearly, covering core flows like account setup, WhatsApp integration, calendar connection, prayer scheduling, and conflict resolution. The database design and system architecture provided a solid technical backbone, ensuring scalability, security, and maintainability.
+A key moment of adaptation was the decision to integrate Baikal instead of building a custom calendar backend. This shift taught us the importance of pragmatism, open standards, and leveraging mature open-source solutions.
 
-However, the journey was not without challenges. Initially, we planned to build a custom calendar storage system, but deeper research revealed the complexities of the CalDAV standard. Pivoting to integrating Baikal was a critical learning moment that taught us the importance of adaptability, pragmatic engineering choices, and working with open standards.
+\section*{Future Work}
+\begin{itemize}
+    \item \textbf{Real-time Conflict Detection:} Improve the reliability of conflict suggestions by implementing deeper EventKit integration or investigating proprietary Apple push mechanisms for CalDAV sync triggers.
+    \item \textbf{Deep Linking for Events:} Add support for deep links in push notifications to open new WhatsApp-parsed events directly inside the app for quicker user action.
+    \item \textbf{Fully Automated Onboarding:} Enhance the onboarding flow to automate permission requests, CalDAV profile installation, and WhatsApp connection with minimal user effort.
+    \item \textbf{Expanded Platform Support:} Extend Jadwal to Android and Web platforms to increase reach and ensure cross-device consistency.
+    \item \textbf{LLM Response Tuning:} Further refine the LLM prompt to improve the accuracy of detected event details, such as time zones, ambiguity handling, and location extraction.
+    \item \textbf{User Feedback Loops:} Allow users to correct or dismiss LLM-extracted events to build feedback datasets for model improvement.
+    \item \textbf{Multi-Language Support:} Add localization for Arabic and other languages to make Jadwal more accessible to a wider user base.
+\end{itemize}
 
-Technically, we gained hands-on experience across a wide range of areas: mobile-first design with SwiftUI, backend systems with Golang and ConnectRPC, scalable messaging with RabbitMQ, CI/CD workflows with Docker and Traefik, and security best practices throughout.
-
-Looking ahead, Jadwal can evolve even further. Potential improvements include real-time calendar updates when WhatsApp messages change, deep-linking users directly into new event details, and onboarding flows that fully automate setup. With more resources, Jadwal could expand to Android and web platforms, becoming a complete cross-device scheduling assistant.
-
-In conclusion, Jadwal stands as a unique and innovative calendar solution that bridges real-world scheduling gaps. It combines technical rigor with user-centric design to empower individuals to manage their time more effectively. We are proud of what we achieved and hope Jadwal becomes an inspiration for creating digital tools that respect users' daily realities, cultural values, and personal goals.
+In conclusion, Jadwal stands as a unique and innovative calendar solution that bridges real-world scheduling gaps. It combines technical rigor with user-centric design to help individuals manage their time more effectively. We are proud of what we achieved and hope Jadwal inspires future tools that reflect users' daily realities, cultural values, and personal goals.
 
 % Bibliography
 \bibliography{references}
