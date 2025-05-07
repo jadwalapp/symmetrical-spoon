@@ -114,7 +114,6 @@ In Jadwal, we intentionally selected controlled libraries and frameworks to ensu
 
 The careful selection of these controlled libraries ensured that Jadwal maintained full control over its critical functionality while leveraging proven open-source technologies.
 
-
 \section{Database Implementation}
 
 The original database design, illustrated in \textbf{Figure~\ref{fig:er-diagram}} and \textbf{Figure~\ref{fig:relational-schema},} was adapted during the actual system implementation. Initially, we planned to manage calendar storage directly within our own database schema. However, during development, we decided to integrate Baikal — an open-source, self-hosted CalDAV server — to handle calendar data following the CalDAV standard.
@@ -153,6 +152,98 @@ The key Baikal tables relevant to Jadwal's functionality are summarized below:
 
 Other tables related to address books, scheduling, and WebDAV-specific functionality (e.g., locks, subscriptions) were unused in our implementation. Baikal's database provided a mature and reliable backend for event storage without requiring us to reinvent a full calendar system.
 
+\section{Jadwal Front-End}
+
+Jadwal was created for universal users, with an emphasis on ease of use and simplicity. It is made using Swift UI. Below we show the wireframes we made that allowed us to deliver the app in its final form. Then we discuss some of the user flows in the app.
+
+\subsection{Wireframes}
+
+These wireframes give an overview of the design and layout we made in the app. Although we made is using Swift UI, the wireframe we made helped us get higher quality results.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/front-end1.png}
+    \caption{Login Page: Continue with Email and Continue with Google}
+    \label{fig:wireframe-login}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/front-end2.png}
+    \caption{Event Management: Add New Event and Edit Event Screens}
+    \label{fig:wireframe-events}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/front-end3.png}
+    \caption{Settings Screen: Connect WhatsApp and Connect CalDAV}
+    \label{fig:wireframe-settings}
+\end{figure}
+
+\subsection{User Flows}
+
+User flows illustrate step-by-step interactions in core features. It is an expansion over the activity diagram we had in \textbf{Figure~\ref{fig:activity-diagram}}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/Login user flow.drawio.png}
+    \caption{User Flow: Continue with Email, Google, and Welcome Email}
+    \label{fig:userflow-login}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/add jadwal calendar to ios calendar account.png}
+    \caption{User Flow: Connect Calendar via iOS Calendar Account}
+    \label{fig:userflow-connect-calendar}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/connect whatsap.drawio.png}
+    \caption{User Flow: Connect WhatsApp}
+    \label{fig:userflow-connect-whatsapp}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/add event.drawio.png}
+    \caption{User Flow: Add New Event}
+    \label{fig:userflow-add-event}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/schedual prayer.drawio.png}
+    \caption{User Flow: Schedule Prayer Times}
+    \label{fig:userflow-schedule-prayer}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/Edit event.drawio.png}
+    \caption{User Flow: Edit Event}
+    \label{fig:userflow-edit-event}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/Manage calendar.drawio.png}
+    \caption{User Flow: Manage Calendar}
+    \label{fig:userflow-manage-calendar}
+\end{figure}
+
+\subsection{App Navigation Map (Sitemap)}
+
+\textbf{Figure~\ref{fig:sitemap}} shows ths app navigation map, or what usually we calla  sitemap in a website. We chose to make it for the app to help illustrate the different flows in the app easily.
+
+\begin{figure}[H]`'
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/JadwalSitemap.drawio.png}
+    \caption{Navigation Flow Diagram of Jadwal App}
+    \label{fig:sitemap}
+\end{figure}
 
 \section{Implementation of Core Functionalities}
 
@@ -303,7 +394,9 @@ PostHog was integrated to capture real user session flows and validate behaviora
 
 \section{Test Design}
 
-\subsection*{Unit Test Design}
+Here we design test cases, both unit and integration. We use methods like ISP and Graph-based testing to visualize and design the tests.
+
+\subsection{Unit Test Design}
 
 \subsubsection*{1. \texttt{InitiateEmail(String email)}}
 
@@ -385,7 +478,7 @@ PostHog was integrated to capture real user session flows and validate behaviora
 \end{tabular}
 \end{table}
 
-\subsection*{Integration Test Design}
+\subsection{Integration Test Design}
 
 \subsubsection*{Email Authentication Flow}
 
@@ -437,8 +530,7 @@ The WhatsApp connection flow is shown in \textbf{Figure~\ref{fig:whatsapp-flow}}
     \label{fig:whatsapp-flow}
 \end{figure}
     
-
-\subsection*{OAuth 2.0 Flow for Google Authentication}
+\subsection{OAuth 2.0 Flow for Google Authentication}
 
 \textbf{Figure~\ref{fig:oauth-flow}} illustrates the OAuth 2.0 login flow used for Google authentication. The mobile app initiates the flow by redirecting the user to Google's consent screen. Upon user approval, Google returns an \texttt{idToken} to the app. The app then forwards this token to the backend, which verifies it using Google's public keys and extracts the authenticated user's identity. This flow ensures secure, federated login without requiring the app to handle passwords directly.
 
@@ -461,7 +553,7 @@ The WhatsApp connection flow is shown in \textbf{Figure~\ref{fig:whatsapp-flow}}
 
 \textbf{Why it matters:} The \texttt{idToken} is a signed JWT. We test it for validity, expiration, and structural integrity.
 
-\subsection*{Integration Test Execution}
+\subsection{Integration Test Execution}
 
 Each integration flow was tested end-to-end using a simulated user input and backend inspection.
 
