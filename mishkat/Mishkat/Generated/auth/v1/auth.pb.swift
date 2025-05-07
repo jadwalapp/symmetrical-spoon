@@ -99,6 +99,8 @@ public struct Auth_V1_CompleteEmailResponse: Sendable {
 
   public var userID: String = String()
 
+  public var email: String = String()
+
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   public init() {}
@@ -126,6 +128,8 @@ public struct Auth_V1_UseGoogleResponse: Sendable {
   public var refreshToken: String = String()
 
   public var userID: String = String()
+
+  public var email: String = String()
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -282,6 +286,7 @@ extension Auth_V1_CompleteEmailResponse: SwiftProtobuf.Message, SwiftProtobuf._M
     1: .standard(proto: "access_token"),
     2: .standard(proto: "refresh_token"),
     3: .standard(proto: "user_id"),
+    4: .same(proto: "email"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -293,6 +298,7 @@ extension Auth_V1_CompleteEmailResponse: SwiftProtobuf.Message, SwiftProtobuf._M
       case 1: try { try decoder.decodeSingularStringField(value: &self.accessToken) }()
       case 2: try { try decoder.decodeSingularStringField(value: &self.refreshToken) }()
       case 3: try { try decoder.decodeSingularStringField(value: &self.userID) }()
+      case 4: try { try decoder.decodeSingularStringField(value: &self.email) }()
       default: break
       }
     }
@@ -308,6 +314,9 @@ extension Auth_V1_CompleteEmailResponse: SwiftProtobuf.Message, SwiftProtobuf._M
     if !self.userID.isEmpty {
       try visitor.visitSingularStringField(value: self.userID, fieldNumber: 3)
     }
+    if !self.email.isEmpty {
+      try visitor.visitSingularStringField(value: self.email, fieldNumber: 4)
+    }
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -315,6 +324,7 @@ extension Auth_V1_CompleteEmailResponse: SwiftProtobuf.Message, SwiftProtobuf._M
     if lhs.accessToken != rhs.accessToken {return false}
     if lhs.refreshToken != rhs.refreshToken {return false}
     if lhs.userID != rhs.userID {return false}
+    if lhs.email != rhs.email {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
@@ -358,6 +368,7 @@ extension Auth_V1_UseGoogleResponse: SwiftProtobuf.Message, SwiftProtobuf._Messa
     1: .standard(proto: "access_token"),
     2: .standard(proto: "refresh_token"),
     3: .standard(proto: "user_id"),
+    4: .same(proto: "email"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -369,6 +380,7 @@ extension Auth_V1_UseGoogleResponse: SwiftProtobuf.Message, SwiftProtobuf._Messa
       case 1: try { try decoder.decodeSingularStringField(value: &self.accessToken) }()
       case 2: try { try decoder.decodeSingularStringField(value: &self.refreshToken) }()
       case 3: try { try decoder.decodeSingularStringField(value: &self.userID) }()
+      case 4: try { try decoder.decodeSingularStringField(value: &self.email) }()
       default: break
       }
     }
@@ -384,6 +396,9 @@ extension Auth_V1_UseGoogleResponse: SwiftProtobuf.Message, SwiftProtobuf._Messa
     if !self.userID.isEmpty {
       try visitor.visitSingularStringField(value: self.userID, fieldNumber: 3)
     }
+    if !self.email.isEmpty {
+      try visitor.visitSingularStringField(value: self.email, fieldNumber: 4)
+    }
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -391,6 +406,7 @@ extension Auth_V1_UseGoogleResponse: SwiftProtobuf.Message, SwiftProtobuf._Messa
     if lhs.accessToken != rhs.accessToken {return false}
     if lhs.refreshToken != rhs.refreshToken {return false}
     if lhs.userID != rhs.userID {return false}
+    if lhs.email != rhs.email {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }

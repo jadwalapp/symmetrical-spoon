@@ -57,3 +57,81 @@ func CreateTimeTag(time string) string {
 	return fmt.Sprintf("<time>%s</time>", time)
 }
 \end{lstlisting}
+
+
+\chapter{Test Execution Results}
+\label{appendix:test-execution}
+
+\subsection*{InitiateEmail Tests}
+
+\begin{longtable}{|p{1cm}|p{2cm}|p{3cm}|p{2.5cm}|p{3cm}|p{1.5cm}|}
+\hline
+\textbf{ID} & \textbf{Combination} & \textbf{Description} & \textbf{Expected Output} & \textbf{Actual Output} & \textbf{Status} \\
+\hline
+1 & A1 & Valid email format & Magic link sent & Magic link sent & Success \\
+\hline
+2 & A2 & Invalid email format & Validation error & Please enter a valid email & Fail \\
+\hline
+3 & A3 & Empty email field & Validation error & Email is required & Fail \\
+\hline
+\end{longtable}
+
+\subsection*{CompleteEmail Tests}
+
+\begin{longtable}{|p{1cm}|p{2cm}|p{3.2cm}|p{2.5cm}|p{3cm}|p{1.5cm}|}
+\hline
+\textbf{ID} & \textbf{Combination} & \textbf{Description} & \textbf{Expected Output} & \textbf{Actual Output} & \textbf{Status} \\
+\hline
+1 & B1 & Valid magic token & Login successful & Login successful & Success \\
+\hline
+2 & B2 & Expired or invalid token & Authentication failure & Invalid token & Fail \\
+\hline
+3 & B3 & Empty token input & Validation error & Token is required & Fail \\
+\hline
+\end{longtable}
+
+\subsection*{GoogleAuthentication Tests}
+
+\begin{longtable}{|p{1cm}|p{2cm}|p{3.2cm}|p{2.5cm}|p{3cm}|p{1.5cm}|}
+\hline
+\textbf{ID} & \textbf{Combination} & \textbf{Description} & \textbf{Expected Output} & \textbf{Actual Output} & \textbf{Status} \\
+\hline
+1 & C1 & Valid idToken & Login successful & Login successful & Success \\
+\hline
+2 & C2 & Expired token & Rejected & Token expired & Fail \\
+\hline
+3 & C3 & Malformed token & Validation error & Invalid JWT format & Fail \\
+\hline
+4 & C4 & Empty token & Validation error & Token is required & Fail \\
+\hline
+\end{longtable}
+
+\subsection*{StartWhatsAppConnection Tests}
+
+\begin{longtable}{|p{1cm}|p{2cm}|p{3.5cm}|p{2.5cm}|p{2.5cm}|p{1.5cm}|}
+\hline
+\textbf{ID} & \textbf{Combination} & \textbf{Description} & \textbf{Expected Output} & \textbf{Actual Output} & \textbf{Status} \\
+\hline
+1 & D1 & Valid international number & Pairing code shown & Code displayed & Success \\
+\hline
+2 & D2 & Invalid phone format & Validation error & Invalid phone number & Fail \\
+\hline
+3 & D3 & Empty input & Validation error & Phone number required & Fail \\
+\hline
+\end{longtable}
+
+\subsection*{CheckWhatsAppConnectionStatus Tests}
+
+\begin{longtable}{|p{1cm}|p{2cm}|p{3.8cm}|p{2.5cm}|p{2.5cm}|p{1.5cm}|}
+\hline
+\textbf{ID} & \textbf{Combination} & \textbf{Description} & \textbf{Expected Output} & \textbf{Actual Output} & \textbf{Status} \\
+\hline
+1 & E1 & Connection complete & Success screen & Success screen & Success \\
+\hline
+2 & E2 & Still pending & Show waiting state & Waiting for confirmation & Pending \\
+\hline
+3 & E3 & Failed attempt & Show error state & Connection failed & Fail \\
+\hline
+4 & E4 & Expired session & Show timeout error & Code expired & Fail \\
+\hline
+\end{longtable}

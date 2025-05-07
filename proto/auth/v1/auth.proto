@@ -25,6 +25,7 @@ message CompleteEmailResponse {
     string access_token = 1;
     string refresh_token = 2;
     string user_id = 3;
+    string email = 4;
 }
 
 message UseGoogleRequest {
@@ -35,6 +36,7 @@ message UseGoogleResponse {
     string access_token = 1;
     string refresh_token = 2;
     string user_id = 3;
+    string email = 4;
 }
 
 enum MagicTokenType {
