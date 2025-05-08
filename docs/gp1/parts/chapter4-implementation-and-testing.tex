@@ -129,13 +129,13 @@ The updated database design for the Falak backend, reflecting these changes, is 
     \label{fig:updated-er-diagram}
 \end{figure}
 
-% TODO: make this a relational one with draw.io, based on the one above :D
-% \begin{figure}[!h]
-%     \centering
-%     \includegraphics[width=\textwidth]{images/updated-database-schema-relational.png}
-%     \caption{Updated Relational Schema (Falak)}
-%     \label{fig:updated-relational-schema}
-% \end{figure}
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=\textwidth]{images/new-relational.png}
+    \caption{Updated Relational Schema (Falak)}
+    \label{fig:updated-relational-schema}
+\end{figure}
+
 
 \subsection{Baikal Database Schema}
 
@@ -273,6 +273,10 @@ SELECT (
 
 \textbf{Send Welcome Email.} If the user is identified as new (based on the query in \textbf{Listing~\ref{lst:is-first-login}}), we trigger a welcome email via a unified \texttt{emailer} interface. For production, we used the Resend implementation; for local testing, we used a stdout-based mock. This interface-driven design allowed us to switch implementations easily. The sequence is shown in \textbf{Figure~\ref{fig:seq/send-welcome-email}}.
 
+\subsection{Logout} \label{subsec:logotu}
+
+For logout, we implemented it easily and quickly since it jus about deleting the tokens from the user's mobile device. This ensures we leave no trails and no tokens for attackers to use.
+
 \subsection{Connect WhatsApp}
 
 Connecting the user's WhatsApp account is an important feature. It allows Jadwal's system to securely read the user's messages (after encryption) to analyze them for events or meeting agreements using an LLM, more on that in \textbf{Subsection~\ref{subsec:whatsapp-event-extraction}}.
@@ -359,6 +363,56 @@ The flow:
 \end{itemize}
 
 Magic tokens are hashed securely using SHA-256 and are one-time use only. The user barely notices all this complexity — for them, it’s just a smooth "click and go" experience.
+
+\subsection{Add Events Manually} \label{subsec:add-events-manually}
+
+In addition to automatic event extraction, Jadwal allows users to add events manually through a familiar calendar interface. Instead of building a custom event form from scratch, we integrated Apple’s built-in calendar event editor to ensure a consistent and reliable user experience.
+
+When users tap “Add Event” inside the app, the system opens the standard iOS event editor, which supports entering event titles, start and end times, locations, alerts, and other metadata. This is the same interface used across the native Calendar app, reducing the learning curve for users.
+
+Technically, this was achieved by embedding the native iOS event editor into our SwiftUI-based app. We used a wrapper technique that bridges UIKit (Apple’s older UI framework) with SwiftUI, allowing us to present Apple’s event editor as part of our flow while keeping the UI consistent.
+
+This approach gave us several advantages:
+\begin{itemize}
+    \item It ensured full compatibility with iOS calendars and system-wide settings.
+    \item It significantly reduced development time and maintenance complexity.
+    \item It allowed users to access advanced features like event alerts, recurrence, and notes without additional code.
+\end{itemize}
+
+Once a user saves or cancels the event, the view is dismissed, and the updated calendar data is reflected in the app. This feature complements Jadwal’s automated event detection and offers full flexibility to users who prefer manual control.
+
+\subsection{Create New Calendars Manually} \label{subsec:create-calendar}
+
+In Jadwal, users can create their own custom calendars directly within the app. This feature was implemented to allow flexibility in organizing different types of events — such as separating work, personal, and WhatsApp-imported schedules — while leveraging iOS's native calendar infrastructure.
+
+To provide a seamless and robust experience, we used Apple’s built-in EventKit framework. EventKit is a system API that manages all user calendar data on iOS. Rather than reinventing calendar synchronization or storage logic, we delegated those responsibilities to EventKit and focused on creating a smooth user interface for calendar creation.
+
+When a user opens the “Calendars” sheet via the toolbar icon, they are presented with a list of available calendar accounts (such as iCloud, local, or CalDAV) and a “+” button to add a new calendar. Upon tapping this button, a form is presented where the user can:
+\begin{itemize}
+    \item Enter the name of the new calendar
+    \item Select a color for visual identification
+    \item Choose the calendar account to which the new calendar will be added (e.g., iCloud, Baikal)
+\end{itemize}
+
+The app then uses EventKit to create and save the calendar. If permissions are not granted, the app displays a prompt asking the user to enable access in the system settings. Calendar creation happens locally on-device, and synchronization with remote accounts (e.g., CalDAV) is handled transparently by iOS.
+
+This implementation ensures that users can manage their calendars natively without needing a network connection for basic actions. It also ensures that all calendars created are fully compatible with other iOS apps, including the built-in Calendar app.
+
+For a detailed overview of the underlying flow and user interactions, refer to the Create Calendar sequence diagram in \textbf{Figure~\ref{fig:seq/create-calendar}}.
+
+\subsection{Receive Event Notifications} \label{subsec:receive-event-notifications}
+
+Although this feature was designed and planned in our architecture, due to time constraints, we did not fully implement local notifications in the current version of Jadwal. However, the system structure is prepared for it.
+
+The intended flow is for users to receive timely alerts based on calendar events that include a reminder. This would be handled using Apple's native notification system, \texttt{UNUserNotificationCenter}. Once implemented, the system would:
+
+\begin{itemize}
+    \item Periodically read all upcoming events with reminders using EventKit
+    \item Schedule local notifications to appear shortly before each event
+    \item Handle notification permission logic and fallback cases gracefully
+\end{itemize}
+
+This feature remains as an item for future work, as described in \textbf{Section~\ref{sec:future-work}}, and its sequence is illustrated in \textbf{Figure~\ref{fig:seq/receive-event-notifications}}.
 
 \section{Our Journey in Getting to Baikal}
 
