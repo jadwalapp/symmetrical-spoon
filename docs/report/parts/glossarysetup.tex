@@ -1,0 +1,161 @@
+\makeglossaries
+
+\newglossaryentry{calendar}{
+    name={Calendar},
+    description={A list of events and dates within a year that are important to an organization or to the people involved in a particular activity. \cite{def:calendar}}
+}
+
+\newglossaryentry{jadwal}{
+    name={Jadwal},
+    description={Jadwal is a comprehensive time management tool designed to aggregate and optimize your existing calendars and data sources.}
+}
+
+\newglossaryentry{whatsapp}{
+    name={WhatsApp},
+    description={WhatsApp is an alternative to SMS and offers simple, secure, reliable messaging and calling, available on phones all over the world. \cite{whatsapp-about}}
+}
+
+\newglossaryentry{caldav}{
+    name={CalDAV},
+    description={Calendaring Extensions to WebDAV}
+}
+
+\newglossaryentry{webdav}{
+    name={WebDAV},
+    description={Web Distributed Authoring and Versioning (WebDAV) consists of a set of methods, headers, and content-types ancillary to HTTP/1.1 for the management of resource properties, creation and management of resource collections, URL namespace manipulation, and resource locking (collision avoidance). \cite{def:WebDAV}}
+}
+
+\newglossaryentry{golang}{
+    name={Golang},
+    description={Go is an open source project developed by a team at Google and many contributors from the open source community. \cite{def:Golang}}
+}
+
+\newglossaryentry{jwt}{
+    name={JWT},
+    description={JSON Web Tokens are an open, industry standard RFC 7519 method for representing claims securely between two parties. \cite{def:JWT}}
+}
+
+\newglossaryentry{rabbitmq}{
+    name={RabbitMQ},
+    description={An open-source message broker that enables asynchronous communication between services. \cite{def:rabbitmq}}
+}
+
+\newglossaryentry{postgresql}{
+    name={PostgreSQL},
+    description={A powerful, open-source object-relational database system used for storing application data. \cite{def:postgresql}}
+}
+
+\newglossaryentry{swiftui}{
+    name={SwiftUI},
+    description={Apple's declarative framework for building user interfaces across all Apple platforms. \cite{def:swiftui}}
+}
+
+\newglossaryentry{grpc}{
+    name={gRPC},
+    description={A high-performance, open-source universal RPC framework that enables efficient communication between services. \cite{def:grpc}}
+}
+
+\newglossaryentry{connectrpc}{
+    name={Connect RPC},
+    description={A family of libraries for building browser and gRPC-compatible HTTP APIs. Users write a Protocol Buffer schema and implement application logic, and Connect generates code to handle marshaling, routing, compression, and content type negotiation, along with type-safe clients. \cite{def:connectRPC}}
+}
+
+\newglossaryentry{compression}{
+    name={Compression},
+    description={Within Connect RPC, the process of automatically compressing request and response payloads using algorithms like Gzip to reduce network bandwidth. Connect negotiates the use of compression via HTTP headers (e.g., `Accept-Encoding`, `Content-Encoding`).}
+}
+
+\newglossaryentry{contenttypenegotiation}{
+    name={Content Type Negotiation},
+    description={The mechanism used by Connect RPC to determine the data format (e.g., Protobuf binary, JSON) for API communication based on HTTP headers (`Content-Type`, `Accept`). This allows interoperability between different client/server capabilities.}
+}
+
+\newglossaryentry{marshaling}{
+    name={Marshaling},
+    description={In the context of Connect RPC, the serialization (encoding) of Protocol Buffer messages into the wire format (like Protobuf binary or JSON) for transmission, and the corresponding deserialization (decoding) upon receipt. Connect performs this automatically based on the negotiated content type.}
+}
+
+\newglossaryentry{routing}{
+    name={Routing},
+    description={How Connect RPC directs incoming HTTP requests to the appropriate application logic. It maps URL paths derived from the Protocol Buffer service/method definitions (e.g., `/Service/Method`) to the corresponding generated handler code, eliminating manual route setup.}
+}
+
+\newglossaryentry{protobuf}{
+    name={Protocol Buffers},
+    description={A language-neutral, platform-neutral extensible mechanism for serializing structured data. \cite{def:protobuf}}
+}
+
+\newglossaryentry{whatsappwebjs}{
+    name={WhatsApp Web.js},
+    description={A WhatsApp client library that enables programmatic interaction with WhatsApp Web. \cite{def:whatsappwebjs}}
+}
+
+\newglossaryentry{bun}{
+    name={Bun},
+    description={Bun is an all-in-one toolkit for JavaScript and TypeScript apps. It ships as a single executable called bun. \cite{def:bun.sh}}
+}
+
+\newglossaryentry{http2}{
+    name={HTTP/2},
+    description={The second major version of the HTTP protocol, offering improved performance and features. \cite{def:http2}}
+}
+
+\newglossaryentry{https}{
+    name={HTTPS},
+    description={HyperText Transfer Protocol Secure}
+}
+
+\newglossaryentry{ios}{
+    name={iOS},
+    description={iPhone Operating System}
+}
+
+\newglossaryentry{na}{
+    name={N/A},
+    description={Not Applicable}
+}
+
+\newglossaryentry{uc}{
+    name={UC},
+    description={Use Case}
+}
+
+\newglossaryentry{erdiagram}{
+    name={ER diagram},
+    description={Entity Relationship (ER) Diagram is a type of flowchart that illustrates how entities (people, objects, concepts, or data) relate to each other within a system or database.}
+}
+
+\newglossaryentry{sequencediagram}{
+    name={Sequence Diagram},
+    description={An interaction diagram that details how operations are carried out.}
+}
+
+\newglossaryentry{apis}{
+    name={APIs},
+    description={Application programming interface.}
+}
+
+\newglossaryentry{apns}{
+    name={APNs},
+    description={Apple Push Notification service}
+}
+
+\newglossaryentry{magictoken}{
+    name={Magic Token},
+    description={A token to the user to authenticate they own a specific resource, like an email address or temporary access to an endpoint. The user has to send it back to the system to prove they own that resource, since only the owner can receive it.}
+}
+
+\newglossaryentry{magiclink}{
+    name={Magic Link},
+    description={A special type of a Magic Token, that is used for passwordless authentication.}
+}
+
+\newglossaryentry{bearer-authentication}{
+    name={Bearer Authentication},
+    description={Bearer authentication (also called token authentication) is an HTTP authentication scheme that involves security tokens called bearer tokens. The name “Bearer authentication” can be understood as “give access to the bearer of this token.” The bearer token is a cryptic string, usually generated by the server in response to a login request. The client must send this token in the Authorization header when making requests to protected resources. \cite{def:bearer-authentication}}
+}
+
+\newglossaryentry{baikal}{
+    name={Baïkal},
+    description={Baïkal is a lightweight CalDAV+CardDAV server. It offers an extensive web interface with easy management of users, address books and calendars. It is fast and simple to install and only needs a basic php capable server. The data can be stored in a MySQL or a SQLite database. \cite{def:baikal-server}}
+}

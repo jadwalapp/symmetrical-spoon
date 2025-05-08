@@ -1,0 +1,219 @@
+\documentclass[12pt,a4paper,twoside]{report}
+
+% Packages
+\usepackage[margin=1in,bindingoffset=0.5in]{geometry}
+\usepackage{times}
+\usepackage{setspace}
+\usepackage{titlesec}
+\usepackage[nottoc,notlot,notlof]{tocbibind}
+\usepackage{tocloft}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{usecase}
+\usepackage{longtable}
+\usepackage{ragged2e}
+\usepackage{emptypage}
+\usepackage[style=long]{glossaries}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{float}
+
+
+\definecolor{lightgrey}{RGB}{120,120,120}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[R]{\color{lightgrey}\leftmark}
+\fancyfoot[C]{\thepage}
+\setlength{\headheight}{25pt}
+
+\renewcommand{\chaptermark}[1]{\markboth{Chapter \thechapter: #1}{}}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{lightgrey}\leaders\hrule height \headrulewidth\hfill}}
+
+\lstset{
+  basicstyle=\ttfamily\footnotesize,
+  breaklines=true,
+  breakatwhitespace=true,
+  columns=fullflexible,
+  frame=single,
+  backgroundcolor=\color[RGB]{248,248,248},
+  keywordstyle=\color{blue},
+  commentstyle=\color{gray},
+  stringstyle=\color{orange},
+  showstringspaces=false
+}
+
+\doublespacing
+
+\setlist[itemize]{leftmargin=1cm}
+\setlist[enumerate]{leftmargin=1cm}
+
+\setlength{\parskip}{1em}
+\setlength{\parindent}{1em}
+
+% hide links so no color appear, but they still work
+\hypersetup{hidelinks}
+
+% Page numbering
+\pagenumbering{roman}
+
+% Title formatting
+\titleformat{\chapter}{\normalfont\huge\bfseries\uppercase}{\thechapter}{20pt}{\huge}
+
+\input{parts/glossarysetup}
+
+% Document begin
+\begin{document}
+
+% Title Page
+\begin{singlespace}
+    \begin{titlepage}
+        \begin{center}
+            \vspace*{1cm}
+            \includegraphics[height=1cm]{images/yu-logo.png}\\[1cm]
+            {\Large\bfseries AL YAMAMAH UNIVERSITY}\\[0.5cm]
+            {\large College of Engineering and Architecture}\\[0.5cm]
+            {\large Bachelor of Science in Software and Network Engineering}\\[2cm]
+            {\Huge\bfseries
+            \begin{spacing}{1}
+                Jadwal: An Intelligent, iOS-based Calendar Manager
+            \end{spacing}
+            }
+            \vspace{2cm}
+            {\Large\bfseries Graduation Project}\\[2cm]
+            \begin{center}
+                \setlength{\fboxsep}{10pt}
+                \setlength{\fboxrule}{1pt}
+                \fbox{
+                    \begin{tabular}{p{0.45\linewidth}p{0.45\linewidth}}
+                        \multicolumn{2}{c}{\textbf{Group Project Submission}}       \\
+                        \midrule
+                        \textbf{Student Names} & \textbf{Student IDs}               \\
+                        \midrule
+                        YAZED ALKHALAF         & 202211123                          \\
+                        SAIMAN TAKLAS          & 202021400                          \\
+                        AFFAN MOHAMMAD         & 202211086                          \\
+                        ALI BA WAZIR           & 202211018                          \\
+                        \midrule
+                        \multicolumn{2}{l}{\textbf{Submission Date}: 3 Dec 2024}    \\
+                        \multicolumn{2}{l}{\textbf{Supervised By}: Dr. Inayatullah} \\
+                    \end{tabular}
+                }
+            \end{center}
+            \vfill
+            {\large First Semester 2024--2025}
+        \end{center}
+    \end{titlepage}
+\end{singlespace}
+
+\cleardoublepage
+
+\begin{singlespace}
+
+    \chapter*{Abstract}
+    \addcontentsline{toc}{chapter}{Abstract}
+
+    \begin{justify}
+        With rapid globalization, time management has became a real challenge. This paper introduces Jadwal, which proposes an automatic schedule management system where an individual can integrate multiple calendars and extract the events that have been discussed in informal communication channels, such as Whatsapp.
+
+        \textbf{Key Objectives:}
+        \begin{itemize}
+            \item To develop an intelligent calendar management system that automatically extracts events from the informal communication channels like WhatsApp and adds them to the user's main calendar.
+            \item To create a user friendly interface that allows users to easily add events to the calendar.
+            \item To implement a smart resolution system that notifies users of scheduling conflicts and provides easy options for resolution.
+            \item To integrate all the calendars into Jadwal's single calendar view to make viewing and managing all the events easy.
+            \item To prioritize and automatically schedule daily routines such as prayer time.
+            \item To significantly reduce the time users spend on manual calendar management.
+        \end{itemize}
+
+
+        \begin{center}
+            The system will be a mobile application, designed for iOS devices.
+        \end{center}
+    \end{justify}
+
+    \cleardoublepage
+
+    \chapter*{Acknowledgment}
+    \addcontentsline{toc}{chapter}{Acknowledgment}
+
+    \begin{justify}
+        First and foremost, we would like to thank our Graduation project supervisor Dr. Inayatullah for his invaluable guidance and precious time. His advise was instrumental in shaping our project. He provided support in challenging times. Moreover, he emphasized that all members should be involved in each phase of the project and should gain core knowledge and contribute effectively.
+
+        Secondly, we would like to thank all the professors and friends for their insightful recommendations which helped us to enhance our project.
+
+        Lastly, we would like to thank our parents for their unwavering support and for preparing us mentally and physically throughout this journey.
+    \end{justify}
+
+    \cleardoublepage
+
+    \tableofcontents
+
+    \cleardoublepage
+
+    \listoffigures
+
+    \cleardoublepage
+
+    \listoftables
+
+    % glossary / terms and stuff
+    \glsaddall
+    \addcontentsline{toc}{chapter}{List of Abbreviations and Terminology}
+    \printglossary[title={List of Abbreviations and Terminology}]
+
+\end{singlespace}
+
+\cleardoublepage
+
+% Main body (switch to Arabic numerals)
+\pagenumbering{arabic}
+
+\input{parts/chapter1-introduction}
+
+\input{parts/chapter2-literature-review}
+
+\input{parts/chapter3-system-analysis-and-design}
+
+\input{parts/chapter4-implementation-and-testing}
+
+\input{parts/chapter5-findings-after-people-usage}
+
+\chapter*{Conclusion}
+\addcontentsline{toc}{chapter}{Conclusion}
+\markboth{Conclusion}{}
+
+In a fast-paced and interconnected world, everyone struggles to manage their time efficiently, especially for someone who has multiple tasks every day. Jadwal addresses these challenges by introducing features that bridge the gaps left by existing calendar applications. It offers a user-friendly interface for managing schedules and reducing the risk of missing important events.
+
+Jadwal integrates with CalDAV, a standardized protocol that facilitates seamless synchronization across calendar platforms. This allows users to connect and manage their calendars from various devices and applications, such as Apple Calendar and Google Calendar, bringing everything together into a unified ecosystem.
+
+A standout feature of Jadwal is its use of a state-of-the-art LLM to extract events from WhatsApp conversations. By analyzing informal chats where events are often agreed upon, Jadwal ensures that no appointment or commitment is overlooked — even those made casually.
+
+The system also prioritizes cultural needs by supporting prayer time scheduling, empowering users to plan their day around their values. Conflict management enhances user control, providing clear options to resolve overlapping events and minimizing scheduling issues.
+
+From a technical perspective, Jadwal applies modern software practices across mobile and backend systems: SwiftUI for front-end development, Golang and ConnectRPC for backend services, RabbitMQ for messaging, and Docker with Traefik for deployment and CI/CD automation. Throughout the project, a focus on security, modularity, and maintainability was maintained.
+
+A key moment of adaptation was the decision to integrate Baikal instead of building a custom calendar backend. This shift taught us the importance of pragmatism, open standards, and leveraging mature open-source solutions.
+
+\section*{Future Work}
+\begin{itemize}
+    \item \textbf{Real-time Conflict Detection:} Improve the reliability of conflict suggestions by implementing deeper EventKit integration or investigating proprietary Apple push mechanisms for CalDAV sync triggers.
+    \item \textbf{Deep Linking for Events:} Add support for deep links in push notifications to open new WhatsApp-parsed events directly inside the app for quicker user action.
+    \item \textbf{Fully Automated Onboarding:} Enhance the onboarding flow to automate permission requests, CalDAV profile installation, and WhatsApp connection with minimal user effort.
+    \item \textbf{Expanded Platform Support:} Extend Jadwal to Android and Web platforms to increase reach and ensure cross-device consistency.
+    \item \textbf{LLM Response Tuning:} Further refine the LLM prompt to improve the accuracy of detected event details, such as time zones, ambiguity handling, and location extraction.
+    \item \textbf{User Feedback Loops:} Allow users to correct or dismiss LLM-extracted events to build feedback datasets for model improvement.
+    \item \textbf{Multi-Language Support:} Add localization for Arabic and other languages to make Jadwal more accessible to a wider user base.
+\end{itemize}
+
+In conclusion, Jadwal stands as a unique and innovative calendar solution that bridges real-world scheduling gaps. It combines technical rigor with user-centric design to help individuals manage their time more effectively. We are proud of what we achieved and hope Jadwal inspires future tools that reflect users' daily realities, cultural values, and personal goals.
+
+% Bibliography
+\bibliography{references}
+\bibliographystyle{apalike}
+
+\include{parts/appendix}
+
+\end{document}
