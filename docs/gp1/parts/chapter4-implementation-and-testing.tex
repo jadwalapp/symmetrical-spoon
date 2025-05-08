@@ -139,6 +139,8 @@ The updated database design for the Falak backend, reflecting these changes, is 
 
 \subsection{Baikal Database Schema}
 
+
+
 To handle calendar event storage, we integrated Baikal directly without modifying its schema. Baikal follows WebDAV and CalDAV standards and manages calendars, events, user principals, and contact address books internally.
 
 The key Baikal tables relevant to Jadwal's functionality are summarized below:
@@ -149,6 +151,13 @@ The key Baikal tables relevant to Jadwal's functionality are summarized below:
     \item \textbf{calendarinstances} — Links calendars to user principals.
     \item \textbf{principals} — Represents authenticated users within Baikal.
 \end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/GPrelation.drawio (1).png}
+    \caption{Database Scheme}
+    \label{fig:architecture-realization}
+\end{figure}
 
 Other tables related to address books, scheduling, and WebDAV-specific functionality (e.g., locks, subscriptions) were unused in our implementation. Baikal's database provided a mature and reliable backend for event storage without requiring us to reinvent a full calendar system.
 
