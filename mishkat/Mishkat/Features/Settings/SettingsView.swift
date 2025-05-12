@@ -181,13 +181,6 @@ struct SettingsView: View {
                     profileViewModel.getWhatsappAccount()
                 }
         }
-        .sheet(isPresented: $settingsViewModel.showPrayerTimesSetupWebView, onDismiss: {
-            settingsViewModel.prayerTimesWebViewDismissed()
-        }) {
-            if let url = settingsViewModel.prayerTimesSetupURL {
-                SafariViewWrapper(  url: url)
-            }
-        }
     }
 }
 
