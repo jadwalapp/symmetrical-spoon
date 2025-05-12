@@ -71,6 +71,7 @@ func (s *service) SchedulePrayerTimes(ctx context.Context, r *connect.Request[ca
 	}
 
 	cfConnectingHeader := r.Header().Get("CF-Connecting-IP")
+	fmt.Println("headers: %v", r.Header())
 
 	geoResp, err := s.geoLocationClient.GetGeoLocationInfo(ctx, &geolocationclient.GetGeoLocationInfoRequest{
 		Ip: cfConnectingHeader,
@@ -80,7 +81,8 @@ func (s *service) SchedulePrayerTimes(ctx context.Context, r *connect.Request[ca
 		return nil, internalError
 	}
 	fmt.Println("geoResp.Country: %s", geoResp.Country)
-	icalUrl := fmt.Sprintf("https://prayerwebcal.dsultan.com/ics/%s_%s", geoResp.Country, geoResp.City)
+	// icalUrl := fmt.Sprintf("https://prayerwebcal.dsultan.com/ics/%s_%s", geoResp.Country, geoResp.City)
+	icalUrl := fmt.Sprintf("https://prayerwebcal.dsultan.com/ics/%s_%s", "Saudi_Arabia", "Riyadh")
 
 	return &connect.Response[calendarv1.SchedulePrayerTimesResponse]{
 		Msg: &calendarv1.SchedulePrayerTimesResponse{
