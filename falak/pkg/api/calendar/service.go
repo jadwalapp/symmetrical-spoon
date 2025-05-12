@@ -79,7 +79,8 @@ func (s *service) SchedulePrayerTimes(ctx context.Context, r *connect.Request[ca
 		log.Ctx(ctx).Err(err).Msg("failed running GetGeoLocationInfo")
 		return nil, internalError
 	}
-	icalUrl := fmt.Sprintf("https://prayerwebcal.dsultan.com/loc/%s_%s", geoResp.Country, geoResp.City)
+	fmt.Println("geoResp.Country: %s", geoResp.Country)
+	icalUrl := fmt.Sprintf("https://prayerwebcal.dsultan.com/ics/%s_%s", geoResp.Country, geoResp.City)
 
 	return &connect.Response[calendarv1.SchedulePrayerTimesResponse]{
 		Msg: &calendarv1.SchedulePrayerTimesResponse{
