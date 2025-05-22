@@ -1,3 +1,22 @@
+> [!WARNING]
+>
+> **⚠️ Archived**  
+> This repository is no longer actively maintained. Jadwal was successfully completed and presented in May 2025 as a fully working system.
+
+# 🗓️ Jadwal – LLM-Powered Calendar Agent (Archived)
+
+> Jadwal is an intelligent scheduling system that extracts events from WhatsApp conversations using LLMs, syncs with calendars via CalDAV, and provides a native mobile experience.  
+> Built for busy people — students, professionals, or anyone drowning in unstructured messages.
+
+✅ Fully implemented and deployed  
+📦 Stack: Go, Docker, ConnectRPC, SQLC, PlantUML  
+📱 iOS frontend, backend APIs, WhatsApp integration, CalDAV sync  
+📁 Archived after successful delivery — project is complete and stable
+
+📄 [Read the full graduation project report (PDF)](./docs/report/report.pdf)
+
+---
+
 # symmetrical spoon
 
 you know, something :D
